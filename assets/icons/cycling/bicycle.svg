@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" fill="none">
+  <defs>
+    <filter id="sticker-shadow" x="-15%" y="-15%" width="130%" height="135%">
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#141410" flood-opacity="0.16" />
+    </filter>
+  </defs>
+
+  <g transform="rotate(-4 64 68)">
+    <!-- White die-cut sticker border with soft shadow -->
+    <g filter="url(#sticker-shadow)">
+      <!-- Wheels sticker base -->
+      <circle cx="34" cy="82" r="20" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="18" />
+      <circle cx="94" cy="82" r="20" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="18" />
+      <!-- Frame & handlebar sticker base -->
+      <path d="M 34 82 L 50 51 H 81 L 94 82 M 34 82 H 60 L 81 51 M 50 51 L 60 82" stroke="#FFFFFF" stroke-width="24" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M 45 42 H 55 M 50 51 L 47 42" stroke="#FFFFFF" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M 81 51 L 77 41 L 87 37" stroke="#FFFFFF" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M 60 82 L 57 92 M 52 92 H 62" stroke="#FFFFFF" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+
+    <!-- Wheels (white inner rim + chunky black tire) -->
+    <circle cx="34" cy="82" r="19" fill="#FFFFFF" stroke="#141410" stroke-width="6.5" />
+    <circle cx="94" cy="82" r="19" fill="#FFFFFF" stroke="#141410" stroke-width="6.5" />
+
+    <!-- Colored bicycle frame (black outline + vibrant brand blue core) -->
+    <path d="M 34 82 L 50 51 H 81 L 94 82 M 34 82 H 60 L 81 51 M 50 51 L 60 82" stroke="#141410" stroke-width="11.5" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M 34 82 L 50 51 H 81 L 94 82 M 34 82 H 60 L 81 51 M 50 51 L 60 82" stroke="#2B62F6" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round" />
+
+    <!-- Seatpost, saddle, stem, handlebars & pedal -->
+    <path d="M 50 51 L 47 42 M 42 42 H 55" stroke="#141410" stroke-width="6.2" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M 81 51 L 77 41 L 88 37" stroke="#141410" stroke-width="6.2" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M 60 82 L 57 92 M 52 92 H 62" stroke="#141410" stroke-width="5.8" stroke-linecap="round" stroke-linejoin="round" />
+
+    <!-- Wheel hubs & bottom bracket accent -->
+    <circle cx="34" cy="82" r="4.5" fill="#F6C828" stroke="#141410" stroke-width="3" />
+    <circle cx="94" cy="82" r="4.5" fill="#F6C828" stroke="#141410" stroke-width="3" />
+    <circle cx="60" cy="82" r="4.5" fill="#F6C828" stroke="#141410" stroke-width="3" />
+  </g>
+</svg>

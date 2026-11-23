@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" fill="none">
+  <defs>
+    <filter id="sticker-shadow" x="-15%" y="-15%" width="130%" height="135%">
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#141410" flood-opacity="0.16" />
+    </filter>
+    <clipPath id="cup-clip">
+      <path d="M 39 54 H 89 L 81.5 103 C 80.7 107.5 76.5 109.5 64 109.5 C 51.5 109.5 47.3 107.5 46.5 103 Z" />
+    </clipPath>
+  </defs>
+
+  <g transform="rotate(-4 64 66)">
+    <!-- White die-cut sticker border with soft shadow -->
+    <g filter="url(#sticker-shadow)">
+      <!-- Straw base -->
+      <path d="M 65 44 L 76 19" stroke="#FFFFFF" stroke-width="24" stroke-linecap="round" />
+      <!-- Dome lid base -->
+      <path d="M 38 49 A 26 17 0 0 1 90 49 Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="19" stroke-linejoin="round" />
+      <!-- Rim base -->
+      <rect x="33" y="46" width="62" height="10" rx="5" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="18" />
+      <!-- Cup body base -->
+      <path d="M 39 54 H 89 L 81.5 103 C 80.7 107.5 76.5 109.5 64 109.5 C 51.5 109.5 47.3 107.5 46.5 103 Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="19" stroke-linejoin="round" />
+    </g>
+
+    <!-- Straw (bold ink outline + vibrant cobalt core matching bicycle.svg) -->
+    <path d="M 65 44 L 76 19" stroke="#141410" stroke-width="13.5" stroke-linecap="round" />
+    <path d="M 65 44 L 76 19" stroke="#2B62F6" stroke-width="4.5" stroke-linecap="round" />
+
+    <!-- Dome lid -->
+    <path d="M 38 49 A 26 17 0 0 1 90 49 Z" fill="#F5F3EE" stroke="#141410" stroke-width="6" stroke-linejoin="round" />
+    <!-- Dome highlight -->
+    <path d="M 46 43 A 18 11 0 0 1 59 37" stroke="#FFFFFF" stroke-width="3.8" stroke-linecap="round" />
+
+    <!-- Cup interior fills (clipped to cup silhouette) -->
+    <g clip-path="url(#cup-clip)">
+      <!-- Rich espresso base -->
+      <rect x="34" y="54" width="60" height="60" fill="#7D4A27" />
+      <!-- Creamy oat/milk top layer -->
+      <path d="M 34 54 H 94 V 73 Q 78 78 64 73 T 34 74 Z" fill="#E8C7A1" />
+      <!-- Subtle deeper espresso bottom shade -->
+      <path d="M 34 94 Q 64 98 94 93 V 114 H 34 Z" fill="#5D341A" />
+
+      <!-- Floating ice cubes -->
+      <rect x="46" y="61" width="14" height="14" rx="3.5" transform="rotate(-14 53 68)" fill="#FFFDF8" fill-opacity="0.92" stroke="#141410" stroke-width="3.6" />
+      <rect x="65" y="65" width="14" height="14" rx="3.5" transform="rotate(16 72 72)" fill="#FFFDF8" fill-opacity="0.92" stroke="#141410" stroke-width="3.6" />
+
+      <!-- Glossy glass highlight stripe -->
+      <path d="M 47 64 L 51 98" stroke="#FFFFFF" stroke-opacity="0.52" stroke-width="4.5" stroke-linecap="round" />
+    </g>
+
+    <!-- Cup outline -->
+    <path d="M 39 54 H 89 L 81.5 103 C 80.7 107.5 76.5 109.5 64 109.5 C 51.5 109.5 47.3 107.5 46.5 103 Z" stroke="#141410" stroke-width="6" stroke-linejoin="round" />
+
+    <!-- Lid rim -->
+    <rect x="33" y="46" width="62" height="10" rx="5" fill="#FFFFFF" stroke="#141410" stroke-width="5.8" stroke-linejoin="round" />
+  </g>
+</svg>

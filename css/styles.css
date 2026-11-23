@@ -1,0 +1,1416 @@
+/* ==========================================================================
+   Ar Razy Fathan Rabbani — Minimal Indie-Maker Editorial Landing Page
+   Pure warm paper, inline die-cut stickers, yellow marker highlights & springs
+   ========================================================================== */
+
+:root {
+  /* Light ("Sat") — pure warm archival paper */
+  --bg: #FBFAF7;
+  --surface: #FFFFFF;
+  --sunken: #F2F0EA;
+  --ink: #17150F;
+  --ink-2: #524E46;
+  --muted: #7C776D;
+  --quiet: #9C968B;
+  --line: rgba(23, 21, 15, 0.09);
+  --line-strong: rgba(23, 21, 15, 0.16);
+
+  /* Marker accents — Work (Mobile Eng.) = Blue, Cycling = Yellow */
+  --y: #FFC629;
+  --b: #0380FC;
+  --accent: #0380FC;
+  --accent-ink: #FFFFFF;
+  --arrow: #0380FC;
+  --ok: #1F8A4C;
+  --strava: #FC4C02;
+
+  /* Typography */
+  --display: 'Gabarito', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --text: 'Geist', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --script: 'Caveat', cursive;
+
+  /* Tactile shadows */
+  --shadow-sm: 0 1px 2px rgba(23, 21, 15, 0.05), 0 4px 12px rgba(23, 21, 15, 0.04);
+  --shadow-pill: 0 2px 6px rgba(23, 21, 15, 0.05), 0 10px 26px rgba(23, 21, 15, 0.06);
+  --shadow-photo: 0 2px 5px rgba(23, 21, 15, 0.10), 0 6px 14px rgba(23, 21, 15, 0.09);
+
+  /* Radii */
+  --r-pill: 999px;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --spring: linear(
+    0, 0.009, 0.035 2.1%, 0.141, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%,
+    1.017, 1.077, 1.121, 1.149 24.3%, 1.159, 1.163, 1.161, 1.154 29.9%,
+    1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991, 0.977 51%, 0.974 53.8%,
+    0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1.004 83.8%, 1
+  );
+  --spring-soft: linear(
+    0, 0.006, 0.025 2.8%, 0.101 6.1%, 0.539 18.9%, 0.721 25.3%,
+    0.849 31.5%, 0.937 38.1%, 0.968 41.8%, 0.991 45.7%, 1.006 50.1%,
+    1.015 55%, 1.017 63.9%, 1.001
+  );
+}
+
+/* Dark ("Sun") — warm charcoal paper */
+html[data-day="sun"] {
+  --bg: #14120E;
+  --surface: #1D1B16;
+  --sunken: #24211B;
+  --ink: #F4EFE4;
+  --ink-2: #C7C1B5;
+  --muted: #938D81;
+  --quiet: #6E695F;
+  --line: rgba(244, 239, 228, 0.10);
+  --line-strong: rgba(244, 239, 228, 0.18);
+  --accent: #1A8CFF;
+  --arrow: #1A8CFF;
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.30);
+  --shadow-pill: 0 4px 16px rgba(0, 0, 0, 0.38);
+  --shadow-photo: 0 3px 10px rgba(0, 0, 0, 0.45);
+}
+
+/* Cycling Mode Accent Overrides (Yellow Jersey) */
+html[data-profile="cycling"] {
+  --accent: #FFC629;
+  --accent-ink: #17150F;
+  --arrow: #D99B00;
+}
+
+html[data-profile="cycling"][data-day="sun"] {
+  --accent: #F5C128;
+  --accent-ink: #17150F;
+  --arrow: #F5C128;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg);
+  color: var(--ink);
+}
+
+body {
+  margin: 0;
+  font-family: var(--text);
+  font-size: 16.5px;
+  line-height: 1.68;
+  color: var(--ink);
+  background-color: var(--bg);
+  transition: background-color 240ms var(--ease-out), color 240ms var(--ease-out);
+  overflow-x: clip;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+button, a {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+
+:focus-visible {
+  outline: 2.5px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+/* Text Selection uses Active Marker Color (Blue in Work, Yellow in Cycling) */
+::selection {
+  background-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+::-moz-selection {
+  background-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* Profile Visibility Switching */
+html[data-profile="work"] .only-cycling,
+html[data-profile="work"] .only-cycling-flex {
+  display: none !important;
+}
+
+html[data-profile="cycling"] .only-work,
+html[data-profile="cycling"] .only-work-flex {
+  display: none !important;
+}
+
+html[data-profile="work"] .only-work-flex {
+  display: inline-flex;
+}
+
+html[data-profile="cycling"] .only-cycling-flex {
+  display: inline-flex;
+}
+
+/* Clean Width Tiers */
+.wrap {
+  width: min(820px, 100% - 40px);
+  margin-inline: auto;
+}
+
+.wrap-letter {
+  width: min(700px, 100% - 40px);
+  margin-inline: auto;
+}
+
+/* Gentle Scroll Reveal */
+html.js .up {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 460ms var(--ease-out), transform 580ms var(--spring-soft);
+}
+
+html.js .up.in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ==========================================================================
+   Minimal Floating Top Bar + Stacked Photo Profile Switcher
+   ========================================================================== */
+.topbar {
+  width: 100%;
+  padding-top: 22px;
+}
+
+.topbar-inner {
+  width: min(820px, 100% - 40px);
+  margin-inline: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* Top-Left Stacked Photo Switcher (Mobile Eng. <-> On Two Wheels) */
+.photo-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  padding: 6px 14px 6px 6px;
+  border-radius: 16px;
+  text-align: left;
+  transition: transform 160ms var(--ease-out), background-color 180ms var(--ease-out);
+}
+
+.photo-toggle:active {
+  transform: scale(0.97);
+}
+
+.photo-stack {
+  position: relative;
+  width: 54px;
+  height: 46px;
+  flex-shrink: 0;
+}
+
+.mini-photo {
+  position: absolute;
+  top: 2px;
+  left: 0;
+  width: 42px;
+  height: 42px;
+  padding: 2.5px;
+  border-radius: 11px;
+  background: var(--surface);
+  border: 1.5px solid var(--line-strong);
+  box-shadow: var(--shadow-photo);
+  overflow: hidden;
+  transition: transform 480ms var(--spring), opacity 220ms var(--ease-out), filter 220ms var(--ease-out);
+}
+
+.mini-photo img {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.mini-photo--work img {
+  background: var(--b);
+}
+
+.mini-photo--cycling img {
+  background: var(--y);
+}
+
+html[data-day="sun"] .mini-photo--work img {
+  background: #1A8CFF;
+}
+
+html[data-day="sun"] .mini-photo--cycling img {
+  background: #F5C128;
+}
+
+/* Work active stack choreography */
+html[data-profile="work"] .mini-photo--work {
+  z-index: 2;
+  transform: translate(0, 0) rotate(-4deg) scale(1);
+  opacity: 1;
+}
+
+html[data-profile="work"] .mini-photo--cycling {
+  z-index: 1;
+  transform: translate(14px, 3px) rotate(9deg) scale(0.88);
+  opacity: 0.88;
+  filter: saturate(0.85);
+}
+
+/* Cycling active stack choreography */
+html[data-profile="cycling"] .mini-photo--cycling {
+  z-index: 2;
+  transform: translate(0, 0) rotate(4deg) scale(1);
+  opacity: 1;
+}
+
+html[data-profile="cycling"] .mini-photo--work {
+  z-index: 1;
+  transform: translate(14px, 3px) rotate(-9deg) scale(0.88);
+  opacity: 0.88;
+  filter: saturate(0.85);
+}
+
+.photo-toggle-meta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.photo-toggle-mode {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--display);
+  font-size: 15.5px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+
+.mode-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.mode-dot--work { background: var(--b); }
+.mode-dot--cycling { background: var(--y); }
+
+.photo-toggle-sub {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* Right Utility Controls: Icon Theme Toggle Switch + Circular Sound Icon */
+.topbar-tools {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.theme-switch {
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: 24px 24px;
+  align-items: center;
+  width: 56px;
+  height: 32px;
+  padding: 3px;
+  border-radius: var(--r-pill);
+  background: var(--sunken);
+  border: 1px solid var(--line);
+  box-shadow: inset 0 1px 2px rgba(23, 21, 15, 0.05);
+  transition: transform 150ms var(--ease-out), border-color 180ms var(--ease-out);
+}
+
+.theme-switch:active {
+  transform: scale(0.96);
+}
+
+.theme-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: 0 1px 4px rgba(23, 21, 15, 0.12);
+  transform: translateX(0);
+  transition: transform 420ms var(--spring), background-color 200ms var(--ease-out);
+}
+
+html[data-day="sun"] .theme-thumb {
+  transform: translateX(24px);
+}
+
+.theme-opt {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  color: var(--quiet);
+  transition: color 180ms var(--ease-out);
+}
+
+html[data-day="sat"] .theme-opt--sun,
+html[data-day="sun"] .theme-opt--moon {
+  color: var(--ink);
+}
+
+.icon-btn {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  box-shadow: var(--shadow-sm);
+  transition: transform 150ms var(--ease-out), border-color 180ms var(--ease-out), color 180ms var(--ease-out);
+}
+
+.icon-btn:active {
+  transform: scale(0.94);
+}
+
+.icon-btn[aria-pressed="true"] .sound-ico--off,
+.icon-btn[aria-pressed="false"] .sound-ico--on {
+  display: none;
+}
+
+.icon-btn[aria-pressed="false"] {
+  color: var(--quiet);
+}
+
+/* ==========================================================================
+   Minimal Hero (Exact rhythm & proportions of reference image 1)
+   ========================================================================== */
+.hero {
+  padding-top: clamp(52px, 9vh, 96px);
+  padding-bottom: clamp(56px, 9vh, 96px);
+  text-align: center;
+}
+
+.hero-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Fanned Die-Cut Sticker Row */
+.sticker-fan {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 26px;
+}
+
+.fan-item {
+  position: relative;
+  display: inline-flex;
+  transform: translateY(var(--y-off, 0px)) rotate(var(--rot, 0deg));
+  transition: transform 360ms var(--spring);
+  cursor: default;
+}
+
+.fan-item img {
+  filter: drop-shadow(0 5px 10px rgba(23, 21, 15, 0.11));
+}
+
+.fan-item::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 6px);
+  transform: translate(-50%, 4px) scale(0.94);
+  opacity: 0;
+  pointer-events: none;
+  padding: 3px 8px;
+  border-radius: 7px;
+  background: var(--ink);
+  color: var(--bg);
+  font-family: var(--mono);
+  font-size: 11px;
+  white-space: nowrap;
+  transition: opacity 150ms var(--ease-out), transform 180ms var(--ease-out);
+}
+
+/* Two-Tone Expressive Headline with Yellow Marker Pills */
+.hero-headline {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(30px, 5vw, 50px);
+  line-height: 1.24;
+  letter-spacing: -0.028em;
+  text-wrap: balance;
+}
+
+.line-strong,
+.line-muted {
+  display: block;
+}
+
+.line-strong {
+  color: var(--ink);
+}
+
+.line-muted {
+  color: var(--muted);
+}
+
+.ink-word {
+  color: var(--ink);
+  font-weight: 800;
+}
+
+/* Hand-painted Canvas Yellow Marker Swappable Word */
+.swap-pill {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 18px 4px 14px;
+  margin-left: 4px;
+  margin-right: 6px;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--accent-ink);
+  font: inherit;
+  line-height: 1.08;
+  vertical-align: baseline;
+  transition: width 440ms var(--spring), transform 200ms var(--ease-out);
+}
+
+.swap-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  will-change: transform, opacity, filter;
+  transition:
+    opacity 200ms var(--ease-out),
+    filter 220ms var(--ease-out),
+    transform 340ms var(--spring-soft);
+}
+
+.swap-pill.is-exiting .swap-inner {
+  opacity: 0;
+  filter: blur(5px);
+  transform: translateY(-5px) scale(0.96);
+  transition: opacity 90ms ease-out, filter 90ms ease-out, transform 110ms ease-out;
+}
+
+.swap-pill.is-entering .swap-inner {
+  opacity: 0;
+  filter: blur(5px);
+  transform: translateY(6px) scale(0.96);
+  transition: none;
+}
+
+.marker-canvas {
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  display: block;
+}
+
+.swap-pill:active {
+  transform: scale(0.96);
+}
+
+.swap-icon {
+  width: 0.78em;
+  height: 0.78em;
+  object-fit: contain;
+  flex-shrink: 0;
+  transform: translateY(0.02em);
+  transform-origin: center 70%;
+  filter: drop-shadow(0 2px 3px rgba(23, 21, 15, 0.14));
+}
+
+.swap-icon.is-wiggle {
+  animation: icon-hop 460ms var(--ease-out);
+}
+
+@keyframes icon-hop {
+  0%   { transform: translateY(2px) rotate(-14deg) scale(0.86); }
+  32%  { transform: translateY(-5px) rotate(10deg) scale(1.16); }
+  62%  { transform: translateY(1px) rotate(-5deg) scale(0.96); }
+  84%  { transform: translateY(-1px) rotate(2deg) scale(1.02); }
+  100% { transform: translateY(0.02em) rotate(0deg) scale(1); }
+}
+
+/* Tiny Blue-Arrow Swap Hint (exact detail from reference image 1) */
+.swap-hint {
+  margin: 14px 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  color: var(--quiet);
+}
+
+.swap-hint svg {
+  transform: translateY(-2px);
+}
+
+/* Centered Soft-Gray Subtitle */
+.hero-sub {
+  margin: 26px auto 0;
+  max-width: 490px;
+  font-size: 15.5px;
+  line-height: 1.65;
+  color: var(--muted);
+}
+
+.hero-sub strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* Clean Pill Email / CTA Bar (matching reference image 1) */
+.cta-pill {
+  margin-top: 28px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 5px 5px 20px;
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  box-shadow: var(--shadow-pill);
+  max-width: 100%;
+}
+
+.cta-email {
+  font-size: 14.5px;
+  color: var(--ink-2);
+  text-decoration: none;
+  padding-right: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+  padding: 0 18px;
+  border-radius: var(--r-pill);
+  background: var(--ink);
+  color: var(--bg);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: transform 150ms var(--ease-out), opacity 160ms var(--ease-out);
+}
+
+.cta-btn:active {
+  transform: scale(0.96);
+}
+
+/* Cycling Hero Action Row (Distinct from Email Pill) */
+.cycling-actions {
+  margin-top: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.btn-strava {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 18px 0 10px;
+  border-radius: var(--r-pill);
+  background: var(--ink);
+  color: var(--bg);
+  font-size: 14.5px;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: var(--shadow-pill);
+  transition: transform 240ms var(--spring), opacity 160ms var(--ease-out);
+}
+
+.btn-strava img {
+  width: 26px;
+  height: 26px;
+  transition: transform 280ms var(--spring);
+}
+
+.btn-strava .btn-arrow {
+  opacity: 0.7;
+  font-size: 13px;
+}
+
+.btn-strava:active {
+  transform: scale(0.96);
+}
+
+.ride-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: var(--r-pill);
+  background: var(--sunken);
+  border: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.ride-badge strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.cta-caption {
+  margin: 14px 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ok);
+  display: inline-block;
+}
+
+.status-dot--bike {
+  background: var(--strava);
+}
+
+/* ==========================================================================
+   Minimal Editorial Letter (Exact calm rhythm of reference image 2)
+   ========================================================================== */
+.letter {
+  padding-top: 20px;
+  padding-bottom: 56px;
+}
+
+.prose {
+  font-size: 18px;
+  line-height: 1.74;
+  color: var(--muted);
+}
+
+.prose p {
+  margin: 0 0 22px;
+}
+
+.prose strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.text-link {
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--line-strong);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 160ms var(--ease-out);
+}
+
+/* Tiny Inline Circular Avatar inside Letter */
+.inline-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--b);
+  border: 1.5px solid var(--surface);
+  box-shadow: 0 1px 4px rgba(23, 21, 15, 0.14);
+  overflow: hidden;
+  vertical-align: -7px;
+  margin-inline: 3px;
+}
+
+.inline-avatar--cycling {
+  background: var(--y);
+}
+
+html[data-day="sun"] .inline-avatar {
+  background: #1A8CFF;
+}
+
+html[data-day="sun"] .inline-avatar--cycling {
+  background: #F5C128;
+}
+
+.inline-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Inline Sticker Cluster (like the stacked company icons in reference image 2) */
+.inline-cluster {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: -6px;
+  margin-inline: 3px 4px;
+}
+
+.inline-cluster img {
+  width: 24px;
+  height: 24px;
+  margin-left: -4px;
+  transition: transform 280ms var(--spring);
+}
+
+.inline-cluster img:first-child {
+  margin-left: 0;
+}
+
+/* Single Inline Sticker Icon */
+.inline-ico {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  vertical-align: -5px;
+  margin-right: 3px;
+  margin-left: 1px;
+}
+
+/* Inline Company Sticker Icon (rounded square with crisp white die-cut stroke) */
+.inline-company-ico {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  background: #FFFFFF;
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 1px 4px rgba(23, 21, 15, 0.22), 0 0 0 1px rgba(23, 21, 15, 0.12);
+  overflow: hidden;
+  vertical-align: -6px;
+  margin-right: 5px;
+  margin-left: 2px;
+  transform: rotate(-3deg);
+  transition: transform 280ms var(--spring);
+}
+
+.inline-company-ico img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+/* Canvas Yellow Highlighter Swipe inside Letter */
+.hl-swipe {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+  background: transparent;
+  color: var(--accent-ink);
+  font-weight: 600;
+  padding: 0 6px;
+  margin-inline: 1px;
+}
+
+/* Subtle Minimal Strava Snapshot Strip */
+.ride-stats {
+  margin-top: 26px;
+  padding-top: 18px;
+  border-top: 1px dashed var(--line-strong);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--quiet);
+}
+
+.ride-stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+}
+
+.ride-stats strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.ride-updated {
+  font-size: 11.5px;
+  color: var(--quiet);
+  opacity: 0.85;
+}
+
+/* Handwritten Sign-Off */
+.signature {
+  margin-top: 28px;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.sig-script {
+  font-family: var(--script);
+  font-size: 30px;
+  line-height: 1;
+  color: var(--ink);
+  transform: rotate(-2deg);
+  display: inline-block;
+}
+
+.sig-loc {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--quiet);
+}
+
+/* ==========================================================================
+   Cycling Phone Photos — Staggered Editorial Gallery (muhraufan-inspired)
+   ========================================================================== */
+.photo-gallery-section {
+  padding-top: 8px;
+  padding-bottom: 56px;
+}
+
+.photo-gallery-head {
+  width: min(1280px, 100% - 40px);
+  margin-inline: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.photo-gallery-head .connect-label {
+  margin-bottom: 0;
+}
+
+.photo-gallery-count {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--quiet);
+}
+
+.stagger-grid {
+  width: min(1280px, 100% - 40px);
+  margin-inline: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.stagger-col {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: var(--col-offset, 0px);
+}
+
+.stagger-item {
+  margin: 0;
+}
+
+.stagger-open {
+  display: block;
+  width: 100%;
+  padding: 0;
+  background: var(--sunken);
+  border-radius: 3px;
+  overflow: hidden;
+  cursor: zoom-in;
+  outline: 1px solid rgba(23, 21, 15, 0.09);
+  outline-offset: -1px;
+  transition: transform 240ms var(--ease-out), opacity 180ms var(--ease-out);
+}
+
+html[data-day="sun"] .stagger-open {
+  outline-color: rgba(244, 239, 228, 0.11);
+}
+
+.stagger-open:active {
+  transform: scale(0.96);
+}
+
+.stagger-open img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Minimal Frosted FLIP Photo Viewer (exact muhraufan.com open/close timing) */
+.photo-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  --viewer-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --viewer-out: cubic-bezier(0.2, 0, 0, 1);
+}
+
+.photo-viewer[hidden] {
+  display: none;
+}
+
+.viewer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(251, 250, 247, 0.86);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  opacity: 0;
+  cursor: zoom-out;
+  transition: opacity 480ms var(--viewer-in-out);
+}
+
+html[data-day="sun"] .viewer-backdrop {
+  background: rgba(20, 18, 14, 0.86);
+}
+
+.photo-viewer.is-open .viewer-backdrop {
+  opacity: 1;
+}
+
+.photo-viewer[data-closing] .viewer-backdrop {
+  opacity: 0;
+  transition: opacity 220ms var(--viewer-in-out);
+}
+
+.viewer-img {
+  position: fixed;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+  object-fit: cover;
+  border-radius: 3px;
+  box-shadow: 0 14px 44px rgba(23, 21, 15, 0.16);
+  cursor: zoom-out;
+  user-select: none;
+  transition: transform 480ms var(--viewer-in-out), opacity 180ms var(--viewer-out);
+}
+
+.photo-viewer[data-closing] .viewer-img {
+  box-shadow: 0 2px 8px rgba(23, 21, 15, 0.08);
+  transition: transform 300ms var(--viewer-out), box-shadow 220ms var(--viewer-out);
+}
+
+.viewer-img.is-swapping {
+  opacity: 0.35;
+}
+
+.viewer-bar {
+  position: fixed;
+  left: 50%;
+  bottom: 22px;
+  z-index: 2;
+  transform: translate(-50%, 10px);
+  opacity: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 6px 8px 6px 16px;
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  box-shadow: var(--shadow-pill);
+  cursor: default;
+  max-width: calc(100vw - 28px);
+  transition:
+    opacity 180ms var(--viewer-out) 140ms,
+    transform 220ms var(--viewer-out) 140ms;
+}
+
+.photo-viewer.is-open .viewer-bar {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.photo-viewer[data-closing] .viewer-bar {
+  opacity: 0;
+  transform: translate(-50%, 6px);
+  transition: opacity 160ms var(--viewer-out), transform 160ms var(--viewer-out);
+}
+
+.viewer-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.viewer-sep {
+  color: var(--quiet);
+}
+
+.viewer-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding-left: 10px;
+  border-left: 1px solid var(--line);
+}
+
+.viewer-counter {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--muted);
+  padding-inline: 4px;
+  white-space: nowrap;
+}
+
+.viewer-btn {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1;
+  transition: background-color 150ms var(--ease-out), transform 140ms var(--ease-out);
+}
+
+.viewer-btn:active {
+  transform: scale(0.92);
+}
+
+.viewer-btn--close {
+  font-size: 18px;
+}
+
+/* ==========================================================================
+   Minimal Connect Row
+   ========================================================================== */
+.connect {
+  padding-top: 28px;
+  padding-bottom: 44px;
+  border-top: 1px solid var(--line);
+}
+
+.connect-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--quiet);
+  margin-bottom: 14px;
+}
+
+.connect-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.connect-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px 6px 8px;
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-sm);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-2);
+  text-decoration: none;
+  transition: transform 280ms var(--spring), border-color 160ms var(--ease-out), color 160ms var(--ease-out);
+}
+
+.connect-pill img {
+  width: 26px;
+  height: 26px;
+  transition: transform 280ms var(--spring);
+}
+
+.connect-pill:active {
+  transform: scale(0.96);
+}
+
+/* ==========================================================================
+   Minimal Year Footer
+   ========================================================================== */
+.foot {
+  padding: 18px 0 48px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--quiet);
+}
+
+.foot p {
+  margin: 0;
+}
+
+.foot strong {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+.foot-meta {
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.foot-link {
+  color: var(--ink-2);
+  text-decoration: underline;
+  text-decoration-color: var(--line-strong);
+  text-underline-offset: 3px;
+  transition: color 160ms var(--ease-out), text-decoration-color 160ms var(--ease-out);
+}
+
+.foot-link:hover {
+  color: var(--ink);
+  text-decoration-color: var(--accent);
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  z-index: 60;
+  transform: translate(-50%, 10px) scale(0.96);
+  opacity: 0;
+  padding: 9px 16px;
+  border-radius: var(--r-pill);
+  background: var(--ink);
+  color: var(--bg);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  font-weight: 500;
+  box-shadow: var(--shadow-pill);
+  transition: transform 220ms var(--ease-out), opacity 180ms var(--ease-out);
+  pointer-events: none;
+}
+
+.toast.is-open {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+}
+
+/* ==========================================================================
+   Pointer-Fine Hover Polish
+   ========================================================================== */
+@media (hover: hover) and (pointer: fine) {
+  .photo-toggle:hover {
+    background: var(--sunken);
+  }
+
+  html[data-profile="work"] .photo-toggle:hover .mini-photo--cycling {
+    transform: translate(18px, 0px) rotate(12deg) scale(0.94);
+    opacity: 1;
+    filter: saturate(1);
+  }
+
+  html[data-profile="cycling"] .photo-toggle:hover .mini-photo--work {
+    transform: translate(18px, 0px) rotate(-12deg) scale(0.94);
+    opacity: 1;
+    filter: saturate(1);
+  }
+
+  .theme-switch:hover,
+  .icon-btn:hover {
+    border-color: var(--line-strong);
+    transform: translateY(-1px);
+  }
+
+  .fan-item:hover {
+    transform: translateY(-9px) rotate(0deg) scale(1.12);
+    z-index: 3;
+  }
+
+  .fan-item:hover::after {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+
+  .swap-pill:hover {
+    transform: translateY(-2px) rotate(0deg) scale(1.02);
+  }
+
+  .cta-btn:hover,
+  .btn-strava:hover {
+    opacity: 0.92;
+    transform: translateY(-2px);
+  }
+
+  .btn-strava:hover img {
+    transform: rotate(-6deg) scale(1.08);
+  }
+
+  .text-link:hover {
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 2.5px;
+  }
+
+  .connect-pill:hover {
+    transform: translateY(-2px);
+    border-color: var(--line-strong);
+    color: var(--ink);
+  }
+
+  .connect-pill:hover img {
+    transform: rotate(-6deg) scale(1.1);
+  }
+
+  .stagger-open:hover {
+    transform: translateY(-2px);
+    opacity: 0.94;
+  }
+
+  .viewer-btn:hover {
+    background: var(--sunken);
+  }
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+@media (max-width: 600px) {
+  .topbar {
+    padding-top: 16px;
+  }
+
+  .topbar-inner {
+    width: calc(100% - 28px);
+    gap: 10px;
+  }
+
+  .photo-toggle {
+    gap: 11px;
+    padding: 4px 8px 4px 4px;
+  }
+
+  .photo-toggle-mode {
+    font-size: 14.5px;
+  }
+
+  .photo-toggle-sub {
+    display: block;
+    font-size: 10.5px;
+  }
+
+  .hero {
+    padding-top: 40px;
+    padding-bottom: 48px;
+  }
+
+  .hero-headline {
+    font-size: clamp(26px, 7.2vw, 36px);
+  }
+
+  .fan-item img {
+    width: 48px;
+    height: 48px;
+  }
+
+  .fan-item--center img {
+    width: 56px;
+    height: 56px;
+  }
+
+  .cta-pill {
+    padding-left: 16px;
+  }
+
+  .cta-email {
+    font-size: 13.5px;
+  }
+
+  .cta-btn {
+    padding: 0 14px;
+    font-size: 13.5px;
+  }
+
+  .prose {
+    font-size: 16px;
+  }
+
+  .stagger-grid {
+    gap: 6px;
+  }
+
+  .stagger-col {
+    gap: 6px;
+  }
+
+  .viewer-bar {
+    gap: 10px;
+    padding: 5px 6px 5px 12px;
+  }
+
+  .viewer-meta {
+    font-size: 11px;
+  }
+
+  .foot {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  html.js .up { transform: none; transition: opacity 200ms ease; }
+  .mini-photo, .fan-item, .swap-pill, .connect-pill, .stagger-open, .viewer-backdrop, .viewer-img, .viewer-bar { transition-duration: 100ms !important; transition-delay: 0ms !important; }
+}

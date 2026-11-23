@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" fill="none">
+  <defs>
+    <filter id="sticker-shadow" x="-15%" y="-15%" width="130%" height="135%">
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#141410" flood-opacity="0.16" />
+    </filter>
+  </defs>
+
+  <g transform="rotate(-4 64 64)">
+    <!-- White die-cut sticker border with soft shadow -->
+    <g filter="url(#sticker-shadow)">
+      <path d="M 64 20 L 102 42 L 102 86 L 64 108 L 26 86 L 26 42 Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="18" stroke-linejoin="round" />
+    </g>
+
+    <!-- Outer 3 isometric faces -->
+    <!-- Top face (green) -->
+    <path d="M 64 20 L 102 42 L 64 64 L 26 42 Z" fill="#3ED682" />
+    <!-- Bottom-left face (deep Jetpack navy) -->
+    <path d="M 26 42 L 64 64 L 64 108 L 26 86 Z" fill="#0B3246" />
+    <!-- Bottom-right face (vibrant blue) -->
+    <path d="M 102 42 L 102 86 L 64 108 L 64 64 Z" fill="#387BF6" />
+
+    <!-- Middle recessed band (darker shades per face) -->
+    <path d="M 64 34 L 90 49 L 64 64 L 38 49 Z" fill="#2CB569" />
+    <path d="M 38 49 L 64 64 L 64 94 L 38 79 Z" fill="#072130" />
+    <path d="M 90 49 L 90 79 L 64 94 L 64 64 Z" fill="#2960C7" />
+
+    <!-- Inner ice-blue hexagon -->
+    <path d="M 64 45 L 80.5 54.5 L 80.5 73.5 L 64 83 L 47.5 73.5 L 47.5 54.5 Z" fill="#DDF2FF" stroke="#141410" stroke-width="4" stroke-linejoin="round" />
+
+    <!-- Outer bold ink outline -->
+    <path d="M 64 20 L 102 42 L 102 86 L 64 108 L 26 86 L 26 42 Z" stroke="#141410" stroke-width="6.5" stroke-linejoin="round" />
+  </g>
+</svg>

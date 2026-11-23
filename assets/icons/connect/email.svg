@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" fill="none">
+  <defs>
+    <filter id="sticker-shadow" x="-15%" y="-15%" width="130%" height="135%">
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#141410" flood-opacity="0.16" />
+    </filter>
+  </defs>
+
+  <g transform="rotate(-4 64 64)">
+    <!-- White die-cut sticker border with soft shadow -->
+    <g filter="url(#sticker-shadow)">
+      <path d="M 64 19 L 105 51 L 105 97 C 105 103 100 107 94 107 H 34 C 28 107 23 103 23 97 V 51 Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="18" stroke-linejoin="round" />
+      <rect x="31" y="30" width="66" height="54" rx="9" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="18" stroke-linejoin="round" />
+    </g>
+
+    <!-- Open envelope back interior -->
+    <path d="M 64 19 L 105 51 L 105 97 C 105 103 100 107 94 107 H 34 C 28 107 23 103 23 97 V 51 Z" fill="#F27A1A" stroke="#141410" stroke-width="6" stroke-linejoin="round" />
+
+    <!-- White letter sticking out -->
+    <rect x="31" y="30" width="66" height="58" rx="9" fill="#F4F8FF" stroke="#141410" stroke-width="5.5" stroke-linejoin="round" />
+
+    <!-- Bold blue "@" symbol on letter -->
+    <g transform="translate(0 -4)">
+      <path d="M 73 59 C 73 53 69 49 63 49 C 56 49 52 54 52 60 C 52 66 56 69 61 69 C 65 69 68 67 69 64 M 70 50 V 64 C 70 67 72 69 75 69 C 79 69 81 65 81 59 C 81 48 73 41 63 41 C 52 41 44 49 44 60 C 44 71 52 78 64 78 C 69 78 73 77 76 75" stroke="#1D4ED8" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+
+    <!-- Envelope left & right front side flaps -->
+    <path d="M 23 52 L 56 78 L 25 104 C 23.5 102 23 99.5 23 97 Z" fill="#FA991C" />
+    <path d="M 105 52 L 72 78 L 103 104 C 104.5 102 105 99.5 105 97 Z" fill="#FA991C" />
+
+    <!-- Envelope bottom triangular front flap -->
+    <path d="M 25 104 L 58 77 C 61.5 74 66.5 74 70 77 L 103 104 C 101 106 98 107 94 107 H 34 C 30 107 27 106 25 104 Z" fill="#F6C828" />
+
+    <!-- Envelope crease & outer ink outlines -->
+    <path d="M 23 52 L 54 76 M 105 52 L 74 76" stroke="#141410" stroke-width="5.5" stroke-linecap="round" />
+    <path d="M 26 104 L 58 77 C 61.5 74 66.5 74 70 77 L 102 104" stroke="#141410" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M 23 51 V 97 C 23 103 28 107 34 107 H 94 C 100 107 105 103 105 97 V 51" stroke="#141410" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+</svg>

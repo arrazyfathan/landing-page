@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" fill="none">
+  <defs>
+    <filter id="sticker-shadow" x="-15%" y="-15%" width="130%" height="135%">
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#141410" flood-opacity="0.16" />
+    </filter>
+    <clipPath id="hills-clip">
+      <rect x="20" y="26" width="88" height="76" rx="18" />
+    </clipPath>
+  </defs>
+
+  <g transform="rotate(-4 64 64)">
+    <!-- White die-cut sticker border -->
+    <g filter="url(#sticker-shadow)">
+      <rect x="20" y="26" width="88" height="76" rx="18" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="18" stroke-linejoin="round" />
+    </g>
+
+    <!-- Sky & rolling Sanggang hills clipped inside rounded badge -->
+    <g clip-path="url(#hills-clip)">
+      <!-- Morning sky -->
+      <rect x="20" y="26" width="88" height="76" fill="#CFE8FF" />
+      <!-- Golden sunrise sun -->
+      <circle cx="80" cy="48" r="14" fill="#FFC629" stroke="#141410" stroke-width="5" />
+      <!-- Back rolling hill -->
+      <path d="M 14 78 Q 48 46 84 74 T 118 68 V 108 H 14 Z" fill="#3ED682" stroke="#141410" stroke-width="5.5" stroke-linejoin="round" />
+      <!-- Front rolling hill -->
+      <path d="M 14 92 Q 52 72 86 84 T 118 82 V 108 H 14 Z" fill="#1F8A4C" stroke="#141410" stroke-width="5.5" stroke-linejoin="round" />
+      <!-- Subtle glossy highlight -->
+      <path d="M 31 44 L 31 37 C 31 35 33 34 36 34 L 46 34" stroke="#FFFFFF" stroke-opacity="0.7" stroke-width="4" stroke-linecap="round" />
+    </g>
+
+    <!-- Bold ink outer frame -->
+    <rect x="20" y="26" width="88" height="76" rx="18" stroke="#141410" stroke-width="6.2" stroke-linejoin="round" />
+  </g>
+</svg>

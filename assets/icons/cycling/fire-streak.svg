@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" fill="none">
+  <defs>
+    <filter id="sticker-shadow" x="-15%" y="-15%" width="130%" height="135%">
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#141410" flood-opacity="0.16" />
+    </filter>
+  </defs>
+
+  <g transform="rotate(-4 64 66)">
+    <!-- White die-cut sticker border -->
+    <g filter="url(#sticker-shadow)">
+      <path d="M 65 18 C 72 34 96 48 96 74 C 96 95 81 110 64 110 C 46 110 32 96 32 76 C 32 61 40 48 49 41 C 48 51 52 57 57 59 C 53 45 57 30 65 18 Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="19" stroke-linejoin="round" />
+    </g>
+
+    <!-- Outer flame (vibrant Strava orange-red) -->
+    <path d="M 65 18 C 72 34 96 48 96 74 C 96 95 81 110 64 110 C 46 110 32 96 32 76 C 32 61 40 48 49 41 C 48 51 52 57 57 59 C 53 45 57 30 65 18 Z" fill="#FC4C02" stroke="#141410" stroke-width="6.2" stroke-linejoin="round" />
+
+    <!-- Inner core flame (warm golden yellow) -->
+    <path d="M 65 56 C 72 66 80 73 80 85 C 80 96 73 103 64 103 C 54 103 47 96 47 86 C 47 77 52 70 57 66 C 57 72 60 75 63 76 C 61 68 62 62 65 56 Z" fill="#FFC629" stroke="#141410" stroke-width="5" stroke-linejoin="round" />
+
+    <!-- Subtle glossy highlight -->
+    <path d="M 43 76 C 43 68 46 61 50 56" stroke="#FFFFFF" stroke-opacity="0.5" stroke-width="4" stroke-linecap="round" />
+  </g>
+</svg>

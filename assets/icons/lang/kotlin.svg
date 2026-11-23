@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" fill="none">
+  <defs>
+    <filter id="sticker-shadow" x="-15%" y="-15%" width="130%" height="135%">
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#141410" flood-opacity="0.16" />
+    </filter>
+    <linearGradient id="kotlin-grad" x1="24" y1="104" x2="104" y2="24" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#7F52FF" />
+      <stop offset="52%" stop-color="#C711E1" />
+      <stop offset="100%" stop-color="#F2485C" />
+    </linearGradient>
+  </defs>
+
+  <g transform="rotate(-4 64 64)">
+    <!-- White die-cut sticker border with soft shadow -->
+    <g filter="url(#sticker-shadow)">
+      <path d="M 24 24 L 104 24 L 64 64 L 104 104 L 24 104 Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="18" stroke-linejoin="round" />
+    </g>
+
+    <!-- Kotlin K body -->
+    <path d="M 24 24 L 104 24 L 64 64 L 104 104 L 24 104 Z" fill="url(#kotlin-grad)" stroke="#141410" stroke-width="6.2" stroke-linejoin="round" />
+
+    <!-- Subtle glossy highlight -->
+    <line x1="35" y1="36" x2="35" y2="66" stroke="#FFFFFF" stroke-opacity="0.45" stroke-width="5" stroke-linecap="round" />
+  </g>
+</svg>

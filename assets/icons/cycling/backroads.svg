@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" fill="none">
+  <defs>
+    <filter id="sticker-shadow" x="-15%" y="-15%" width="130%" height="135%">
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#141410" flood-opacity="0.16" />
+    </filter>
+    <clipPath id="road-clip">
+      <rect x="22" y="22" width="84" height="84" rx="20" />
+    </clipPath>
+  </defs>
+
+  <g transform="rotate(-4 64 64)">
+    <!-- White die-cut sticker border -->
+    <g filter="url(#sticker-shadow)">
+      <rect x="22" y="22" width="84" height="84" rx="20" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="18" stroke-linejoin="round" />
+    </g>
+
+    <!-- Country backroad scene clipped to rounded square -->
+    <g clip-path="url(#road-clip)">
+      <!-- Lush green fields -->
+      <rect x="22" y="22" width="84" height="84" fill="#3ED682" />
+      <!-- Lighter sunlit pasture top -->
+      <path d="M 22 22 H 106 V 52 Q 64 42 22 54 Z" fill="#8AE8AE" />
+
+      <!-- Winding asphalt backroad -->
+      <path d="M 59 22 C 62 36 84 44 82 58 C 80 72 40 76 42 106 H 82 C 78 86 102 74 98 54 C 95 40 74 34 71 22 Z" fill="#2D3138" stroke="#141410" stroke-width="5" stroke-linejoin="round" />
+
+      <!-- Yellow dashed road centerline -->
+      <path d="M 65 26 C 68 38 89 45 89 57 C 89 72 58 78 61 102" stroke="#FFC629" stroke-width="4" stroke-linecap="round" stroke-dasharray="7 8" />
+
+      <!-- Cute roadside tree bush -->
+      <circle cx="38" cy="54" r="9" fill="#1F8A4C" stroke="#141410" stroke-width="4.5" />
+      <circle cx="96" cy="92" r="9" fill="#1F8A4C" stroke="#141410" stroke-width="4.5" />
+
+      <!-- Glossy top-left corner gleam -->
+      <path d="M 32 42 L 32 35 C 32 33 34 31 37 31 L 46 31" stroke="#FFFFFF" stroke-opacity="0.55" stroke-width="4" stroke-linecap="round" />
+    </g>
+
+    <!-- Bold ink outer border -->
+    <rect x="22" y="22" width="84" height="84" rx="20" stroke="#141410" stroke-width="6.2" stroke-linejoin="round" />
+  </g>
+</svg>

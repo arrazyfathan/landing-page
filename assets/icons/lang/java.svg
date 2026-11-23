@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" fill="none">
+  <defs>
+    <filter id="sticker-shadow" x="-15%" y="-15%" width="130%" height="135%">
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#141410" flood-opacity="0.16" />
+    </filter>
+  </defs>
+
+  <g transform="rotate(-4 64 64)">
+    <!-- White die-cut sticker border with soft shadow -->
+    <g filter="url(#sticker-shadow)">
+      <!-- Steam wisps -->
+      <path d="M 55 50 C 46 41 64 33 58 21" stroke="#FFFFFF" stroke-width="23" stroke-linecap="round" />
+      <path d="M 72 51 C 65 44 79 38 74 29" stroke="#FFFFFF" stroke-width="22" stroke-linecap="round" />
+      <!-- Handle -->
+      <path d="M 85 63 H 94 C 101 63 103 78 93 82 L 83 84" stroke="#FFFFFF" stroke-width="23" stroke-linecap="round" stroke-linejoin="round" />
+      <!-- Cup body -->
+      <path d="M 32 58 H 87 L 82 89 C 80 95 74 98 60 98 C 46 98 40 95 38 89 Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="19" stroke-linejoin="round" />
+      <!-- Saucer -->
+      <ellipse cx="60" cy="101" rx="36" ry="7" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="18" />
+    </g>
+
+    <!-- Orange steam wisps (black outline + vibrant orange core) -->
+    <path d="M 55 49 C 46 41 64 33 58 21" stroke="#141410" stroke-width="13.5" stroke-linecap="round" />
+    <path d="M 72 50 C 65 44 79 38 74 29" stroke="#141410" stroke-width="12.5" stroke-linecap="round" />
+    <path d="M 55 49 C 46 41 64 33 58 21" stroke="#F26522" stroke-width="4.5" stroke-linecap="round" />
+    <path d="M 72 50 C 65 44 79 38 74 29" stroke="#F26522" stroke-width="4" stroke-linecap="round" />
+
+    <!-- Saucer -->
+    <ellipse cx="60" cy="101" rx="36" ry="7" fill="#4682B8" stroke="#141410" stroke-width="6" />
+
+    <!-- Cup handle -->
+    <path d="M 85 63 H 94 C 101 63 103 78 93 82 L 83 84" stroke="#141410" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M 85 63 H 94 C 101 63 103 78 93 82 L 83 84" stroke="#4682B8" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round" />
+
+    <!-- Cup body -->
+    <path d="M 32 58 H 87 L 82 89 C 80 95 74 98 60 98 C 46 98 40 95 38 89 Z" fill="#4682B8" stroke="#141410" stroke-width="6" stroke-linejoin="round" />
+
+    <!-- Playful Java wave stripe & highlight on cup -->
+    <path d="M 43 72 Q 60 77 77 72" stroke="#FFFFFF" stroke-opacity="0.55" stroke-width="4.5" stroke-linecap="round" />
+    <path d="M 46 84 Q 60 88 74 84" stroke="#FFFFFF" stroke-opacity="0.38" stroke-width="4" stroke-linecap="round" />
+  </g>
+</svg>

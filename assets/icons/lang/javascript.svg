@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" fill="none">
+  <defs>
+    <filter id="sticker-shadow" x="-15%" y="-15%" width="130%" height="135%">
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#141410" flood-opacity="0.16" />
+    </filter>
+  </defs>
+
+  <g transform="rotate(-5 64 64)">
+    <!-- White die-cut sticker border with soft shadow -->
+    <g filter="url(#sticker-shadow)">
+      <rect x="22" y="22" width="84" height="84" rx="14" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="18" stroke-linejoin="round" />
+    </g>
+
+    <!-- Yellow badge -->
+    <rect x="22" y="22" width="84" height="84" rx="14" fill="#F6C828" stroke="#141410" stroke-width="6.5" stroke-linejoin="round" />
+
+    <!-- Subtle glossy highlight -->
+    <path d="M 34 44 L 34 36 C 34 34 36 33 38 33 L 50 33" stroke="#FFFFFF" stroke-opacity="0.55" stroke-width="4.5" stroke-linecap="round" />
+
+    <!-- Pure vector "J" -->
+    <path d="M 63 57 V 83 C 63 90 58 94 51 94 C 46 94 43 92 41 89" stroke="#141410" stroke-width="7.8" stroke-linecap="round" stroke-linejoin="round" />
+
+    <!-- Pure vector "S" -->
+    <path d="M 92 63 C 90 59 86 57 81 57 C 75 57 72 60 72 65 C 72 70 76 72 82 74 C 89 76 93 79 93 85 C 93 91 88 94 81 94 C 75 94 71 92 69 88" stroke="#141410" stroke-width="7.8" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+</svg>

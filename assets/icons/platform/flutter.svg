@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" fill="none">
+  <defs>
+    <filter id="sticker-shadow" x="-15%" y="-15%" width="130%" height="135%">
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#141410" flood-opacity="0.16" />
+    </filter>
+  </defs>
+
+  <g transform="rotate(-3 64 64)">
+    <!-- White die-cut sticker border with soft shadow -->
+    <g filter="url(#sticker-shadow)">
+      <path d="M 70 20 L 98 20 L 44 74 L 30 60 Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="18" stroke-linejoin="round" />
+      <path d="M 70 62 L 98 62 L 75 85 L 98 108 L 70 108 L 47 85 Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="18" stroke-linejoin="round" />
+    </g>
+
+    <!-- Upper diagonal ribbon -->
+    <path d="M 70 20 L 98 20 L 44 74 L 30 60 Z" fill="#4CC3FF" stroke="#141410" stroke-width="6" stroke-linejoin="round" />
+    <!-- Glossy highlight on upper ribbon -->
+    <line x1="74" y1="29" x2="45" y2="58" stroke="#FFFFFF" stroke-opacity="0.5" stroke-width="4" stroke-linecap="round" />
+
+    <!-- Lower chevron fills -->
+    <!-- Bottom-right foot (deep blue) -->
+    <path d="M 75 85 L 98 108 L 70 108 L 61 99 Z" fill="#1D4ED8" />
+    <!-- Fold shadow triangle -->
+    <path d="M 61 99 L 75 85 L 82 92 Z" fill="#1437A6" />
+    <!-- Upper-right arm (sky blue) -->
+    <path d="M 70 62 L 98 62 L 75 85 L 61 71 Z" fill="#4CC3FF" />
+    <!-- Overlap diamond (vibrant mid blue) -->
+    <path d="M 47 85 L 61 71 L 75 85 L 61 99 Z" fill="#2B62F6" />
+
+    <!-- Lower chevron bold ink outline -->
+    <path d="M 70 62 L 98 62 L 75 85 L 98 108 L 70 108 L 47 85 Z" stroke="#141410" stroke-width="6" stroke-linejoin="round" />
+  </g>
+</svg>
