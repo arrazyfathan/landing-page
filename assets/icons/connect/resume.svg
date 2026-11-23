@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" fill="none">
+  <defs>
+    <filter id="sticker-shadow" x="-15%" y="-15%" width="130%" height="135%">
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#141410" flood-opacity="0.16" />
+    </filter>
+  </defs>
+
+  <g transform="rotate(-4 64 64)">
+    <!-- White die-cut sticker border with soft shadow -->
+    <g filter="url(#sticker-shadow)">
+      <path d="M 37 20 H 77 L 101 44 V 100 C 101 105.5 96.5 110 91 110 H 37 C 31.5 110 27 105.5 27 100 V 30 C 27 24.5 31.5 20 37 20 Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="18" stroke-linejoin="round" />
+    </g>
+
+    <!-- Crisp paper sheet body -->
+    <path d="M 37 20 H 77 L 101 44 V 100 C 101 105.5 96.5 110 91 110 H 37 C 31.5 110 27 105.5 27 100 V 30 C 27 24.5 31.5 20 37 20 Z" fill="#FFFDF7" stroke="#141410" stroke-width="6" stroke-linejoin="round" />
+
+    <!-- Folded dog-ear corner in Work accent blue -->
+    <path d="M 77 20 V 38 C 77 41.3 79.7 44 83 44 H 101 Z" fill="#0380FC" stroke="#141410" stroke-width="5.5" stroke-linejoin="round" />
+
+    <!-- Mini profile badge on top-left of resume -->
+    <circle cx="48" cy="43" r="9.5" fill="#0380FC" stroke="#141410" stroke-width="4.5" />
+    <path d="M 43 40 A 5.5 5.5 0 0 1 48.5 37" stroke="#FFFFFF" stroke-opacity="0.65" stroke-width="2.5" stroke-linecap="round" />
+
+    <!-- Clean resume text lines -->
+    <path d="M 41 66 H 87" stroke="#141410" stroke-width="6" stroke-linecap="round" />
+    <path d="M 41 80 H 83" stroke="#141410" stroke-width="6" stroke-linecap="round" />
+    <path d="M 41 94 H 67" stroke="#0380FC" stroke-width="6" stroke-linecap="round" />
+  </g>
+</svg>

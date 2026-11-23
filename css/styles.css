@@ -705,9 +705,25 @@ html[data-day="sun"] .theme-opt--moon {
   margin: 14px 0 0;
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 5px 7px;
   font-size: 13px;
   color: var(--muted);
+}
+
+.caption-sep {
+  color: var(--quiet);
+}
+
+.caption-link {
+  color: var(--ink-2);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--line-strong);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+  transition: color 160ms var(--ease-out), text-decoration-color 160ms var(--ease-out);
 }
 
 .status-dot {
@@ -1342,7 +1358,9 @@ html[data-day="sun"] .viewer-backdrop {
     transform: rotate(-6deg) scale(1.08);
   }
 
-  .text-link:hover {
+  .text-link:hover,
+  .caption-link:hover {
+    color: var(--ink);
     text-decoration-color: var(--accent);
     text-decoration-thickness: 2.5px;
   }
