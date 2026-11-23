@@ -269,6 +269,10 @@ function renderStaggerGrid() {
     const img = document.createElement('img');
     img.src = item.thumb;
     img.alt = `Cycling photo taken ${item.date}`;
+    if (item.w && item.h) {
+      img.width = item.w;
+      img.height = item.h;
+    }
     img.loading = 'lazy';
     img.decoding = 'async';
 

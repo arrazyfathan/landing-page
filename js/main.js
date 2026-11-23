@@ -79,13 +79,13 @@ function applyProfile(nextProfile, { silent = false, updateHash = true } = {}) {
     document.title =
       target === 'cycling'
         ? 'Ar Razy — On Two Wheels'
-        : 'Ar Razy Fathan Rabbani — Mobile Engineer';
+        : 'Ar Razy Fathan Rabbani — Mobile Engineer (Android & iOS)';
 
     if (faviconEl) {
       faviconEl.href =
         target === 'cycling'
-          ? './assets/avatars/cycling.png'
-          : './assets/avatars/work.png';
+          ? './assets/icons/favicon-cycling-48.png'
+          : './assets/icons/favicon-48.png';
     }
 
     if (photoToggle) {
