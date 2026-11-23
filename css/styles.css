@@ -1187,11 +1187,18 @@ html[data-day="sun"] .viewer-backdrop {
   padding: 18px 0 48px;
   border-top: 1px solid var(--line);
   display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--quiet);
+}
+
+.foot-row {
+  display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  font-size: 13px;
-  color: var(--quiet);
+  flex-wrap: wrap;
 }
 
 .foot p {
@@ -1206,6 +1213,45 @@ html[data-day="sun"] .viewer-backdrop {
 .foot-meta {
   font-family: var(--mono);
   font-size: 12px;
+}
+
+.foot-keys {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--quiet);
+}
+
+.foot-keys span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.foot-keys kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 5px;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-bottom-width: 2px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+  line-height: 1;
+}
+
+@media (hover: none), (max-width: 600px) {
+  .foot-keys {
+    display: none;
+  }
 }
 
 .foot-link {
@@ -1401,7 +1447,7 @@ html[data-day="sun"] .viewer-backdrop {
     font-size: 11px;
   }
 
-  .foot {
+  .foot-row {
     flex-direction: column;
     align-items: flex-start;
     gap: 4px;
