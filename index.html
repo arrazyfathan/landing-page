@@ -42,7 +42,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png" />
   <link rel="manifest" href="/site.webmanifest" />
   <link rel="prefetch" href="/cycling/" />
-  <link rel="stylesheet" href="/css/styles.css?v=7" />
+  <link rel="stylesheet" href="/css/styles.css?v=13" />
 
   <!-- Structured Data (JSON-LD: Person + WebSite) -->
   <script type="application/ld+json">
@@ -227,12 +227,16 @@
             <button
               type="button"
               class="swap-pill"
-              data-swap="Android &amp; iOS apps|Play Store apps|App Store apps|Mobile Apps"
-              data-icons="/assets/icons/platform/android.svg|/assets/icons/platform/android.svg|/assets/icons/platform/apple.svg|/assets/icons/platform/flutter.svg"
+              data-swap="Android &amp;::iOS apps|Play Store apps|App Store apps|Mobile Apps"
+              data-swap-mobile="Android &amp;::iOS|Play Store|App Store|Mobile Apps"
+              data-icons="/assets/icons/platform/android.svg|/assets/icons/platform/playstore.svg|/assets/icons/platform/appstore.svg|/assets/icons/platform/flutter.svg"
+              data-icons-mid="/assets/icons/platform/apple.svg|||"
             >
               <span class="swap-inner">
                 <img class="swap-icon" src="/assets/icons/platform/android.svg" alt="" width="28" height="28" />
-                <span class="swap-text">Android &amp; iOS apps</span>
+                <span class="swap-text">Android &amp;</span>
+                <img class="swap-icon swap-icon--mid" src="/assets/icons/platform/apple.svg" alt="" width="28" height="28" />
+                <span class="swap-text-after">iOS apps</span>
               </span>
             </button>.
           </span>
@@ -242,7 +246,8 @@
               type="button"
               class="swap-pill"
               data-swap="Kotlin|Jetpack Compose|Java|Kotlin Multiplatform"
-              data-icons="/assets/icons/lang/kotlin.svg|/assets/icons/lang/jetpack-compose.svg|/assets/icons/lang/java.svg|/assets/icons/lang/kotlin.svg"
+              data-swap-mobile="Kotlin|Compose|Java|KMP"
+              data-icons="/assets/icons/lang/kotlin.svg|/assets/icons/lang/jetpack-compose.svg|/assets/icons/lang/java.svg|/assets/icons/lang/kmp.svg"
             >
               <span class="swap-inner">
                 <img class="swap-icon" src="/assets/icons/lang/kotlin.svg" alt="" width="28" height="28" />
@@ -306,10 +311,20 @@
           Open for mobile engineering roles &amp; collaborations.
         </p>
       </div>
+
+      <a href="#intro" class="scroll-cue" aria-label="Scroll down to introduction">
+        <span class="scroll-cue-label">Scroll down</span>
+        <span class="scroll-cue-arrow" aria-hidden="true">
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 3v10" />
+            <path d="M4.5 9.5 8 13l3.5-3.5" />
+          </svg>
+        </span>
+      </a>
     </section>
 
     <!-- EDITORIAL LETTER -->
-    <section class="letter wrap-letter" aria-label="Introduction">
+    <section class="letter wrap-letter" id="intro" aria-label="Introduction">
       <article class="prose up">
         <p>
           Hi, I'm
@@ -455,6 +470,6 @@
   <!-- Subtle Copy Toast -->
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-  <script type="module" src="/js/main.js?v=7"></script>
+  <script type="module" src="/js/main.js?v=13"></script>
 </body>
 </html>

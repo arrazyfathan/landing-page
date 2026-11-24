@@ -570,6 +570,55 @@ html[data-day="sun"] .theme-opt--moon {
   will-change: transform, opacity;
 }
 
+/* Subtle Bottom Scroll-Down Instruction */
+.scroll-cue {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(32px, 5.5vh, 52px);
+  transform: translateX(-50%);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: var(--r-pill);
+  text-decoration: none;
+  color: var(--quiet);
+  opacity: 0.9;
+  transition: opacity 220ms var(--ease-out), transform 260ms var(--ease-out), color 160ms var(--ease-out);
+}
+
+.scroll-cue-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  line-height: 1;
+}
+
+.scroll-cue-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  animation: scroll-cue-bob 2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+
+@keyframes scroll-cue-bob {
+  0%, 100% {
+    transform: translateY(0);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translateY(4.5px);
+    opacity: 1;
+  }
+}
+
+.scroll-cue.is-hidden {
+  opacity: 0;
+  transform: translate(-50%, 6px);
+  pointer-events: none;
+}
+
 /* Fanned Die-Cut Sticker Row */
 .sticker-fan {
   display: inline-flex;
@@ -645,9 +694,9 @@ html[data-day="sun"] .theme-opt--moon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 2px 18px 4px 14px;
+  padding: 2px 16px 4px 13px;
   margin-left: 4px;
-  margin-right: 6px;
+  margin-right: 2px;
   border-radius: 999px;
   background: var(--accent);
   color: var(--accent-ink);
@@ -706,6 +755,11 @@ html[data-day="sun"] .theme-opt--moon {
   transform: translateY(0.02em);
   transform-origin: center 70%;
   filter: drop-shadow(0 2px 3px rgba(23, 21, 15, 0.14));
+}
+
+.swap-icon[hidden],
+.swap-text-after[hidden] {
+  display: none;
 }
 
 .swap-icon.is-wiggle {
@@ -1932,6 +1986,11 @@ html[data-day="sun"] .viewer-backdrop {
     transform: translateY(-2px) rotate(0deg) scale(1.02);
   }
 
+  .scroll-cue:hover {
+    color: var(--ink);
+    opacity: 1;
+  }
+
   .cta-btn:hover,
   .btn-strava:hover {
     opacity: 0.92;
@@ -2071,67 +2130,143 @@ html[data-day="sun"] .viewer-backdrop {
 
   .hero {
     width: calc(100% - 28px);
-    min-height: calc(100svh - 70px);
-    padding-top: 20px;
-    padding-bottom: 40px;
+    min-height: calc(100svh - 68px);
+    padding-top: 8px;
+    padding-bottom: 84px;
+  }
+
+  .scroll-cue {
+    bottom: 36px;
+  }
+
+  .sticker-fan {
+    gap: 4px;
+    margin-bottom: 20px;
+  }
+
+  .fan-item img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .fan-item--center img {
+    width: 46px;
+    height: 46px;
   }
 
   .hero-headline {
-    font-size: clamp(22px, 6.2vw, 34px);
+    font-size: clamp(19.5px, 5.2vw, 26px);
+    line-height: 1.42;
+    letter-spacing: -0.025em;
   }
 
   .line-strong,
   .line-muted {
-    white-space: normal;
+    white-space: nowrap;
   }
 
   .swap-pill {
     max-width: 100%;
-    padding: 2px 12px 3px 10px;
-    margin-left: 2px;
-    margin-right: 4px;
+    padding: 1px 10px 2px 8px;
+    margin: 2px 1px 2px 3px;
   }
 
   .swap-inner {
-    gap: 6px;
+    gap: 5px;
   }
 
-  .fan-item img {
-    width: 48px;
-    height: 48px;
+  .swap-hint {
+    margin-top: 12px;
+    font-size: 11.5px;
+    opacity: 0.85;
   }
 
-  .fan-item--center img {
-    width: 56px;
-    height: 56px;
+  .hero-sub {
+    margin-top: 18px;
+    max-width: 318px;
+    font-size: 14.5px;
+    line-height: 1.58;
+    text-wrap: balance;
+  }
+
+  .hero-sub .inline-ico {
+    width: 18px;
+    height: 18px;
+    vertical-align: -4px;
+  }
+
+  .hero-actions {
+    margin-top: 22px;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
   }
 
   .cta-pill {
-    padding-left: 16px;
+    padding: 4px 4px 4px 16px;
+    box-shadow: var(--shadow-sm);
   }
 
   .cta-email {
     font-size: 13.5px;
+    padding-right: 8px;
   }
 
   .cta-btn {
+    height: 34px;
     padding: 0 14px;
-    font-size: 13.5px;
+    font-size: 13px;
   }
 
   .btn-resume {
-    height: 46px;
-    padding: 0 16px 0 10px;
+    height: 38px;
+    padding: 0 14px 0 9px;
+    background: var(--sunken);
+    border-color: var(--line);
+    box-shadow: none;
+    color: var(--ink-2);
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .btn-resume img {
+    width: 20px;
+    height: 20px;
+  }
+
+  .cycling-actions {
+    margin-top: 22px;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .btn-strava {
+    height: 42px;
+    padding: 0 16px 0 9px;
     font-size: 13.5px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .btn-strava img {
+    width: 22px;
+    height: 22px;
   }
 
   .ride-badge {
     max-width: 100%;
     height: auto;
-    min-height: 40px;
-    padding: 8px 14px;
+    min-height: 36px;
+    padding: 6px 14px;
+    font-size: 11.5px;
     flex-wrap: wrap;
     justify-content: center;
+  }
+
+  .cta-caption {
+    margin-top: 14px;
+    font-size: 12px;
+    max-width: 300px;
+    text-wrap: balance;
   }
 
   .prose {
@@ -2224,17 +2359,17 @@ html[data-day="sun"] .viewer-backdrop {
   }
 
   .fan-item img {
+    width: 36px;
+    height: 36px;
+  }
+
+  .fan-item--center img {
     width: 42px;
     height: 42px;
   }
 
-  .fan-item--center img {
-    width: 50px;
-    height: 50px;
-  }
-
   .hero-headline {
-    font-size: clamp(20px, 5.8vw, 24px);
+    font-size: clamp(17.5px, 4.9vw, 20px);
   }
 
   .cta-pill {
@@ -2257,6 +2392,7 @@ html[data-day="sun"] .viewer-backdrop {
   html { scroll-behavior: auto; }
   html.js .up { transform: none; transition: opacity 200ms ease; }
   .status-dot::after { animation: none; opacity: 0; }
+  .scroll-cue-arrow { animation: none; }
   .mini-photo, .fan-item, .swap-pill, .connect-pill, .stagger-open, .viewer-backdrop, .viewer-img, .viewer-bar, .inline-ico, .inline-avatar, .inline-company-ico, .inline-cluster img { transition-duration: 100ms !important; transition-delay: 0ms !important; }
   ::view-transition-group(*),
   ::view-transition-old(*),

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" fill="none">
+  <defs>
+    <filter id="sticker-shadow" x="-15%" y="-15%" width="130%" height="135%">
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#141410" flood-opacity="0.16" />
+    </filter>
+    <clipPath id="play-clip">
+      <path d="M 27 31 Q 27 18 38.3 24.4 L 96.7 57.6 Q 108 64 96.7 70.4 L 38.3 103.6 Q 27 110 27 97 Z" />
+    </clipPath>
+  </defs>
+
+  <g transform="rotate(-4 64 64)">
+    <!-- White die-cut sticker border with soft shadow -->
+    <g filter="url(#sticker-shadow)">
+      <path d="M 27 31 Q 27 18 38.3 24.4 L 96.7 57.6 Q 108 64 96.7 70.4 L 38.3 103.6 Q 27 110 27 97 Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="18" stroke-linejoin="round" />
+    </g>
+
+    <!-- 4 Google Play facets clipped to rounded play triangle -->
+    <g clip-path="url(#play-clip)">
+      <!-- Right tip (amber yellow) -->
+      <path d="M 27 18 H 112 V 110 H 27 Z" fill="#FBBC04" />
+      <!-- Top facet (Play green) -->
+      <path d="M 16 18 L 109 18 L 62.5 64.5 Z" fill="#34A853" />
+      <!-- Bottom facet (Play red) -->
+      <path d="M 16 110 L 62.5 63.5 L 109 110 Z" fill="#EA4335" />
+      <!-- Left facet (Play blue) -->
+      <path d="M 16 18 L 62.5 64 L 16 110 Z" fill="#4285F4" />
+    </g>
+
+    <!-- Subtle glossy highlight on blue facet -->
+    <line x1="37" y1="47" x2="37" y2="75" stroke="#FFFFFF" stroke-opacity="0.48" stroke-width="4.5" stroke-linecap="round" />
+
+    <!-- Outer bold ink outline -->
+    <path d="M 27 31 Q 27 18 38.3 24.4 L 96.7 57.6 Q 108 64 96.7 70.4 L 38.3 103.6 Q 27 110 27 97 Z" stroke="#141410" stroke-width="6.5" stroke-linejoin="round" />
+  </g>
+</svg>

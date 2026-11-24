@@ -170,26 +170,77 @@ const swapControllers = [];
 let autoSwapPaused = false;
 let autoSwapTimer = null;
 let heroScrollProgress = 0;
+const mobileSwapQuery = window.matchMedia('(max-width: 600px)');
 
 document.querySelectorAll('.swap-pill').forEach((btn) => {
-  const words = (btn.getAttribute('data-swap') || '').split('|').filter(Boolean);
-  const icons = (btn.getAttribute('data-icons') || '').split('|').filter(Boolean);
+  const desktopWords = (btn.getAttribute('data-swap') || '').split('|').filter(Boolean);
+  const mobileWords = (btn.getAttribute('data-swap-mobile') || '').split('|').filter(Boolean);
+  const icons = (btn.getAttribute('data-icons') || '').split('|');
+  const iconsMid = btn.hasAttribute('data-icons-mid')
+    ? (btn.getAttribute('data-icons-mid') || '').split('|')
+    : [];
   const innerEl = btn.querySelector('.swap-inner');
   const textEl = btn.querySelector('.swap-text');
-  const iconEl = btn.querySelector('.swap-icon');
+  const textAfterEl = btn.querySelector('.swap-text-after');
+  const iconEl = btn.querySelector('.swap-icon:not(.swap-icon--mid)');
+  const iconMidEl = btn.querySelector('.swap-icon--mid');
 
-  if (words.length < 2 || !textEl || !innerEl) return;
+  if (desktopWords.length < 2 || !textEl || !innerEl) return;
   let idx = 0;
   let swapSeq = 0;
   let exitTimer = null;
   let settleTimer = null;
+
+  function applyContent(word, i) {
+    if (iconEl && icons[i]) {
+      iconEl.src = icons[i];
+    }
+    const parts = word.split('::');
+    textEl.textContent = parts[0];
+
+    const midSrc = iconsMid[i] || '';
+    if (iconMidEl) {
+      if (midSrc) {
+        iconMidEl.src = midSrc;
+        iconMidEl.hidden = false;
+      } else {
+        iconMidEl.hidden = true;
+      }
+    }
+    if (textAfterEl) {
+      if (parts.length > 1 && parts[1]) {
+        textAfterEl.textContent = parts[1];
+        textAfterEl.hidden = false;
+      } else {
+        textAfterEl.textContent = '';
+        textAfterEl.hidden = true;
+      }
+    }
+  }
+
+  function getActiveWords() {
+    return mobileSwapQuery.matches && mobileWords.length === desktopWords.length
+      ? mobileWords
+      : desktopWords;
+  }
+
+  function syncWordForViewport() {
+    const word = getActiveWords()[idx];
+    applyContent(word, idx);
+    btn.style.width = '';
+    morphMarker(btn, 80, { reseed: false });
+  }
+
+  // Sync initial word & icons immediately
+  applyContent(getActiveWords()[idx], idx);
 
   function triggerSwap({ manual = true } = {}) {
     const seq = ++swapSeq;
     clearTimeout(exitTimer);
     clearTimeout(settleTimer);
 
-    idx = (idx + 1) % words.length;
+    const activeWords = getActiveWords();
+    idx = (idx + 1) % activeWords.length;
     if (manual) {
       totalSwaps += 1;
       updateSwapHints();
@@ -199,8 +250,7 @@ document.querySelectorAll('.swap-pill').forEach((btn) => {
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reducedMotion) {
-      textEl.textContent = words[idx];
-      if (iconEl && icons[idx]) iconEl.src = icons[idx];
+      applyContent(activeWords[idx], idx);
       morphMarker(btn, 60, { reseed: true });
       return;
     }
@@ -216,11 +266,8 @@ document.querySelectorAll('.swap-pill').forEach((btn) => {
     exitTimer = setTimeout(() => {
       if (seq !== swapSeq) return;
 
-      // 3. Swap word & icon and measure exact unscaled target width
-      textEl.textContent = words[idx];
-      if (iconEl && icons[idx]) {
-        iconEl.src = icons[idx];
-      }
+      // 3. Swap word & icon(s) and measure exact unscaled target width
+      applyContent(getActiveWords()[idx], idx);
 
       const cs = getComputedStyle(btn);
       const padH = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
@@ -235,11 +282,13 @@ document.querySelectorAll('.swap-pill').forEach((btn) => {
       btn.classList.remove('is-entering');
       btn.style.width = `${targetWidth}px`;
 
-      if (iconEl) {
-        iconEl.classList.remove('is-wiggle');
-        void iconEl.offsetWidth;
-        iconEl.classList.add('is-wiggle');
-      }
+      [iconEl, iconMidEl].forEach((el) => {
+        if (el && !el.hidden) {
+          el.classList.remove('is-wiggle');
+          void el.offsetWidth;
+          el.classList.add('is-wiggle');
+        }
+      });
 
       // Keep same organic seed so the marker glides smoothly without jumping shape
       morphMarker(btn, 540, { reseed: false });
@@ -248,6 +297,7 @@ document.querySelectorAll('.swap-pill').forEach((btn) => {
         if (seq !== swapSeq) return;
         btn.style.width = '';
         if (iconEl) iconEl.classList.remove('is-wiggle');
+        if (iconMidEl) iconMidEl.classList.remove('is-wiggle');
       }, 550);
     }, 125);
   }
@@ -258,8 +308,14 @@ document.querySelectorAll('.swap-pill').forEach((btn) => {
   btn.addEventListener('focus', () => { autoSwapPaused = true; });
   btn.addEventListener('blur', () => { autoSwapPaused = false; });
 
-  swapControllers.push({ btn, triggerSwap });
+  swapControllers.push({ btn, triggerSwap, syncWordForViewport });
 });
+
+if (mobileSwapQuery.addEventListener) {
+  mobileSwapQuery.addEventListener('change', () => {
+    swapControllers.forEach((ctrl) => ctrl.syncWordForViewport());
+  });
+}
 
 function runAutoSwapCycle() {
   if (
@@ -339,7 +395,14 @@ window.addEventListener('keydown', (e) => {
 function initHeroScrollShrink() {
   const hero = document.querySelector('.hero');
   const inner = hero && hero.querySelector('.hero-inner');
+  const scrollCue = hero && hero.querySelector('.scroll-cue');
   if (!hero || !inner) return;
+
+  if (scrollCue) {
+    scrollCue.addEventListener('click', () => {
+      playClick();
+    });
+  }
 
   function applyHeroScroll() {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -347,6 +410,10 @@ function initHeroScrollShrink() {
     const range = Math.max(260, hero.offsetHeight * 0.95);
     const raw = Math.min(1, Math.max(0, scrollY / range));
     heroScrollProgress = raw;
+
+    if (scrollCue) {
+      scrollCue.classList.toggle('is-hidden', scrollY > 36);
+    }
 
     if (reducedMotion || raw <= 0.002) {
       inner.style.transform = '';
