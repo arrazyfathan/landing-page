@@ -17,6 +17,7 @@ const viewportEl = document.getElementById('watch-viewport');
 const countEl = document.getElementById('photo-count');
 const hudDateEl = document.getElementById('watch-hud-date');
 const hudIndexEl = document.getElementById('watch-hud-index');
+const panBtnEl = document.getElementById('watch-pan-btn');
 const resetBtnEl = document.getElementById('watch-reset-btn');
 
 // Frosted FLIP Lightbox DOM
@@ -42,6 +43,8 @@ let maxPanY = 280;
 
 let isPointerDown = false;
 let isDragging = false;
+let isFreePan = false;
+let dragAllowVertical = true;
 let activePointerId = null;
 let dragStartX = 0;
 let dragStartY = 0;
@@ -142,12 +145,12 @@ function readMetrics() {
   if (vw <= 600) {
     metrics = {
       vpW: rect.width || vw - 16,
-      vpH: rect.height || 400,
-      tileW: 58,
-      tileH: 72,
-      spacingX: 68,
-      spacingY: 82,
-      hoverScale: 1.48,
+      vpH: rect.height || 368,
+      tileW: 54,
+      tileH: 66,
+      spacingX: 64,
+      spacingY: 74,
+      hoverScale: 1.44,
     };
   } else if (vw <= 900) {
     metrics = {
@@ -220,8 +223,13 @@ function computeLensPosition(st, px, py) {
   const rx = st.baseX + px;
   const ry = st.baseY + py;
 
-  const lensRx = Math.max(metrics.vpW * 0.43, metrics.spacingX * 3.9);
-  const lensRy = Math.max(metrics.vpH * 0.46, metrics.spacingY * 2.18);
+  const isCompact = metrics.vpW <= 600;
+  const lensRx = isCompact
+    ? Math.max(metrics.vpW * 0.47, metrics.spacingX * 2.45)
+    : Math.max(metrics.vpW * 0.43, metrics.spacingX * 3.9);
+  const lensRy = isCompact
+    ? Math.max(metrics.vpH * 0.49, metrics.spacingY * 2.15)
+    : Math.max(metrics.vpH * 0.46, metrics.spacingY * 2.18);
 
   const normDist = Math.hypot(rx / lensRx, ry / lensRy);
 
@@ -488,8 +496,17 @@ function tick(now) {
     const dimFactor = activeHi >= 0 && i !== activeHi ? 0.84 : 1;
     const finalOpacity = clamp(lerp(lp.baseOpacity * dimFactor, 1.0, clamp(hp, 0, 1)), 0, 1);
 
-    el.style.transform = `translate3d(${finalX.toFixed(2)}px, ${finalY.toFixed(2)}px, 0) scale(${finalScale.toFixed(4)})`;
-    el.style.opacity = finalOpacity.toFixed(3);
+    // Mobile GPU culling: hide completely dissolved off-rim tiles to skip unnecessary rasterization
+    const shouldBeVisible = finalOpacity > 0.015 || i === activeHi;
+    if (st.isVisible !== shouldBeVisible) {
+      st.isVisible = shouldBeVisible;
+      el.style.visibility = shouldBeVisible ? '' : 'hidden';
+    }
+
+    if (shouldBeVisible) {
+      el.style.transform = `translate3d(${finalX.toFixed(2)}px, ${finalY.toFixed(2)}px, 0) scale(${finalScale.toFixed(4)})`;
+      el.style.opacity = finalOpacity.toFixed(3);
+    }
 
     // Stable compositor layering with zero filter toggling (avoids GPU layer reallocation flicker)
     let nextZ;
@@ -535,6 +552,20 @@ function panToPhoto(index, immediate = false) {
     targetPanY = destY;
   }
   wakeLoop();
+}
+
+function setFreePan(next, { silent = false } = {}) {
+  const value = Boolean(next);
+  if (isFreePan === value) return;
+  isFreePan = value;
+  if (viewportEl) {
+    viewportEl.classList.toggle('is-free-pan', isFreePan);
+  }
+  if (panBtnEl) {
+    panBtnEl.setAttribute('aria-pressed', String(isFreePan));
+    panBtnEl.textContent = isFreePan ? 'Done' : '2D pan';
+  }
+  if (!silent) playClick();
 }
 
 function recenterGallery() {
@@ -829,6 +860,7 @@ function renderWatchGallery() {
       nudgeX: 0,
       nudgeY: 0,
       zIndex: -1,
+      isVisible: true,
       isHighlighted: false,
     };
 
@@ -862,6 +894,8 @@ function wirePanGestures() {
 
     isPointerDown = true;
     isDragging = false;
+    // Desktop mouse/pen always pans in 2D; touch defaults to horizontal-only so vertical swipes scroll the page natively unless 2D pan is toggled on
+    dragAllowVertical = e.pointerType !== 'touch' || isFreePan;
     activePointerId = e.pointerId;
     dragStartX = e.clientX;
     dragStartY = e.clientY;
@@ -882,21 +916,36 @@ function wirePanGestures() {
     const dx = e.clientX - dragStartX;
     const dy = e.clientY - dragStartY;
 
-    if (!isDragging && Math.hypot(dx, dy) > 6) {
-      isDragging = true;
-      hoveredIndex = -1;
-      viewportEl.classList.add('is-dragging');
-      try {
-        viewportEl.setPointerCapture(e.pointerId);
-      } catch (_) {}
+    if (!isDragging) {
+      // On touch in default scroll-safe mode, immediately yield vertical drags to native page scrolling
+      if (!dragAllowVertical && Math.abs(dy) > 8 && Math.abs(dy) > Math.abs(dx) * 1.1) {
+        isPointerDown = false;
+        activePointerId = null;
+        return;
+      }
+
+      const movedEnough = dragAllowVertical
+        ? Math.hypot(dx, dy) > 6
+        : Math.abs(dx) > 8 && Math.abs(dx) >= Math.abs(dy);
+
+      if (movedEnough) {
+        isDragging = true;
+        hoveredIndex = -1;
+        viewportEl.classList.add('is-dragging');
+        try {
+          viewportEl.setPointerCapture(e.pointerId);
+        } catch (_) {}
+      }
     }
 
     if (!isDragging) return;
 
     const rawX = dragOriginPanX + dx;
-    const rawY = dragOriginPanY + dy;
     panX = applyBoundsWithRubberband(rawX, maxPanX, metrics.vpW * 0.55);
-    panY = applyBoundsWithRubberband(rawY, maxPanY, metrics.vpH * 0.55);
+    if (dragAllowVertical) {
+      const rawY = dragOriginPanY + dy;
+      panY = applyBoundsWithRubberband(rawY, maxPanY, metrics.vpH * 0.55);
+    }
 
     const now = performance.now();
     velocitySamples.push({ x: e.clientX, y: e.clientY, t: now });
@@ -913,6 +962,7 @@ function wirePanGestures() {
   function endDrag(e) {
     if (!isPointerDown || e.pointerId !== activePointerId) return;
     const wasDragging = isDragging;
+    const allowV = dragAllowVertical;
 
     isPointerDown = false;
     isDragging = false;
@@ -934,7 +984,7 @@ function wirePanGestures() {
         const last = velocitySamples[velocitySamples.length - 1];
         const dtSec = Math.max(0.012, (last.t - first.t) / 1000);
         panVelX = clamp((last.x - first.x) / dtSec, -1800, 1800);
-        panVelY = clamp((last.y - first.y) / dtSec, -1800, 1800);
+        panVelY = allowV ? clamp((last.y - first.y) / dtSec, -1800, 1800) : 0;
       }
       wakeLoop();
     }
@@ -973,8 +1023,69 @@ function wirePanGestures() {
   });
 }
 
+function wireLightboxTouchSwipes() {
+  if (!viewer) return;
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchStartTime = 0;
+  let tracking = false;
+
+  viewer.addEventListener(
+    'touchstart',
+    (e) => {
+      if (!isOpen || isClosing || e.touches.length !== 1) return;
+      if (e.target && e.target.closest && e.target.closest('.viewer-bar')) return;
+      const t = e.touches[0];
+      touchStartX = t.clientX;
+      touchStartY = t.clientY;
+      touchStartTime = performance.now();
+      tracking = true;
+    },
+    { passive: true }
+  );
+
+  viewer.addEventListener(
+    'touchend',
+    (e) => {
+      if (!tracking || !isOpen || isClosing) return;
+      tracking = false;
+      const t = e.changedTouches[0];
+      if (!t) return;
+      const dx = t.clientX - touchStartX;
+      const dy = t.clientY - touchStartY;
+      const dt = Math.max(16, performance.now() - touchStartTime);
+      const vx = Math.abs(dx) / dt;
+
+      // Horizontal swipe: next / previous photo
+      if ((Math.abs(dx) > 42 || vx > 0.35) && Math.abs(dx) > Math.abs(dy) * 1.25) {
+        stepLightbox(dx < 0 ? 1 : -1);
+      } else if (dy > 76 && Math.abs(dy) > Math.abs(dx) * 1.4) {
+        // Downward swipe: dismiss photo viewer
+        closeLightbox();
+      }
+    },
+    { passive: true }
+  );
+}
+
 function wireEvents() {
   wirePanGestures();
+  wireLightboxTouchSwipes();
+
+  if (panBtnEl) {
+    panBtnEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setFreePan(!isFreePan);
+    });
+  }
+
+  // Tapping outside the gallery cleanly exits 2D pan mode so page scroll is never accidentally left locked
+  document.addEventListener('pointerdown', (e) => {
+    if (!isFreePan || !galleryEl) return;
+    if (!galleryEl.contains(e.target)) {
+      setFreePan(false, { silent: true });
+    }
+  });
 
   if (resetBtnEl) {
     resetBtnEl.addEventListener('click', recenterGallery);

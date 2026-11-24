@@ -1414,6 +1414,10 @@ html[data-day="sun"] .inline-avatar--cycling {
   opacity: 0.85;
 }
 
+.photo-gallery-hint--mobile {
+  display: none;
+}
+
 .photo-gallery-count {
   font-family: var(--mono);
   font-size: 11.5px;
@@ -1589,6 +1593,7 @@ html[data-day="sun"] .watch-tile:focus-visible {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
   gap: 8px;
   min-height: 32px;
 }
@@ -1641,6 +1646,7 @@ html[data-day="sun"] .watch-tile:focus-visible {
   font-variant-numeric: tabular-nums;
 }
 
+.watch-pan-btn,
 .watch-reset-btn {
   display: inline-flex;
   align-items: center;
@@ -1653,15 +1659,77 @@ html[data-day="sun"] .watch-tile:focus-visible {
   font-size: 11.5px;
   font-weight: 500;
   color: var(--ink-2);
-  transition: transform 150ms var(--ease-out), border-color 160ms var(--ease-out), color 160ms var(--ease-out), opacity 180ms var(--ease-out);
+  transition: transform 150ms var(--ease-out), border-color 160ms var(--ease-out), background-color 160ms var(--ease-out), color 160ms var(--ease-out), opacity 180ms var(--ease-out);
+}
+
+/* 2D pan toggle is only needed on touch/mobile (desktop mouse always pans 2D) */
+.watch-pan-btn {
+  display: none;
+}
+
+.watch-pan-btn[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: transparent;
+  color: var(--accent-ink);
+  font-weight: 600;
 }
 
 .watch-reset-btn[hidden] {
   display: none;
 }
 
+.watch-pan-btn:active,
 .watch-reset-btn:active {
   transform: scale(0.95);
+}
+
+/* Subtle touch-safe mode & 2D free-pan feedback for touch devices / narrow viewports */
+@media (hover: none), (max-width: 600px) {
+  .photo-gallery-hint--desktop {
+    display: none;
+  }
+
+  .photo-gallery-hint--mobile {
+    display: inline;
+  }
+
+  .watch-viewport {
+    /* Let vertical swipes scroll the page natively at 120Hz; horizontal swipes pan the gallery */
+    touch-action: pan-y;
+    border-radius: 20px;
+    transition: box-shadow 220ms var(--ease-out);
+  }
+
+  .watch-viewport.is-free-pan {
+    touch-action: none;
+    box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--accent) 55%, transparent);
+  }
+
+  .watch-pan-btn {
+    display: inline-flex;
+  }
+}
+
+/* Mobile GPU optimization: collapse 4 backdrop-filter rings into 2 lightweight progressive layers */
+@media (max-width: 600px), (hover: none) and (pointer: coarse) {
+  .watch-blur-layer--1 {
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    mask-image: radial-gradient(ellipse 47% 47% at 50% 50%, transparent 44%, #000 76%);
+    -webkit-mask-image: radial-gradient(ellipse 47% 47% at 50% 50%, transparent 44%, #000 76%);
+  }
+
+  .watch-blur-layer--2,
+  .watch-blur-layer--4 {
+    display: none;
+  }
+
+  .watch-blur-layer--3 {
+    backdrop-filter: blur(6.5px);
+    -webkit-backdrop-filter: blur(6.5px);
+    mask-image: radial-gradient(ellipse 52% 52% at 50% 50%, transparent 66%, #000 94%);
+    -webkit-mask-image: radial-gradient(ellipse 52% 52% at 50% 50%, transparent 66%, #000 94%);
+  }
 }
 
 /* Minimal Frosted FLIP Photo Viewer (exact muhraufan.com open/close timing) */
@@ -2331,19 +2399,35 @@ html[data-day="sun"] .viewer-backdrop {
     width: calc(100% - 28px);
   }
 
-  .photo-gallery-hint {
+  .photo-gallery-head-meta {
+    gap: 8px;
+  }
+
+  .photo-gallery-hint--mobile {
     display: none;
   }
 
   .watch-gallery {
     width: calc(100% - 16px);
-    --tile-w: 58px;
-    --tile-h: 72px;
+    --tile-w: 54px;
+    --tile-h: 66px;
     --tile-r: 11px;
   }
 
   .watch-viewport {
-    height: 400px;
+    height: 368px;
+  }
+
+  .watch-hud {
+    gap: 6px;
+  }
+
+  .watch-hud-pill,
+  .watch-pan-btn,
+  .watch-reset-btn {
+    height: 30px;
+    font-size: 11px;
+    padding-inline: 11px;
   }
 
   .topbar {

@@ -42,7 +42,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png" />
   <link rel="manifest" href="/site.webmanifest" />
   <link rel="prefetch" href="/" />
-  <link rel="stylesheet" href="/css/styles.css?v=16" />
+  <link rel="stylesheet" href="/css/styles.css?v=17" />
 
   <!-- Structured Data (JSON-LD: WebPage + BreadcrumbList) -->
   <script type="application/ld+json">
@@ -309,7 +309,8 @@
       <div class="photo-gallery-head">
         <span class="connect-label">SHOTS FROM THE ROAD</span>
         <div class="photo-gallery-head-meta">
-          <span class="photo-gallery-hint">Drag to pan &middot; Hover to zoom</span>
+          <span class="photo-gallery-hint photo-gallery-hint--desktop">Drag to pan &middot; Hover to zoom</span>
+          <span class="photo-gallery-hint photo-gallery-hint--mobile">Swipe &middot; Tap to view</span>
           <span class="photo-gallery-count" id="photo-count"></span>
         </div>
       </div>
@@ -338,6 +339,15 @@
             <span class="watch-hud-sep" aria-hidden="true">&middot;</span>
             <span class="watch-hud-index" id="watch-hud-index">01 / 37</span>
           </span>
+          <button
+            type="button"
+            class="watch-pan-btn"
+            id="watch-pan-btn"
+            aria-pressed="false"
+            aria-label="Toggle free 2D panning inside the photo gallery"
+          >
+            2D pan
+          </button>
           <button
             type="button"
             class="watch-reset-btn"
@@ -424,6 +434,6 @@
   <!-- Subtle Copy Toast -->
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-  <script type="module" src="/js/main.js?v=16"></script>
+  <script type="module" src="/js/main.js?v=17"></script>
 </body>
 </html>

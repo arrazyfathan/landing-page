@@ -7,7 +7,7 @@ import {
   playSuccess
 } from './sound.js';
 import { initMarkers, morphMarker, repaintAllMarkers } from './marker.js?v=7';
-import { initCyclingPhotos } from './photos.js?v=16';
+import { initCyclingPhotos } from './photos.js?v=17';
 
 const root = document.documentElement;
 const EMAIL = 'hello@arrazyfathan.com';
