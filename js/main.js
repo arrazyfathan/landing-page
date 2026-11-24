@@ -118,7 +118,7 @@ if (soundToggle) {
 }
 syncSoundUI();
 
-/* 6. Tappable Highlighted Hero Words (Spring Width Morph + Blur-Slide + Icon Hop) */
+/* 6. Tappable + Auto-Swapping Highlighted Hero Words (4s interval + manual tap) */
 let totalSwaps = 0;
 
 function updateSwapHints() {
@@ -133,6 +133,10 @@ function updateSwapHints() {
   });
 }
 
+const swapControllers = [];
+let autoSwapPaused = false;
+let autoSwapTimer = null;
+
 document.querySelectorAll('.swap-pill').forEach((btn) => {
   const words = (btn.getAttribute('data-swap') || '').split('|').filter(Boolean);
   const icons = (btn.getAttribute('data-icons') || '').split('|').filter(Boolean);
@@ -146,15 +150,18 @@ document.querySelectorAll('.swap-pill').forEach((btn) => {
   let exitTimer = null;
   let settleTimer = null;
 
-  btn.addEventListener('click', () => {
+  function triggerSwap({ manual = true } = {}) {
     const seq = ++swapSeq;
     clearTimeout(exitTimer);
     clearTimeout(settleTimer);
 
     idx = (idx + 1) % words.length;
-    totalSwaps += 1;
-    updateSwapHints();
-    playPop(0.95 + idx * 0.08);
+    if (manual) {
+      totalSwaps += 1;
+      updateSwapHints();
+      playPop(0.95 + idx * 0.08);
+      resetAutoSwapTimer();
+    }
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reducedMotion) {
@@ -190,7 +197,7 @@ document.querySelectorAll('.swap-pill').forEach((btn) => {
       btn.classList.add('is-entering');
       void btn.offsetWidth; // flush pre-enter styles
 
-      // 5. Release into crisp blur-in + spring width morph + icon hop + live canvas morph
+      // 5. Release into crisp blur-in + silky width morph + gentle icon hop + live canvas morph
       btn.classList.remove('is-entering');
       btn.style.width = `${targetWidth}px`;
 
@@ -200,16 +207,53 @@ document.querySelectorAll('.swap-pill').forEach((btn) => {
         iconEl.classList.add('is-wiggle');
       }
 
-      morphMarker(btn, 480, { reseed: true });
+      // Keep same organic seed so the marker glides smoothly without jumping shape
+      morphMarker(btn, 540, { reseed: false });
 
       settleTimer = setTimeout(() => {
         if (seq !== swapSeq) return;
         btn.style.width = '';
         if (iconEl) iconEl.classList.remove('is-wiggle');
-      }, 490);
-    }, 85);
-  });
+      }, 550);
+    }, 125);
+  }
+
+  btn.addEventListener('click', () => triggerSwap({ manual: true }));
+  btn.addEventListener('mouseenter', () => { autoSwapPaused = true; });
+  btn.addEventListener('mouseleave', () => { autoSwapPaused = false; });
+  btn.addEventListener('focus', () => { autoSwapPaused = true; });
+  btn.addEventListener('blur', () => { autoSwapPaused = false; });
+
+  swapControllers.push({ btn, triggerSwap });
 });
+
+function runAutoSwapCycle() {
+  if (
+    autoSwapPaused ||
+    document.hidden ||
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+    document.querySelector('.photo-viewer:not([hidden])')
+  ) {
+    return;
+  }
+
+  // Cascade each marker smoothly with a gentle 220ms wave
+  swapControllers.forEach((ctrl, i) => {
+    setTimeout(() => {
+      if (autoSwapPaused || document.hidden) return;
+      ctrl.triggerSwap({ manual: false });
+    }, i * 220);
+  });
+}
+
+function resetAutoSwapTimer() {
+  clearInterval(autoSwapTimer);
+  if (swapControllers.length > 0) {
+    autoSwapTimer = setInterval(runAutoSwapCycle, 5000);
+  }
+}
+
+resetAutoSwapTimer();
 
 /* 7. Copy Email Pill */
 document.querySelectorAll('[data-copy-email]').forEach((btn) => {

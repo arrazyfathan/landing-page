@@ -38,23 +38,31 @@ function drawStroke(el, seed) {
 
   const w = Math.ceil(rect.width + padX * 2);
   const h = Math.ceil(rect.height + padY * 2);
-  const dpr = Math.min(window.devicePixelRatio || 1, 3);
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-  canvas.style.width = `${w}px`;
-  canvas.style.height = `${h}px`;
+  // Keep a monotonic buffer width during live morphs to avoid GPU texture reallocation every frame
+  const minBufW = isInlineSwipe ? w : Math.max(w, parseInt(canvas.dataset.bufW || '0', 10));
+  const minBufH = isInlineSwipe ? h : Math.max(h, parseInt(canvas.dataset.bufH || '0', 10));
+  const targetPxW = Math.round(minBufW * dpr);
+  const targetPxH = Math.round(minBufH * dpr);
+
+  if (canvas.width !== targetPxW || canvas.height !== targetPxH) {
+    canvas.dataset.bufW = String(minBufW);
+    canvas.dataset.bufH = String(minBufH);
+    canvas.width = targetPxW;
+    canvas.height = targetPxH;
+    canvas.style.width = `${minBufW}px`;
+    canvas.style.height = `${minBufH}px`;
+  }
+
   canvas.style.left = `${-padX}px`;
   canvas.style.top = `${-padY}px`;
-
-  if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) {
-    canvas.width = Math.round(w * dpr);
-    canvas.height = Math.round(h * dpr);
-  }
 
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  ctx.clearRect(0, 0, w, h);
+  ctx.clearRect(0, 0, minBufW, minBufH);
 
   const rand = mulberry32(seed);
   const color = getMarkerColor();
