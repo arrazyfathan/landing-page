@@ -236,10 +236,10 @@ html.js .up.in {
   left: 0;
   width: 42px;
   height: 42px;
-  padding: 2.5px;
+  padding: 1px;
   border-radius: 11px;
   background: var(--surface);
-  border: 1.5px solid var(--line-strong);
+  border: 1px solid var(--line);
   box-shadow: var(--shadow-photo);
   overflow: hidden;
   transition: transform 480ms var(--spring), opacity 220ms var(--ease-out), filter 220ms var(--ease-out);
@@ -248,7 +248,7 @@ html.js .up.in {
 .mini-photo img {
   width: 100%;
   height: 100%;
-  border-radius: 8px;
+  border-radius: 9.5px;
   object-fit: cover;
 }
 
@@ -418,12 +418,19 @@ html[data-day="sun"] .theme-opt--moon {
 }
 
 /* ==========================================================================
-   Minimal Hero (Exact rhythm & proportions of reference image 1)
+   Minimal Hero (Full-viewport sticky hero that shrinks as content rises)
    ========================================================================== */
 .hero {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   width: min(980px, 100% - 40px);
-  padding-top: clamp(52px, 9vh, 96px);
-  padding-bottom: clamp(56px, 9vh, 96px);
+  min-height: calc(100svh - 80px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: clamp(24px, 4vh, 48px);
+  padding-bottom: clamp(48px, 8vh, 84px);
   text-align: center;
 }
 
@@ -431,6 +438,8 @@ html[data-day="sun"] .theme-opt--moon {
   display: flex;
   flex-direction: column;
   align-items: center;
+  transform-origin: center center;
+  will-change: transform, opacity;
 }
 
 /* Fanned Die-Cut Sticker Row */
@@ -779,11 +788,38 @@ html[data-day="sun"] .theme-opt--moon {
 }
 
 /* ==========================================================================
-   Minimal Editorial Letter (Exact calm rhythm of reference image 2)
+   Minimal Editorial Letter (Rises cleanly over the shrinking sticky hero)
    ========================================================================== */
 .letter {
-  padding-top: 20px;
+  position: relative;
+  z-index: 2;
+  background-color: var(--bg);
+  padding-top: 48px;
   padding-bottom: 56px;
+}
+
+.letter::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: -72px;
+  width: 100vw;
+  height: 72px;
+  background: linear-gradient(to bottom, transparent, var(--bg));
+  pointer-events: none;
+}
+
+.letter::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  background: var(--bg);
+  z-index: -1;
+  pointer-events: none;
 }
 
 .prose {
@@ -979,6 +1015,9 @@ html[data-day="sun"] .inline-avatar--cycling {
    Cycling Phone Photos — Staggered Editorial Gallery (muhraufan-inspired)
    ========================================================================== */
 .photo-gallery-section {
+  position: relative;
+  z-index: 2;
+  background-color: var(--bg);
   padding-top: 8px;
   padding-bottom: 56px;
 }
@@ -1203,6 +1242,9 @@ html[data-day="sun"] .viewer-backdrop {
    Minimal Connect Row & Dedicated /connect/ Directory Page
    ========================================================================== */
 .connect {
+  position: relative;
+  z-index: 2;
+  background-color: var(--bg);
   padding-top: 28px;
   padding-bottom: 44px;
   border-top: 1px solid var(--line);
@@ -1432,6 +1474,9 @@ html[data-day="sun"] .viewer-backdrop {
    Minimal Year Footer
    ========================================================================== */
 .foot {
+  position: relative;
+  z-index: 2;
+  background-color: var(--bg);
   padding: 18px 0 48px;
   border-top: 1px solid var(--line);
   display: flex;
@@ -1701,8 +1746,9 @@ html[data-day="sun"] .viewer-backdrop {
 
   .hero {
     width: calc(100% - 28px);
-    padding-top: 40px;
-    padding-bottom: 48px;
+    min-height: calc(100svh - 70px);
+    padding-top: 20px;
+    padding-bottom: 40px;
   }
 
   .hero-headline {

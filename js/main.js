@@ -136,6 +136,7 @@ function updateSwapHints() {
 const swapControllers = [];
 let autoSwapPaused = false;
 let autoSwapTimer = null;
+let heroScrollProgress = 0;
 
 document.querySelectorAll('.swap-pill').forEach((btn) => {
   const words = (btn.getAttribute('data-swap') || '').split('|').filter(Boolean);
@@ -230,6 +231,7 @@ document.querySelectorAll('.swap-pill').forEach((btn) => {
 function runAutoSwapCycle() {
   if (
     autoSwapPaused ||
+    heroScrollProgress > 0.15 ||
     document.hidden ||
     window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
     document.querySelector('.photo-viewer:not([hidden])')
@@ -302,7 +304,46 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
+/* 9. Full-Viewport Hero Scroll-Driven Shrink Transition */
+function initHeroScrollShrink() {
+  const hero = document.querySelector('.hero');
+  const inner = hero && hero.querySelector('.hero-inner');
+  if (!hero || !inner) return;
+
+  function applyHeroScroll() {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+    const range = Math.max(260, hero.offsetHeight * 0.95);
+    const raw = Math.min(1, Math.max(0, scrollY / range));
+    heroScrollProgress = raw;
+
+    if (reducedMotion || raw <= 0.002) {
+      inner.style.transform = '';
+      inner.style.opacity = '';
+      inner.style.filter = '';
+      hero.style.pointerEvents = '';
+      return;
+    }
+
+    // Sticky hero smoothly shrinks and fades across the full rise of the intro section
+    const scale = 1 - raw * 0.30;           // 1.00 -> 0.70
+    const translateY = -raw * 24;           // 0 -> -24px gentle lift
+    const opacity = Math.max(0, 1 - raw * 1.08); // 1.00 -> 0.00 smoothly
+    const blur = raw * 4;                   // 0 -> 4px soft depth-of-field
+
+    inner.style.transform = `translate3d(0, ${translateY.toFixed(1)}px, 0) scale(${scale.toFixed(4)})`;
+    inner.style.opacity = opacity.toFixed(3);
+    inner.style.filter = blur > 0.15 ? `blur(${blur.toFixed(2)}px)` : '';
+    hero.style.pointerEvents = raw > 0.75 ? 'none' : '';
+  }
+
+  window.addEventListener('scroll', applyHeroScroll, { passive: true });
+  window.addEventListener('resize', applyHeroScroll, { passive: true });
+  applyHeroScroll();
+}
+
 /* Boot */
 setupScrollReveal();
 initMarkers();
 initCyclingPhotos();
+initHeroScrollShrink();
