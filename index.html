@@ -102,7 +102,7 @@
     }
   </script>
 
-  <!-- Prevent theme flash & redirect legacy #cycling bookmarks -->
+  <!-- Enable progressive reveal, preserve per-tab theme choice (Light-first on new visits) -->
   <script>
     (function () {
       try {
@@ -112,11 +112,9 @@
         }
         var root = document.documentElement;
         root.classList.add('js');
-        var savedDay = localStorage.getItem('arrazy-day');
-        if (savedDay === 'sun' || savedDay === 'sat') {
-          root.setAttribute('data-day', savedDay);
-        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-          root.setAttribute('data-day', 'sun');
+        var sessionDay = sessionStorage.getItem('arrazy-day');
+        if (sessionDay === 'sun' || sessionDay === 'sat') {
+          root.setAttribute('data-day', sessionDay);
         }
       } catch (e) {}
     })();

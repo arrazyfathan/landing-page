@@ -89,7 +89,7 @@ function toggleDay() {
   const next = root.getAttribute('data-day') === 'sun' ? 'sat' : 'sun';
   root.setAttribute('data-day', next);
   try {
-    localStorage.setItem('arrazy-day', next);
+    sessionStorage.setItem('arrazy-day', next);
   } catch (_) {}
   syncDayUI();
   repaintAllMarkers();
