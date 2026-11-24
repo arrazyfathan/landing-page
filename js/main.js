@@ -8,6 +8,7 @@ import {
 } from './sound.js';
 import { initMarkers, morphMarker, repaintAllMarkers } from './marker.js?v=7';
 import { initCyclingPhotos } from './photos.js?v=17';
+import { initTrophyCase } from './trophies.js?v=19';
 
 const root = document.documentElement;
 const EMAIL = 'hello@arrazyfathan.com';
@@ -600,5 +601,6 @@ function initInlineAppPopovers() {
 setupScrollReveal();
 initMarkers();
 initCyclingPhotos();
+initTrophyCase();
 initHeroScrollShrink();
 initInlineAppPopovers();

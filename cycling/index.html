@@ -42,7 +42,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png" />
   <link rel="manifest" href="/site.webmanifest" />
   <link rel="prefetch" href="/" />
-  <link rel="stylesheet" href="/css/styles.css?v=17" />
+  <link rel="stylesheet" href="/css/styles.css?v=19" />
 
   <!-- Structured Data (JSON-LD: WebPage + BreadcrumbList) -->
   <script type="application/ld+json">
@@ -361,6 +361,29 @@
       </div>
     </section>
 
+    <!-- STRAVA TROPHY CASE & RECENT PRs -->
+    <section class="trophy-section wrap-letter up" id="trophy-case" aria-label="Strava trophy case">
+      <div class="trophy-head">
+        <span class="connect-label">TROPHY CASE</span>
+        <a
+          href="https://www.strava.com/athletes/45137448"
+          target="_blank"
+          rel="noopener noreferrer me"
+          class="trophy-strava-link"
+        >
+          Last 10 &middot; Strava &nearr;
+        </a>
+      </div>
+
+      <div class="trophy-shelf-grid" id="trophy-shelf-grid" role="list">
+        <!-- Populated from /assets/trophies/trophies.json by /js/trophies.js -->
+      </div>
+
+      <div class="trophy-prs" id="trophy-prs" aria-label="Recent Strava personal records">
+        <!-- Populated from /assets/trophies/achievements.json by /js/trophies.js -->
+      </div>
+    </section>
+
     <!-- MINIMAL CONNECT ROW -->
     <section class="connect wrap-letter" id="connect" aria-label="Connect">
       <div class="connect-label">CONNECT</div>
@@ -434,6 +457,6 @@
   <!-- Subtle Copy Toast -->
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-  <script type="module" src="/js/main.js?v=17"></script>
+  <script type="module" src="/js/main.js?v=19"></script>
 </body>
 </html>
