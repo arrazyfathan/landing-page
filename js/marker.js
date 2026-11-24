@@ -29,15 +29,18 @@ function drawStroke(el, seed) {
   const canvas = el.querySelector(':scope > .marker-canvas');
   if (!canvas) return;
 
-  const rect = el.getBoundingClientRect();
-  if (rect.width < 4 || rect.height < 4) return;
+  // Use offsetWidth/offsetHeight (unscaled CSS layout box) so ancestor CSS transforms
+  // like hero scroll-shrink scale() never distort the marker canvas dimensions.
+  const elW = el.offsetWidth;
+  const elH = el.offsetHeight;
+  if (elW < 4 || elH < 4) return;
 
   const isInlineSwipe = el.classList.contains('hl-swipe');
   const padX = isInlineSwipe ? 6 : 8;
   const padY = isInlineSwipe ? 4 : 8;
 
-  const w = Math.ceil(rect.width + padX * 2);
-  const h = Math.ceil(rect.height + padY * 2);
+  const w = Math.ceil(elW + padX * 2);
+  const h = Math.ceil(elH + padY * 2);
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
   // Keep a monotonic buffer width during live morphs to avoid GPU texture reallocation every frame
@@ -70,7 +73,7 @@ function drawStroke(el, seed) {
   // Stroke geometry: thick rounded-cap highlighter path with gentle organic wave.
   // Round caps extend by `radius` past leftX/rightX, so keep caps strictly within
   // the element's bounds (never overlapping trailing punctuation).
-  const thickness = isInlineSwipe ? rect.height * 0.74 : rect.height * 0.84;
+  const thickness = isInlineSwipe ? elH * 0.74 : elH * 0.84;
   const radius = thickness / 2;
 
   const capInset = isInlineSwipe ? 2 : 1;

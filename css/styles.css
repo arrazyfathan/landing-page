@@ -972,7 +972,7 @@ html[data-day="sun"] .theme-opt--moon {
   z-index: 2;
   background-color: var(--bg);
   padding-top: 48px;
-  padding-bottom: 56px;
+  padding-bottom: clamp(96px, 14vh, 148px);
 }
 
 .letter::before {
@@ -1120,6 +1120,131 @@ html[data-day="sun"] .inline-avatar--cycling {
   height: 100%;
   object-fit: cover;
   border-radius: 5px;
+}
+
+/* Interactive Inline Shipped Product & Open-Source Project Icon Clusters */
+.inline-app-cluster {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: -7px;
+  margin-inline: 4px 5px;
+}
+
+.inline-app-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 27px;
+  height: 27px;
+  margin-left: -5px;
+  padding: 0;
+  border-radius: 8px;
+  background: #FFFFFF;
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 1px 4px rgba(23, 21, 15, 0.22), 0 0 0 1px rgba(23, 21, 15, 0.12);
+  overflow: hidden;
+  transform: rotate(var(--rot, 0deg));
+  transform-origin: center 75%;
+  transition:
+    transform 420ms var(--spring),
+    margin-left 280ms var(--spring-soft),
+    box-shadow 200ms var(--ease-out);
+  cursor: pointer;
+}
+
+.inline-app-btn:first-child {
+  margin-left: 0;
+}
+
+.inline-app-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+.inline-app-btn--contain img {
+  object-fit: contain;
+  padding: 2px;
+}
+
+.inline-app-btn.is-active {
+  transform: translateY(-6px) scale(1.26) rotate(0deg);
+  box-shadow: 0 7px 14px rgba(23, 21, 15, 0.24), 0 0 0 1.5px var(--accent);
+  z-index: 5;
+}
+
+.inline-app-btn:active {
+  transform: translateY(-2px) scale(1.08) rotate(0deg);
+}
+
+/* Floating Popup Label for Shipped Products & Open-Source Projects */
+.app-popover {
+  position: fixed;
+  top: var(--pop-y, 0px);
+  left: var(--pop-x, 0px);
+  z-index: 70;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 10px;
+  background: var(--ink);
+  color: var(--bg);
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  white-space: nowrap;
+  box-shadow: 0 6px 20px rgba(23, 21, 15, 0.22);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(6px) scale(0.92);
+  transform-origin: var(--arrow-x, 50%) bottom;
+  transition:
+    opacity 150ms var(--ease-out),
+    transform 240ms var(--spring-soft);
+}
+
+.app-popover.is-open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+.app-popover::after {
+  content: "";
+  position: absolute;
+  left: var(--arrow-x, 50%);
+  top: 100%;
+  width: 8px;
+  height: 8px;
+  background: var(--ink);
+  transform: translate(-50%, -50%) rotate(45deg);
+  border-radius: 1.5px;
+  pointer-events: none;
+}
+
+.app-popover-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.app-popover-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.app-popover-arrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  opacity: 0.72;
 }
 
 /* Canvas Yellow Highlighter Swipe inside Letter */
@@ -1853,14 +1978,21 @@ html[data-day="sun"] .viewer-backdrop {
     z-index: 3;
   }
 
-  .inline-cluster:hover img:not(:first-child) {
-    margin-left: 2px;
+  .inline-cluster:hover img:not(:first-child),
+  .inline-app-cluster:hover .inline-app-btn:not(:first-child) {
+    margin-left: 3px;
   }
 
   .inline-cluster img:hover {
     transform: translateY(-6px) scale(1.32) rotate(-7deg);
     filter: drop-shadow(0 5px 8px rgba(23, 21, 15, 0.18));
     z-index: 4;
+  }
+
+  .inline-app-btn:hover {
+    transform: translateY(-6px) scale(1.26) rotate(0deg);
+    box-shadow: 0 7px 14px rgba(23, 21, 15, 0.24), 0 0 0 1px rgba(23, 21, 15, 0.15);
+    z-index: 5;
   }
 
   .connect-pill:hover {
@@ -2004,6 +2136,10 @@ html[data-day="sun"] .viewer-backdrop {
 
   .prose {
     font-size: 16px;
+  }
+
+  .letter {
+    padding-bottom: 84px;
   }
 
   /* /connect/ Directory Page Mobile Layout */

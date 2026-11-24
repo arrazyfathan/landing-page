@@ -6,7 +6,7 @@ import {
   playSwitch,
   playSuccess
 } from './sound.js';
-import { initMarkers, morphMarker, repaintAllMarkers } from './marker.js';
+import { initMarkers, morphMarker, repaintAllMarkers } from './marker.js?v=7';
 import { initCyclingPhotos } from './photos.js';
 
 const root = document.documentElement;
@@ -205,8 +205,8 @@ document.querySelectorAll('.swap-pill').forEach((btn) => {
       return;
     }
 
-    // 1. Capture current live width (even mid-spring for smooth interruption)
-    const oldWidth = btn.getBoundingClientRect().width;
+    // 1. Capture current live unscaled layout width (immune to ancestor scroll scale)
+    const oldWidth = btn.offsetWidth;
     btn.style.width = `${oldWidth}px`;
 
     // 2. Quick blur-up exit on current content
@@ -216,7 +216,7 @@ document.querySelectorAll('.swap-pill').forEach((btn) => {
     exitTimer = setTimeout(() => {
       if (seq !== swapSeq) return;
 
-      // 3. Swap word & icon and measure exact target width
+      // 3. Swap word & icon and measure exact unscaled target width
       textEl.textContent = words[idx];
       if (iconEl && icons[idx]) {
         iconEl.src = icons[idx];
@@ -224,7 +224,7 @@ document.querySelectorAll('.swap-pill').forEach((btn) => {
 
       const cs = getComputedStyle(btn);
       const padH = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
-      const targetWidth = Math.ceil(innerEl.getBoundingClientRect().width + padH);
+      const targetWidth = Math.ceil(innerEl.offsetWidth + padH);
 
       // 4. Prep enter state (blurred & slightly below) with no transition
       btn.classList.remove('is-exiting');
@@ -373,8 +373,165 @@ function initHeroScrollShrink() {
   applyHeroScroll();
 }
 
+/* 10. Inline Product & Open-Source Project Icon Popover (Hover + Click/Tap) */
+function initInlineAppPopovers() {
+  const buttons = Array.from(document.querySelectorAll('.inline-app-btn'));
+  if (!buttons.length) return;
+
+  const popover = document.createElement('div');
+  popover.className = 'app-popover';
+  popover.setAttribute('role', 'tooltip');
+  document.body.appendChild(popover);
+
+  let activeBtn = null;
+  let pinnedBtn = null;
+  let hideTimer = null;
+
+  function renderPopoverContent(btn) {
+    const name = btn.getAttribute('data-app-name') || '';
+    const url = btn.getAttribute('data-app-url') || '';
+    popover.textContent = '';
+    if (url) {
+      const a = document.createElement('a');
+      a.href = url;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.className = 'app-popover-link';
+      a.textContent = name;
+      const arrow = document.createElement('span');
+      arrow.className = 'app-popover-arrow';
+      arrow.setAttribute('aria-hidden', 'true');
+      arrow.textContent = '↗';
+      a.appendChild(arrow);
+      popover.appendChild(a);
+    } else {
+      popover.textContent = name;
+    }
+  }
+
+  function positionPopover(btn) {
+    const rect = btn.getBoundingClientRect();
+    const popW = popover.offsetWidth;
+    const popH = popover.offsetHeight;
+    const vw = window.innerWidth;
+    const margin = 12;
+
+    const btnCenterX = rect.left + rect.width / 2;
+    const rawX = btnCenterX - popW / 2;
+    const clampedX = Math.max(margin, Math.min(vw - popW - margin, rawX));
+    const popY = Math.max(margin, rect.top - popH - 12);
+    const arrowX = Math.max(12, Math.min(popW - 12, btnCenterX - clampedX));
+
+    popover.style.setProperty('--pop-x', `${Math.round(clampedX)}px`);
+    popover.style.setProperty('--pop-y', `${Math.round(popY)}px`);
+    popover.style.setProperty('--arrow-x', `${Math.round(arrowX)}px`);
+  }
+
+  function showFor(btn, { pin = false } = {}) {
+    clearTimeout(hideTimer);
+    if (activeBtn && activeBtn !== btn) {
+      activeBtn.classList.remove('is-active');
+    }
+    activeBtn = btn;
+    if (pin) pinnedBtn = btn;
+    btn.classList.add('is-active');
+
+    renderPopoverContent(btn);
+    positionPopover(btn);
+    requestAnimationFrame(() => {
+      if (activeBtn === btn) {
+        positionPopover(btn);
+        popover.classList.add('is-open');
+      }
+    });
+  }
+
+  function hideAll(immediate = false) {
+    clearTimeout(hideTimer);
+    const doHide = () => {
+      if (activeBtn) activeBtn.classList.remove('is-active');
+      activeBtn = null;
+      pinnedBtn = null;
+      popover.classList.remove('is-open');
+    };
+    if (immediate) doHide();
+    else hideTimer = setTimeout(doHide, 140);
+  }
+
+  buttons.forEach((btn) => {
+    btn.addEventListener('pointerenter', (e) => {
+      if (e.pointerType === 'touch') return;
+      if (pinnedBtn && pinnedBtn !== btn) {
+        pinnedBtn.classList.remove('is-active');
+        pinnedBtn = null;
+      }
+      showFor(btn, { pin: false });
+    });
+
+    btn.addEventListener('pointerleave', (e) => {
+      if (e.pointerType === 'touch') return;
+      if (pinnedBtn === btn) return;
+      hideAll(false);
+    });
+
+    btn.addEventListener('focus', () => {
+      showFor(btn, { pin: false });
+    });
+
+    btn.addEventListener('blur', () => {
+      if (pinnedBtn === btn) return;
+      hideAll(false);
+    });
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      playPop(1.04);
+      const url = btn.getAttribute('data-app-url');
+
+      if (pinnedBtn === btn) {
+        if (url) {
+          window.open(url, '_blank', 'noopener,noreferrer');
+        }
+        hideAll(true);
+        return;
+      }
+
+      showFor(btn, { pin: true });
+    });
+  });
+
+  popover.addEventListener('pointerenter', () => {
+    clearTimeout(hideTimer);
+  });
+
+  popover.addEventListener('pointerleave', () => {
+    if (!pinnedBtn) hideAll(false);
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!activeBtn) return;
+    if (popover.contains(e.target)) return;
+    hideAll(true);
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && activeBtn) {
+      hideAll(true);
+    }
+  });
+
+  window.addEventListener('scroll', () => {
+    if (activeBtn) positionPopover(activeBtn);
+  }, { passive: true });
+
+  window.addEventListener('resize', () => {
+    if (activeBtn) positionPopover(activeBtn);
+  }, { passive: true });
+}
+
 /* Boot */
 setupScrollReveal();
 initMarkers();
 initCyclingPhotos();
 initHeroScrollShrink();
+initInlineAppPopovers();
