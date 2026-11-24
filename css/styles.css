@@ -8,6 +8,110 @@
   navigation: auto;
 }
 
+::view-transition-group(root) {
+  animation-duration: 380ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+::view-transition-old(root) {
+  animation: vt-page-out 260ms cubic-bezier(0.32, 0, 0.67, 0) both;
+}
+
+::view-transition-new(root) {
+  animation: vt-page-in 380ms cubic-bezier(0.22, 1, 0.36, 1) 40ms both;
+}
+
+@keyframes vt-page-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.99);
+  }
+}
+
+@keyframes vt-page-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Swappable Stacked Avatar Cards — keep cards solid & spring-morph smoothly across pages */
+::view-transition-group(avatar-work),
+::view-transition-group(avatar-cycling) {
+  animation-duration: 580ms;
+  animation-timing-function: cubic-bezier(0.22, 1.18, 0.36, 1);
+}
+
+::view-transition-old(avatar-work),
+::view-transition-old(avatar-cycling) {
+  animation: none;
+  opacity: 0;
+}
+
+::view-transition-new(avatar-work),
+::view-transition-new(avatar-cycling) {
+  animation: none;
+  opacity: 1;
+  width: 100%;
+  height: 100%;
+}
+
+/* Ensure the newly active card glides ON TOP of the retiring card mid-swap */
+html[data-profile="work"]::view-transition-group(avatar-work) {
+  z-index: 6;
+}
+html[data-profile="work"]::view-transition-group(avatar-cycling) {
+  z-index: 5;
+}
+html[data-profile="cycling"]::view-transition-group(avatar-cycling) {
+  z-index: 6;
+}
+html[data-profile="cycling"]::view-transition-group(avatar-work) {
+  z-index: 5;
+}
+
+/* Playful slight lift on the incoming card during the swap */
+html[data-profile="work"]::view-transition-image-pair(avatar-work),
+html[data-profile="cycling"]::view-transition-image-pair(avatar-cycling) {
+  animation: vt-card-pop 580ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes vt-card-pop {
+  0%   { transform: scale(1) translateY(0); }
+  42%  { transform: scale(1.14) translateY(-4px); }
+  100% { transform: scale(1) translateY(0); }
+}
+
+/* Keep topbar text & right utility controls steady & crisp during page swap */
+::view-transition-group(toggle-meta) {
+  z-index: 4;
+  animation-duration: 320ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+::view-transition-group(topbar-tools) {
+  z-index: 4;
+  animation-duration: 240ms;
+}
+
+::view-transition-old(topbar-tools) {
+  animation: none;
+  opacity: 0;
+}
+
+::view-transition-new(topbar-tools) {
+  animation: none;
+  opacity: 1;
+}
+
 :root {
   /* Light ("Sat") — pure warm archival paper */
   --bg: #FBFAF7;
@@ -177,16 +281,30 @@ html[data-profile="cycling"] .only-cycling-flex {
   margin-inline: auto;
 }
 
-/* Gentle Scroll Reveal */
+/* Gentle Scroll Reveal (keep above-the-fold hero & connect header immediately visible for silky View Transitions) */
 html.js .up {
   opacity: 0;
   transform: translateY(10px);
   transition: opacity 460ms var(--ease-out), transform 580ms var(--spring-soft);
 }
 
+html.js .hero .up,
+html.js .connect-page-head.up,
+html.js .directory-list.up {
+  opacity: 1;
+  transform: none;
+}
+
 html.js .up.in {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* Smooth fallback transition when switching pages in browsers without MPA View Transitions */
+body.is-switching main {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.99);
+  transition: opacity 280ms var(--ease-out), transform 320ms var(--ease-out);
 }
 
 /* ==========================================================================
@@ -252,6 +370,14 @@ html.js .up.in {
   object-fit: cover;
 }
 
+.mini-photo--work {
+  view-transition-name: avatar-work;
+}
+
+.mini-photo--cycling {
+  view-transition-name: avatar-cycling;
+}
+
 .mini-photo--work img {
   background: var(--b);
 }
@@ -300,6 +426,7 @@ html[data-profile="cycling"] .mini-photo--work {
   display: flex;
   flex-direction: column;
   line-height: 1.25;
+  view-transition-name: toggle-meta;
 }
 
 .photo-toggle-mode {
@@ -336,6 +463,7 @@ html[data-profile="cycling"] .mini-photo--work {
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
+  view-transition-name: topbar-tools;
 }
 
 .theme-switch {
@@ -520,13 +648,17 @@ html[data-day="sun"] .theme-opt--moon {
   padding: 2px 18px 4px 14px;
   margin-left: 4px;
   margin-right: 6px;
-  border-radius: 14px;
-  background: transparent;
+  border-radius: 999px;
+  background: var(--accent);
   color: var(--accent-ink);
   font: inherit;
   line-height: 1.08;
   vertical-align: baseline;
   transition: width 520ms cubic-bezier(0.22, 1, 0.36, 1), transform 220ms var(--ease-out);
+}
+
+.swap-pill.has-marker {
+  background: transparent;
 }
 
 .swap-inner {
@@ -615,9 +747,19 @@ html[data-day="sun"] .theme-opt--moon {
   font-weight: 600;
 }
 
+/* Work Hero Action Row (Email Pill + Resume Pill) */
+.hero-actions {
+  margin-top: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-width: 100%;
+}
+
 /* Clean Pill Email / CTA Bar (matching reference image 1) */
 .cta-pill {
-  margin-top: 28px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -627,6 +769,41 @@ html[data-day="sun"] .theme-opt--moon {
   border: 1px solid var(--line-strong);
   box-shadow: var(--shadow-pill);
   max-width: 100%;
+}
+
+.btn-resume {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 50px;
+  padding: 0 18px 0 12px;
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  box-shadow: var(--shadow-pill);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: transform 240ms var(--spring), border-color 160ms var(--ease-out), box-shadow 180ms var(--ease-out);
+}
+
+.btn-resume img {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  transition: transform 280ms var(--spring);
+}
+
+.btn-resume .btn-arrow {
+  color: var(--muted);
+  font-size: 13px;
+  transition: transform 180ms var(--ease-out), color 160ms var(--ease-out);
+}
+
+.btn-resume:active {
+  transform: scale(0.96);
 }
 
 .cta-email {
@@ -951,11 +1128,16 @@ html[data-day="sun"] .inline-avatar--cycling {
   z-index: 1;
   display: inline-block;
   max-width: 100%;
-  background: transparent;
+  border-radius: 8px;
+  background: var(--accent);
   color: var(--accent-ink);
   font-weight: 600;
   padding: 0 6px;
   margin-inline: 1px;
+}
+
+.hl-swipe.has-marker {
+  background: transparent;
 }
 
 /* Subtle Minimal Strava Snapshot Strip */
@@ -1631,8 +1813,19 @@ html[data-day="sun"] .viewer-backdrop {
     transform: translateY(-2px);
   }
 
-  .btn-strava:hover img {
+  .btn-strava:hover img,
+  .btn-resume:hover img {
     transform: rotate(-6deg) scale(1.08);
+  }
+
+  .btn-resume:hover {
+    transform: translateY(-2px);
+    border-color: var(--ink-2);
+  }
+
+  .btn-resume:hover .btn-arrow {
+    color: var(--ink);
+    transform: translate(2px, -2px);
   }
 
   .text-link:hover,
@@ -1794,6 +1987,12 @@ html[data-day="sun"] .viewer-backdrop {
     font-size: 13.5px;
   }
 
+  .btn-resume {
+    height: 46px;
+    padding: 0 16px 0 10px;
+    font-size: 13.5px;
+  }
+
   .ride-badge {
     max-width: 100%;
     height: auto;
@@ -1923,4 +2122,11 @@ html[data-day="sun"] .viewer-backdrop {
   html.js .up { transform: none; transition: opacity 200ms ease; }
   .status-dot::after { animation: none; opacity: 0; }
   .mini-photo, .fan-item, .swap-pill, .connect-pill, .stagger-open, .viewer-backdrop, .viewer-img, .viewer-bar, .inline-ico, .inline-avatar, .inline-company-ico, .inline-cluster img { transition-duration: 100ms !important; transition-delay: 0ms !important; }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-image-pair(*) {
+    animation-duration: 100ms !important;
+    animation-delay: 0ms !important;
+  }
 }

@@ -41,7 +41,8 @@
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/favicon-192.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png" />
   <link rel="manifest" href="/site.webmanifest" />
-  <link rel="stylesheet" href="/css/styles.css?v=2" />
+  <link rel="prefetch" href="/cycling/" />
+  <link rel="stylesheet" href="/css/styles.css?v=5" />
 
   <!-- Structured Data (JSON-LD: Person + WebSite) -->
   <script type="application/ld+json">
@@ -280,11 +281,24 @@
           <img class="inline-ico" src="/assets/icons/platform/apple.svg" alt="" width="20" height="20" /><strong>iOS</strong>.
         </p>
 
-        <div class="cta-pill up">
-          <a href="mailto:hello@arrazyfathan.com" class="cta-email">hello@arrazyfathan.com</a>
-          <button type="button" class="cta-btn" data-copy-email>
-            <span class="copy-label">Copy email</span>
-          </button>
+        <div class="hero-actions up">
+          <div class="cta-pill">
+            <a href="mailto:hello@arrazyfathan.com" class="cta-email">hello@arrazyfathan.com</a>
+            <button type="button" class="cta-btn" data-copy-email>
+              <span class="copy-label">Copy email</span>
+            </button>
+          </div>
+          <a
+            href="https://cv.arrazyfathan.com"
+            target="_blank"
+            rel="noopener noreferrer me"
+            class="btn-resume"
+            title="View full resume at cv.arrazyfathan.com"
+          >
+            <img src="/assets/icons/connect/resume.svg" alt="" width="24" height="24" />
+            <span>See my resume</span>
+            <span class="btn-arrow" aria-hidden="true">&nearr;</span>
+          </a>
         </div>
 
         <p class="cta-caption up">
@@ -401,6 +415,6 @@
   <!-- Subtle Copy Toast -->
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-  <script type="module" src="/js/main.js?v=3"></script>
+  <script type="module" src="/js/main.js?v=4"></script>
 </body>
 </html>

@@ -66,12 +66,45 @@ function observeVisibleReveals() {
   });
 }
 
-/* 3. Profile Navigation Sound Feedback (/, /cycling/, /connect/) */
+/* 3. Smooth Profile Navigation & Card Swap Feedback (/, /cycling/, /connect/) */
+const supportsMpaViewTransition =
+  typeof CSS !== 'undefined' &&
+  typeof CSS.supports === 'function' &&
+  CSS.supports('view-transition-name', 'avatar-work') &&
+  'onpagereveal' in window;
+
+function navigateProfile(href, goingToCycling) {
+  playSwitch(goingToCycling);
+
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (supportsMpaViewTransition || reducedMotion) {
+    window.location.href = href;
+    return;
+  }
+
+  // Smooth pre-navigation card-swap fallback for browsers without cross-document View Transitions
+  const targetProfile = goingToCycling ? 'cycling' : 'work';
+  root.setAttribute('data-profile', targetProfile);
+  document.body.classList.add('is-switching');
+  setTimeout(() => {
+    window.location.href = href;
+  }, 340);
+}
+
 const photoToggle = document.getElementById('profile-photo-toggle');
 if (photoToggle) {
-  photoToggle.addEventListener('click', () => {
-    const goingToCycling = photoToggle.getAttribute('href') === '/cycling/';
-    playSwitch(goingToCycling);
+  photoToggle.addEventListener('click', (e) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    const href = photoToggle.getAttribute('href') || '/';
+    const goingToCycling = href.startsWith('/cycling');
+
+    if (supportsMpaViewTransition || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      playSwitch(goingToCycling);
+      return;
+    }
+
+    e.preventDefault();
+    navigateProfile(href, goingToCycling);
   });
 }
 
@@ -294,11 +327,9 @@ window.addEventListener('keydown', (e) => {
   const key = e.key.toLowerCase();
   const path = window.location.pathname;
   if (key === 'w' && path !== '/' && path !== '/index.html') {
-    playSwitch(false);
-    window.location.href = '/';
+    navigateProfile('/', false);
   } else if (key === 'c' && !path.startsWith('/cycling')) {
-    playSwitch(true);
-    window.location.href = '/cycling/';
+    navigateProfile('/cycling/', true);
   } else if (key === 'd') {
     toggleDay();
   }

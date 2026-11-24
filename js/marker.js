@@ -117,6 +117,7 @@ function drawStroke(el, seed) {
   );
   ctx.stroke();
   ctx.restore();
+  el.classList.add('has-marker');
 }
 
 const seedMap = new WeakMap();
