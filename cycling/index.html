@@ -42,7 +42,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png" />
   <link rel="manifest" href="/site.webmanifest" />
   <link rel="prefetch" href="/" />
-  <link rel="stylesheet" href="/css/styles.css?v=13" />
+  <link rel="stylesheet" href="/css/styles.css?v=16" />
 
   <!-- Structured Data (JSON-LD: WebPage + BreadcrumbList) -->
   <script type="application/ld+json">
@@ -304,14 +304,50 @@
       </article>
     </section>
 
-    <!-- STAGGERED ROAD PHOTO GALLERY -->
+    <!-- WATCHOS RADIAL LENS ROAD PHOTO GALLERY -->
     <section class="photo-gallery-section up" id="ride-photos" aria-label="Cycling photos">
       <div class="photo-gallery-head">
         <span class="connect-label">SHOTS FROM THE ROAD</span>
-        <span class="photo-gallery-count" id="photo-count"></span>
+        <div class="photo-gallery-head-meta">
+          <span class="photo-gallery-hint">Drag to pan &middot; Hover to zoom</span>
+          <span class="photo-gallery-count" id="photo-count"></span>
+        </div>
       </div>
-      <div class="stagger-grid" id="stagger-grid" role="list">
-        <!-- Populated from /assets/photos/photos.json by /js/photos.js -->
+
+      <div class="watch-gallery" id="watch-gallery">
+        <div
+          class="watch-viewport"
+          id="watch-viewport"
+          role="region"
+          aria-label="Interactive road photo cluster — drag to explore, hover to zoom, click to open"
+        >
+          <!-- Photo tiles populated from /assets/photos/photos.json by /js/photos.js -->
+
+          <!-- Multi-layer Radial Progressive Blur + Paper Opacity Vignette (z-index: 20) -->
+          <div class="watch-blur-layer watch-blur-layer--1" aria-hidden="true"></div>
+          <div class="watch-blur-layer watch-blur-layer--2" aria-hidden="true"></div>
+          <div class="watch-blur-layer watch-blur-layer--3" aria-hidden="true"></div>
+          <div class="watch-blur-layer watch-blur-layer--4" aria-hidden="true"></div>
+          <div class="watch-radial-fade" aria-hidden="true"></div>
+        </div>
+
+        <div class="watch-hud" aria-live="polite">
+          <span class="watch-hud-pill">
+            <i class="watch-hud-dot" aria-hidden="true"></i>
+            <span class="watch-hud-date" id="watch-hud-date">Road moments</span>
+            <span class="watch-hud-sep" aria-hidden="true">&middot;</span>
+            <span class="watch-hud-index" id="watch-hud-index">01 / 37</span>
+          </span>
+          <button
+            type="button"
+            class="watch-reset-btn"
+            id="watch-reset-btn"
+            aria-label="Recenter photo gallery"
+            hidden
+          >
+            Recenter
+          </button>
+        </div>
       </div>
     </section>
 
@@ -388,6 +424,6 @@
   <!-- Subtle Copy Toast -->
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-  <script type="module" src="/js/main.js?v=13"></script>
+  <script type="module" src="/js/main.js?v=16"></script>
 </body>
 </html>

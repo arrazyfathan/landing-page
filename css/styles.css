@@ -1029,6 +1029,10 @@ html[data-day="sun"] .theme-opt--moon {
   padding-bottom: clamp(96px, 14vh, 148px);
 }
 
+html[data-profile="cycling"] .letter {
+  padding-bottom: clamp(32px, 4.5vh, 48px);
+}
+
 .letter::before {
   content: "";
   position: absolute;
@@ -1373,82 +1377,291 @@ html[data-day="sun"] .inline-avatar--cycling {
 }
 
 /* ==========================================================================
-   Cycling Phone Photos — Staggered Editorial Gallery (muhraufan-inspired)
+   Cycling Phone Photos — WatchOS Radial Lens Gallery (Warm Archival Paper)
    ========================================================================== */
 .photo-gallery-section {
   position: relative;
   z-index: 2;
   background-color: var(--bg);
-  padding-top: 8px;
-  padding-bottom: 56px;
+  padding-top: 0;
+  padding-bottom: 52px;
 }
 
 .photo-gallery-head {
-  width: min(1280px, 100% - 40px);
+  width: min(700px, 100% - 40px);
   margin-inline: auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 18px;
+  margin-bottom: 0;
 }
 
 .photo-gallery-head .connect-label {
   margin-bottom: 0;
 }
 
+.photo-gallery-head-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.photo-gallery-hint {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--quiet);
+  opacity: 0.85;
+}
+
 .photo-gallery-count {
   font-family: var(--mono);
   font-size: 11.5px;
+  color: var(--muted);
+}
+
+.watch-gallery {
+  position: relative;
+  width: min(1040px, 100% - 24px);
+  margin-inline: auto;
+  --tile-w: 80px;
+  --tile-h: 98px;
+  --tile-r: 14px;
+}
+
+.watch-viewport {
+  position: relative;
+  width: 100%;
+  height: clamp(500px, 64vh, 570px);
+  overflow: hidden;
+  isolation: isolate;
+  contain: layout paint;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.watch-viewport.is-dragging {
+  cursor: grabbing;
+}
+
+/* WatchOS Honeycomb Photo Tile */
+.watch-tile {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--tile-w);
+  height: var(--tile-h);
+  margin-left: calc(var(--tile-w) * -0.5);
+  margin-top: calc(var(--tile-h) * -0.5);
+  padding: 0;
+  border-radius: var(--tile-r);
+  background: var(--sunken);
+  overflow: hidden;
+  cursor: zoom-in;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  box-shadow:
+    0 2px 8px rgba(23, 21, 15, 0.10),
+    0 0 0 1px rgba(23, 21, 15, 0.08);
+  will-change: transform, opacity;
+  transition: box-shadow 220ms var(--ease-out);
+}
+
+html[data-day="sun"] .watch-tile {
+  box-shadow:
+    0 3px 10px rgba(0, 0, 0, 0.42),
+    0 0 0 1px rgba(244, 239, 228, 0.12);
+}
+
+/* Subtle Apple-style top glass specular edge on each photo tile */
+.watch-tile::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  pointer-events: none;
+  opacity: 0.7;
+  transition: opacity 180ms var(--ease-out);
+}
+
+.watch-tile img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  opacity: 0;
+  transition: opacity 280ms var(--ease-out);
+}
+
+.watch-tile img.is-loaded {
+  opacity: 1;
+}
+
+/* Elevated, razor-sharp state when hovered or keyboard-focused */
+.watch-tile.is-hovered,
+.watch-tile:focus-visible {
+  box-shadow:
+    0 20px 44px rgba(23, 21, 15, 0.22),
+    0 5px 14px rgba(23, 21, 15, 0.11),
+    0 0 0 1.4px var(--surface),
+    0 0 0 2.1px rgba(23, 21, 15, 0.14);
+}
+
+html[data-day="sun"] .watch-tile.is-hovered,
+html[data-day="sun"] .watch-tile:focus-visible {
+  box-shadow:
+    0 24px 52px rgba(0, 0, 0, 0.68),
+    0 7px 18px rgba(0, 0, 0, 0.42),
+    0 0 0 1.4px var(--surface),
+    0 0 0 2.1px rgba(244, 239, 228, 0.22);
+}
+
+.watch-tile.is-hovered::after,
+.watch-tile:focus-visible::after {
+  opacity: 1;
+}
+
+.watch-viewport.is-dragging .watch-tile {
+  cursor: grabbing;
+}
+
+/* Multi-layer Radial Progressive Blur (z-index: 20 — hovered tile pops above at z-index: 40) */
+.watch-blur-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.watch-blur-layer--1 {
+  backdrop-filter: blur(1.5px);
+  -webkit-backdrop-filter: blur(1.5px);
+  mask-image: radial-gradient(ellipse 48% 48% at 50% 50%, transparent 45%, rgba(0, 0, 0, 0.92) 70%, #000 100%);
+  -webkit-mask-image: radial-gradient(ellipse 48% 48% at 50% 50%, transparent 45%, rgba(0, 0, 0, 0.92) 70%, #000 100%);
+}
+
+.watch-blur-layer--2 {
+  backdrop-filter: blur(3.5px);
+  -webkit-backdrop-filter: blur(3.5px);
+  mask-image: radial-gradient(ellipse 51% 50% at 50% 50%, transparent 58%, rgba(0, 0, 0, 0.96) 82%, #000 100%);
+  -webkit-mask-image: radial-gradient(ellipse 51% 50% at 50% 50%, transparent 58%, rgba(0, 0, 0, 0.96) 82%, #000 100%);
+}
+
+.watch-blur-layer--3 {
+  backdrop-filter: blur(6.5px);
+  -webkit-backdrop-filter: blur(6.5px);
+  mask-image: radial-gradient(ellipse 54% 52% at 50% 50%, transparent 70%, #000 92%);
+  -webkit-mask-image: radial-gradient(ellipse 54% 52% at 50% 50%, transparent 70%, #000 92%);
+}
+
+.watch-blur-layer--4 {
+  backdrop-filter: blur(10.5px);
+  -webkit-backdrop-filter: blur(10.5px);
+  mask-image: radial-gradient(ellipse 57% 54% at 50% 50%, transparent 80%, #000 98%);
+  -webkit-mask-image: radial-gradient(ellipse 57% 54% at 50% 50%, transparent 80%, #000 98%);
+}
+
+/* Progressive Radial Paper Opacity Vignette (melts cluster seamlessly into --bg) */
+.watch-radial-fade {
+  position: absolute;
+  inset: 0;
+  z-index: 21;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 52% 51% at 50% 50%,
+    transparent 45%,
+    color-mix(in srgb, var(--bg) 14%, transparent) 62%,
+    color-mix(in srgb, var(--bg) 48%, transparent) 78%,
+    color-mix(in srgb, var(--bg) 84%, transparent) 90%,
+    var(--bg) 99%
+  );
+}
+
+/* Minimal Editorial Focal HUD below the lens */
+.watch-hud {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 32px;
+}
+
+.watch-hud-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-sm);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--muted);
+  transition: border-color 180ms var(--ease-out), box-shadow 180ms var(--ease-out);
+}
+
+.watch-gallery.has-hover .watch-hud-pill {
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-pill);
+}
+
+.watch-hud-dot {
+  width: 6.5px;
+  height: 6.5px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+  transition: transform 220ms var(--spring);
+}
+
+.watch-gallery.has-hover .watch-hud-dot {
+  transform: scale(1.25);
+}
+
+.watch-hud-date {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.watch-hud-sep {
   color: var(--quiet);
 }
 
-.stagger-grid {
-  width: min(1280px, 100% - 40px);
-  margin-inline: auto;
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
+.watch-hud-index {
+  color: var(--quiet);
+  font-variant-numeric: tabular-nums;
 }
 
-.stagger-col {
-  flex: 1 1 0;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: var(--col-offset, 0px);
-}
-
-.stagger-item {
-  margin: 0;
-}
-
-.stagger-open {
-  display: block;
-  width: 100%;
-  padding: 0;
+.watch-reset-btn {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--r-pill);
   background: var(--sunken);
-  border-radius: 3px;
-  overflow: hidden;
-  cursor: zoom-in;
-  outline: 1px solid rgba(23, 21, 15, 0.09);
-  outline-offset: -1px;
-  transition: transform 240ms var(--ease-out), opacity 180ms var(--ease-out);
+  border: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--ink-2);
+  transition: transform 150ms var(--ease-out), border-color 160ms var(--ease-out), color 160ms var(--ease-out), opacity 180ms var(--ease-out);
 }
 
-html[data-day="sun"] .stagger-open {
-  outline-color: rgba(244, 239, 228, 0.11);
+.watch-reset-btn[hidden] {
+  display: none;
 }
 
-.stagger-open:active {
-  transform: scale(0.96);
-}
-
-.stagger-open img {
-  display: block;
-  width: 100%;
-  height: auto;
+.watch-reset-btn:active {
+  transform: scale(0.95);
 }
 
 /* Minimal Frosted FLIP Photo Viewer (exact muhraufan.com open/close timing) */
@@ -2064,9 +2277,10 @@ html[data-day="sun"] .viewer-backdrop {
     transform: rotate(-6deg) scale(1.1);
   }
 
-  .stagger-open:hover {
-    transform: translateY(-2px);
-    opacity: 0.94;
+  .watch-reset-btn:hover {
+    border-color: var(--line-strong);
+    color: var(--ink);
+    background: var(--surface);
   }
 
   .viewer-btn:hover {
@@ -2097,13 +2311,39 @@ html[data-day="sun"] .viewer-backdrop {
 /* ==========================================================================
    Responsive
    ========================================================================== */
+@media (max-width: 900px) {
+  .watch-gallery {
+    --tile-w: 70px;
+    --tile-h: 86px;
+    --tile-r: 13px;
+  }
+
+  .watch-viewport {
+    height: 460px;
+  }
+}
+
 @media (max-width: 600px) {
   .wrap,
   .wrap-letter,
   .topbar-inner,
-  .photo-gallery-head,
-  .stagger-grid {
+  .photo-gallery-head {
     width: calc(100% - 28px);
+  }
+
+  .photo-gallery-hint {
+    display: none;
+  }
+
+  .watch-gallery {
+    width: calc(100% - 16px);
+    --tile-w: 58px;
+    --tile-h: 72px;
+    --tile-r: 11px;
+  }
+
+  .watch-viewport {
+    height: 400px;
   }
 
   .topbar {
@@ -2277,6 +2517,10 @@ html[data-day="sun"] .viewer-backdrop {
     padding-bottom: 84px;
   }
 
+  html[data-profile="cycling"] .letter {
+    padding-bottom: 32px;
+  }
+
   /* /connect/ Directory Page Mobile Layout */
   .connect-page {
     padding-top: 32px;
@@ -2329,14 +2573,6 @@ html[data-day="sun"] .viewer-backdrop {
     font-size: 11.5px;
   }
 
-  .stagger-grid {
-    gap: 6px;
-  }
-
-  .stagger-col {
-    gap: 6px;
-  }
-
   .viewer-bar {
     gap: 10px;
     padding: 5px 6px 5px 12px;
@@ -2387,18 +2623,24 @@ html[data-day="sun"] .viewer-backdrop {
   }
 }
 
-/* Reduced Motion */
+/* Reduced Motion & Reduced Transparency */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   html.js .up { transform: none; transition: opacity 200ms ease; }
   .status-dot::after { animation: none; opacity: 0; }
   .scroll-cue-arrow { animation: none; }
-  .mini-photo, .fan-item, .swap-pill, .connect-pill, .stagger-open, .viewer-backdrop, .viewer-img, .viewer-bar, .inline-ico, .inline-avatar, .inline-company-ico, .inline-cluster img { transition-duration: 100ms !important; transition-delay: 0ms !important; }
+  .mini-photo, .fan-item, .swap-pill, .connect-pill, .watch-tile, .watch-hud-pill, .watch-reset-btn, .viewer-backdrop, .viewer-img, .viewer-bar, .inline-ico, .inline-avatar, .inline-company-ico, .inline-cluster img { transition-duration: 100ms !important; transition-delay: 0ms !important; }
   ::view-transition-group(*),
   ::view-transition-old(*),
   ::view-transition-new(*),
   ::view-transition-image-pair(*) {
     animation-duration: 100ms !important;
     animation-delay: 0ms !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .watch-blur-layer {
+    display: none;
   }
 }
