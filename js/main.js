@@ -66,73 +66,12 @@ function observeVisibleReveals() {
   });
 }
 
-/* 3. Top-Left Stacked Photo Profile Toggle (Mobile Eng. <-> On Two Wheels) */
+/* 3. Profile Navigation Sound Feedback (/, /cycling/, /connect/) */
 const photoToggle = document.getElementById('profile-photo-toggle');
-const faviconEl = document.querySelector('link[rel="icon"]');
-
-function applyProfile(nextProfile, { silent = false, updateHash = true } = {}) {
-  const target = nextProfile === 'cycling' ? 'cycling' : 'work';
-  const current = root.getAttribute('data-profile');
-
-  const commit = () => {
-    root.setAttribute('data-profile', target);
-    document.title =
-      target === 'cycling'
-        ? 'Ar Razy — On Two Wheels'
-        : 'Ar Razy Fathan Rabbani — Mobile Engineer (Android & iOS)';
-
-    if (faviconEl) {
-      faviconEl.href =
-        target === 'cycling'
-          ? './assets/icons/favicon-cycling-48.png'
-          : './assets/icons/favicon-48.png';
-    }
-
-    if (photoToggle) {
-      photoToggle.setAttribute('aria-pressed', String(target === 'cycling'));
-    }
-
-    try {
-      localStorage.setItem('arrazy-profile', target);
-    } catch (_) {}
-
-    if (updateHash && window.history && window.history.replaceState) {
-      const hash = target === 'cycling' ? '#cycling' : '#work';
-      if (window.location.hash !== hash) {
-        window.history.replaceState(null, '', hash);
-      }
-    }
-
-    requestAnimationFrame(() => {
-      observeVisibleReveals();
-      repaintAllMarkers();
-    });
-  };
-
-  if (current === target && !silent) {
-    playClick();
-    return;
-  }
-
-  if (!silent) {
-    playSwitch(target === 'cycling');
-  }
-
-  if (
-    !silent &&
-    document.startViewTransition &&
-    !window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  ) {
-    document.startViewTransition(commit);
-  } else {
-    commit();
-  }
-}
-
 if (photoToggle) {
   photoToggle.addEventListener('click', () => {
-    const current = root.getAttribute('data-profile');
-    applyProfile(current === 'work' ? 'cycling' : 'work');
+    const goingToCycling = photoToggle.getAttribute('href') === '/cycling/';
+    playSwitch(goingToCycling);
   });
 }
 
@@ -276,6 +215,7 @@ document.querySelectorAll('.swap-pill').forEach((btn) => {
 document.querySelectorAll('[data-copy-email]').forEach((btn) => {
   btn.addEventListener('click', async () => {
     const label = btn.querySelector('.copy-label');
+    const originalText = label ? label.textContent : '';
     try {
       await navigator.clipboard.writeText(EMAIL);
       playSuccess();
@@ -283,7 +223,7 @@ document.querySelectorAll('[data-copy-email]').forEach((btn) => {
       if (label) {
         label.textContent = 'Copied!';
         setTimeout(() => {
-          label.textContent = 'Copy email';
+          label.textContent = originalText || 'Copy email';
         }, 1600);
       }
     } catch (_) {
@@ -306,13 +246,19 @@ window.addEventListener('keydown', (e) => {
     return;
   }
   const key = e.key.toLowerCase();
-  if (key === 'w') applyProfile('work');
-  else if (key === 'c') applyProfile('cycling');
-  else if (key === 'd') toggleDay();
+  const path = window.location.pathname;
+  if (key === 'w' && path !== '/' && path !== '/index.html') {
+    playSwitch(false);
+    window.location.href = '/';
+  } else if (key === 'c' && !path.startsWith('/cycling')) {
+    playSwitch(true);
+    window.location.href = '/cycling/';
+  } else if (key === 'd') {
+    toggleDay();
+  }
 });
 
 /* Boot */
-applyProfile(root.getAttribute('data-profile') || 'work', { silent: true, updateHash: false });
 setupScrollReveal();
 initMarkers();
 initCyclingPhotos();

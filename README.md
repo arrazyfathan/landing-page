@@ -26,20 +26,29 @@ Design and interaction craft inspired by [muhraufan.com](https://muhraufan.com/)
 
 ```text
 landing-page/
-├── index.html                  # Single-page markup (Work & Cycling profiles + FLIP photo viewer)
+├── index.html                  # Home — Mobile Engineer (https://arrazyfathan.com/)
+├── cycling/
+│   └── index.html              # On Two Wheels — Strava stats & 37-photo gallery (/cycling/)
+├── connect/
+│   └── index.html              # Where You Can Find Me — direct links directory (/connect/)
 ├── css/
-│   └── styles.css              # Design tokens, spring curves, typography, staggered gallery & viewer
+│   └── styles.css              # Design tokens, spring curves, view transitions & viewer styles
 ├── js/
-│   ├── main.js                 # Profile toggle, theme/SFX switches, word swap choreography & shortcuts
+│   ├── main.js                 # Theme/SFX switches, word swap choreography & shortcuts
 │   ├── marker.js               # Retina <canvas> organic highlighter stroke renderer & live morph loop
 │   ├── photos.js               # Staggered gallery renderer + FLIP lightbox with keyboard navigation
 │   └── sound.js                # Procedural Web Audio API click, pop, switch & copy chimes
 ├── assets/
 │   ├── avatars/                # work.png & cycling.png transparent portrait illustrations
-│   ├── icons/                  # Custom die-cut sticker SVGs (platform, lang, connect, cycling) + gamatechno.png
-│   └── photos/                 # GPS-stripped WebP cycling shots (*-640.webp, *-1600.webp) & photos.json
+│   ├── icons/                  # Custom die-cut sticker SVGs, multi-size favicons & gamatechno.png
+│   ├── photos/                 # GPS-stripped WebP cycling shots (*-640.webp, *-1600.webp) & photos.json
+│   ├── og-image.png            # 1200x630 Open Graph preview card (Mobile Engineer)
+│   └── og-cycling.png          # 1200x630 Open Graph preview card (Cycling)
 ├── scripts/
 │   └── optimize-photos.sh      # Batch resizer & EXIF/GPS stripper using macOS sips + cwebp
+├── robots.txt                  # Crawler directives & sitemap reference
+├── sitemap.xml                 # Indexable URLs (/, /cycling/, /connect/) for Google Sitelinks
+├── site.webmanifest            # Web app manifest
 ├── .gitignore
 └── README.md
 ```

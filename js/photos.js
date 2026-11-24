@@ -344,7 +344,7 @@ export async function initCyclingPhotos() {
   wireEvents();
 
   try {
-    const res = await fetch('./assets/photos/photos.json');
+    const res = await fetch('/assets/photos/photos.json');
     if (!res.ok) return;
     const data = await res.json();
     if (Array.isArray(data) && data.length) {

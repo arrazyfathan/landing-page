@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en" data-profile="cycling" data-day="sat">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cycling &amp; Road Photos — Ar Razy Fathan Rabbani</title>
+  <meta name="description" content="Off the keyboard on two wheels around Surakarta &amp; Wonogiri — 75-week Strava streak, 3,974 km on a United Miami 2.0, and cycling phone photography." />
+  <meta name="author" content="Ar Razy Fathan Rabbani" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <meta name="theme-color" content="#FBFAF7" />
+  <link rel="canonical" href="https://arrazyfathan.com/cycling/" />
+
+  <!-- Open Graph / Social Previews -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Ar Razy Fathan Rabbani" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:url" content="https://arrazyfathan.com/cycling/" />
+  <meta property="og:title" content="Cycling &amp; Road Photos — Ar Razy Fathan Rabbani" />
+  <meta property="og:description" content="Off the keyboard around Surakarta &amp; Wonogiri — 75-week Strava streak, 3,974 km on a United Miami 2.0, and cycling phone photos." />
+  <meta property="og:image" content="https://arrazyfathan.com/assets/og-cycling.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Ar Razy Fathan Rabbani — Cycling &amp; Road Photos around Surakarta" />
+
+  <!-- Twitter / X Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@arrazyfathan" />
+  <meta name="twitter:creator" content="@arrazyfathan" />
+  <meta name="twitter:title" content="Cycling &amp; Road Photos — Ar Razy Fathan Rabbani" />
+  <meta name="twitter:description" content="Off the keyboard around Surakarta &amp; Wonogiri — 75-week Strava streak, 3,974 km on a United Miami 2.0, and cycling phone photos." />
+  <meta name="twitter:image" content="https://arrazyfathan.com/assets/og-cycling.png" />
+  <meta name="twitter:image:alt" content="Ar Razy Fathan Rabbani — Cycling &amp; Road Photos around Surakarta" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Gabarito:wght@600;700;800&family=Geist+Mono:wght@400;500&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Favicons & Manifest -->
+  <link rel="icon" type="image/png" sizes="48x48" href="/assets/icons/favicon-cycling-48.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/favicon-192.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <link rel="stylesheet" href="/css/styles.css" />
+
+  <!-- Structured Data (JSON-LD: WebPage + BreadcrumbList) -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "CollectionPage",
+          "@id": "https://arrazyfathan.com/cycling/#webpage",
+          "url": "https://arrazyfathan.com/cycling/",
+          "name": "Cycling & Road Photos — Ar Razy Fathan Rabbani",
+          "description": "Off the keyboard on two wheels around Surakarta & Wonogiri — 75-week Strava streak, 3,974 km on a United Miami 2.0, and cycling phone photography.",
+          "isPartOf": { "@id": "https://arrazyfathan.com/#website" },
+          "about": { "@id": "https://arrazyfathan.com/#person" },
+          "inLanguage": "en"
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Mobile Engineer",
+              "item": "https://arrazyfathan.com/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Cycling & Road Photos",
+              "item": "https://arrazyfathan.com/cycling/"
+            }
+          ]
+        }
+      ]
+    }
+  </script>
+
+  <!-- Prevent theme flash before first paint -->
+  <script>
+    (function () {
+      try {
+        var root = document.documentElement;
+        root.classList.add('js');
+        var savedDay = localStorage.getItem('arrazy-day');
+        if (savedDay === 'sun' || savedDay === 'sat') {
+          root.setAttribute('data-day', savedDay);
+        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          root.setAttribute('data-day', 'sun');
+        }
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- Minimal Top Bar -->
+  <header class="topbar" role="banner">
+    <div class="topbar-inner">
+      <a
+        href="/"
+        class="photo-toggle"
+        id="profile-photo-toggle"
+        aria-label="Switch to Mobile Engineer profile"
+        title="Switch to Mobile Eng. (W)"
+      >
+        <span class="photo-stack" aria-hidden="true">
+          <span class="mini-photo mini-photo--work">
+            <img src="/assets/avatars/work.png" alt="" width="40" height="40" />
+          </span>
+          <span class="mini-photo mini-photo--cycling">
+            <img src="/assets/avatars/cycling.png" alt="" width="40" height="40" />
+          </span>
+        </span>
+        <span class="photo-toggle-meta">
+          <span class="photo-toggle-mode">
+            <i class="mode-dot mode-dot--cycling" aria-hidden="true"></i>
+            On Two Wheels
+          </span>
+          <span class="photo-toggle-sub">Switch to work &rlarr;</span>
+        </span>
+      </a>
+
+      <div class="topbar-tools">
+        <button
+          type="button"
+          class="theme-switch"
+          id="day-toggle"
+          role="switch"
+          aria-checked="false"
+          aria-label="Toggle dark mode"
+          title="Toggle light / dark theme (D)"
+        >
+          <span class="theme-thumb" aria-hidden="true"></span>
+          <span class="theme-opt theme-opt--sun" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="4" />
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+            </svg>
+          </span>
+          <span class="theme-opt theme-opt--moon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+            </svg>
+          </span>
+        </button>
+
+        <button
+          type="button"
+          class="icon-btn"
+          id="sound-toggle"
+          aria-label="Toggle UI sound effects"
+          aria-pressed="true"
+          title="Toggle sound"
+        >
+          <svg class="sound-ico sound-ico--on" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+          </svg>
+          <svg class="sound-ico sound-ico--off" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+            <line x1="22" y1="9" x2="16" y2="15" />
+            <line x1="16" y1="9" x2="22" y2="15" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- CYCLING HERO -->
+    <section class="hero wrap">
+      <div class="hero-inner">
+        <div class="sticker-fan up" aria-label="Cycling icons">
+          <span class="fan-item" style="--rot: -7deg; --y-off: 6px" data-tip="Strava">
+            <img src="/assets/icons/cycling/strava.svg" alt="Strava" width="54" height="54" />
+          </span>
+          <span class="fan-item" style="--rot: -3deg; --y-off: 1px" data-tip="Climbs">
+            <img src="/assets/icons/cycling/bike-climbs.svg" alt="Bike climbs" width="56" height="56" />
+          </span>
+          <span class="fan-item fan-item--center" style="--rot: 2deg; --y-off: -5px" data-tip="United Miami 2.0">
+            <img src="/assets/icons/cycling/bicycle.svg" alt="Bicycle" width="66" height="66" />
+          </span>
+          <span class="fan-item" style="--rot: -4deg; --y-off: 1px" data-tip="Loops">
+            <img src="/assets/icons/cycling/loops.svg" alt="Cycling loops" width="56" height="56" />
+          </span>
+          <span class="fan-item" style="--rot: 6deg; --y-off: 6px" data-tip="Iced Coffee">
+            <img src="/assets/icons/cycling/iced-coffee.svg" alt="Iced Coffee" width="56" height="56" />
+          </span>
+        </div>
+
+        <h1 class="hero-headline up">
+          <span class="line-strong">
+            Chasing
+            <button
+              type="button"
+              class="swap-pill"
+              data-swap="Solo Raya climbs|Sanggang hills|Wonogiri loops|Bulu backroads"
+              data-icons="/assets/icons/cycling/bike-climbs.svg|/assets/icons/cycling/bike-hills.svg|/assets/icons/cycling/loops.svg|/assets/icons/cycling/backroads.svg"
+            >
+              <span class="swap-inner">
+                <img class="swap-icon" src="/assets/icons/cycling/bike-climbs.svg" alt="" width="28" height="28" />
+                <span class="swap-text">Solo Raya climbs</span>
+              </span>
+            </button>.
+          </span>
+          <span class="line-muted">
+            Off the keyboard around <strong class="ink-word">Surakarta</strong>,
+          </span>
+          <span class="line-muted">
+            logging steady miles on
+            <button
+              type="button"
+              class="swap-pill"
+              data-swap="Strava|United Miami 2.0|iced coffee"
+              data-icons="/assets/icons/cycling/strava.svg|/assets/icons/cycling/bicycle.svg|/assets/icons/cycling/iced-coffee.svg"
+            >
+              <span class="swap-inner">
+                <img class="swap-icon" src="/assets/icons/cycling/strava.svg" alt="" width="28" height="28" />
+                <span class="swap-text">Strava</span>
+              </span>
+            </button>.
+          </span>
+        </h1>
+
+        <p class="swap-hint up" aria-live="polite">
+          <span class="swap-hint-text">Tap a highlighted word to swap it.</span>
+          <svg viewBox="0 0 24 20" width="16" height="14" fill="none" aria-hidden="true">
+            <path d="M3 16C9 14 14 10 19 4" stroke="var(--arrow)" stroke-width="2" stroke-linecap="round" />
+            <path d="M12 4H19.5V11.5" stroke="var(--arrow)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </p>
+
+        <p class="hero-sub up">
+          When Android Studio closes, I trade Gradle builds for two wheels &mdash; spinning my <strong>United Miami 2.0</strong> across Surakarta, Bulu, and Wonogiri with <strong>75 straight weeks</strong> active and <strong>2,777+ km</strong> logged in 2026.
+        </p>
+
+        <div class="cycling-actions up">
+          <a href="https://www.strava.com/athletes/45137448" target="_blank" rel="noopener noreferrer me" class="btn-strava">
+            <img src="/assets/icons/cycling/strava.svg" alt="" width="24" height="24" />
+            <span>Follow on Strava</span>
+            <span class="btn-arrow" aria-hidden="true">&nearr;</span>
+          </a>
+          <span class="ride-badge">
+            <i class="status-dot status-dot--bike" aria-hidden="true"></i>
+            <strong>3,974 km</strong> all-time &middot; <strong>75w</strong> streak
+          </span>
+        </div>
+
+        <p class="cta-caption up">
+          Averaging ~95 km &amp; 4 rides/week &middot; Updated Nov 23, 2026
+        </p>
+      </div>
+    </section>
+
+    <!-- CYCLING EDITORIAL LETTER -->
+    <section class="letter wrap-letter" aria-label="About my cycling">
+      <article class="prose up">
+        <p>
+          Off the clock, I'm
+          <span class="inline-avatar inline-avatar--cycling" aria-hidden="true">
+            <img src="/assets/avatars/cycling.png" alt="" width="28" height="28" />
+          </span>
+          <strong>Ar Razy on two wheels.</strong>
+          About four times a week I roll out around <strong>Surakarta</strong> on my
+          <img class="inline-ico" src="/assets/icons/cycling/bicycle.svg" alt="" width="23" height="23" /><strong>United Miami 2.0</strong> &mdash;
+          nearly <strong>4,000 km</strong> and <strong>31,820 m</strong> of climbing logged all-time, keeping a <img class="inline-ico" src="/assets/icons/cycling/fire-streak.svg" alt="" width="22" height="22" /><strong>75-week active streak</strong> going.
+        </p>
+
+        <p>
+          Most loops head south through <strong>Tawangsari, Bulu, and Nguter</strong> toward <strong>Wonogiri</strong> &mdash; grinding punchy rollers like <strong>Sanggang</strong> and <strong>Kunden&ndash;Kamal</strong>, or chasing sunrise views up to <strong>We Land</strong> and <strong>Tugu Candi Ngreco</strong>.
+        </p>
+
+        <p>
+          Putting <strong>2,777 km</strong> across <strong>125 rides</strong> into 2026 reinforced the same habit as shipping good software: show up every week, stay steady on the climbs, and <mark class="hl-swipe">reward yourself with iced coffee after.</mark>
+          Catch my loops and Local Legend segments on
+          <img class="inline-ico" src="/assets/icons/cycling/strava.svg" alt="" width="21" height="21" /><a href="https://www.strava.com/athletes/45137448" target="_blank" rel="noopener noreferrer me" class="text-link">Strava</a>.
+        </p>
+
+        <div class="ride-stats" aria-label="2026 Strava cycling snapshot">
+          <div class="ride-stats-row">
+            <span><strong>2,777.5 km</strong> in 2026</span>
+            <span><strong>20,583 m</strong> climbed</span>
+            <span><strong>75 wks</strong> streak</span>
+            <span><strong>51 km</strong> longest ride</span>
+          </div>
+          <span class="ride-updated">Strava &middot; Updated Nov 23, 2026</span>
+        </div>
+      </article>
+    </section>
+
+    <!-- STAGGERED ROAD PHOTO GALLERY -->
+    <section class="photo-gallery-section up" id="ride-photos" aria-label="Cycling photos">
+      <div class="photo-gallery-head">
+        <span class="connect-label">SHOTS FROM THE ROAD</span>
+        <span class="photo-gallery-count" id="photo-count"></span>
+      </div>
+      <div class="stagger-grid" id="stagger-grid" role="list">
+        <!-- Populated from /assets/photos/photos.json by /js/photos.js -->
+      </div>
+    </section>
+
+    <!-- MINIMAL CONNECT ROW -->
+    <section class="connect wrap-letter" id="connect" aria-label="Connect">
+      <div class="connect-label">CONNECT</div>
+      <div class="connect-row">
+        <a href="mailto:hello@arrazyfathan.com" class="connect-pill" title="Email hello@arrazyfathan.com">
+          <img src="/assets/icons/connect/email.svg" alt="" width="28" height="28" />
+          <span>Email</span>
+        </a>
+        <a href="https://www.linkedin.com/in/arrazyfathan/" target="_blank" rel="noopener noreferrer me" class="connect-pill">
+          <img src="/assets/icons/connect/linkedin.svg" alt="" width="28" height="28" />
+          <span>LinkedIn</span>
+        </a>
+        <a href="https://github.com/arrazyfathan" target="_blank" rel="noopener noreferrer me" class="connect-pill">
+          <img src="/assets/icons/connect/github.svg" alt="" width="28" height="28" />
+          <span>GitHub</span>
+        </a>
+        <a href="https://x.com/arrazyfathan" target="_blank" rel="noopener noreferrer me" class="connect-pill">
+          <img src="/assets/icons/connect/x.svg" alt="" width="28" height="28" />
+          <span>X</span>
+        </a>
+        <a href="https://www.strava.com/athletes/45137448" target="_blank" rel="noopener noreferrer me" class="connect-pill">
+          <img src="/assets/icons/cycling/strava.svg" alt="" width="28" height="28" />
+          <span>Strava</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Minimal Year Footer + Sitelink Navigation -->
+  <footer class="foot wrap-letter">
+    <nav class="foot-nav" aria-label="Site sections">
+      <a href="/">Mobile Engineer</a>
+      <a href="/cycling/" aria-current="page">Cycling &amp; Photos</a>
+      <a href="/connect/">Where to Find Me</a>
+      <a href="https://cv.arrazyfathan.com" target="_blank" rel="noopener noreferrer me">Resume &nearr;</a>
+    </nav>
+    <div class="foot-row">
+      <p>&copy; <span id="year">2026</span> <strong>Ar Razy Fathan Rabbani</strong></p>
+      <p class="foot-meta">
+        Surakarta, ID &middot; Inspired by <a href="https://muhraufan.com/" target="_blank" rel="noopener noreferrer" class="foot-link">muhraufan.com</a>
+      </p>
+    </div>
+    <p class="foot-keys" aria-label="Keyboard shortcuts">
+      <span><kbd>W</kbd> Work</span>
+      <span><kbd>C</kbd> Cycling</span>
+      <span><kbd>D</kbd> Theme</span>
+      <span><kbd>&larr;</kbd><kbd>&rarr;</kbd> Photos</span>
+    </p>
+  </footer>
+
+  <!-- Minimal Frosted FLIP Photo Viewer -->
+  <div class="photo-viewer" id="photo-lightbox" role="dialog" aria-modal="true" aria-label="Cycling photo viewer" hidden>
+    <div class="viewer-backdrop" id="viewer-backdrop"></div>
+    <img id="lb-img" class="viewer-img" src="" alt="Cycling photo" decoding="async" />
+
+    <div class="viewer-bar" id="viewer-bar">
+      <span class="viewer-meta">
+        <span id="lb-date"></span>
+        <span class="viewer-sep" aria-hidden="true">&middot;</span>
+        <span id="lb-camera"></span>
+      </span>
+      <div class="viewer-nav">
+        <button type="button" class="viewer-btn" id="lb-prev" aria-label="Previous photo">&larr;</button>
+        <span class="viewer-counter" id="lb-counter">1 / 37</span>
+        <button type="button" class="viewer-btn" id="lb-next" aria-label="Next photo">&rarr;</button>
+        <button type="button" class="viewer-btn viewer-btn--close" id="lb-close" aria-label="Close photo viewer">&times;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subtle Copy Toast -->
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <script type="module" src="/js/main.js"></script>
+</body>
+</html>
