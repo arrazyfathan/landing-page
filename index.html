@@ -42,7 +42,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png" />
   <link rel="manifest" href="/site.webmanifest" />
   <link rel="prefetch" href="/cycling/" />
-  <link rel="stylesheet" href="/css/styles.css?v=25" />
+  <link rel="stylesheet" href="/css/styles.css?v=33" />
 
   <!-- Structured Data (JSON-LD: Person + WebSite) -->
   <script type="application/ld+json">
@@ -126,7 +126,7 @@
   <!-- Minimal Top Bar -->
   <header class="topbar" role="banner">
     <div class="topbar-inner">
-      <!-- Top-Left Stacked Photo Profile Switcher (links cleanly to /cycling/ for SEO sitelinks) -->
+      <!-- Top-Left Minimal Stacked Avatar Switcher (links cleanly to /cycling/ for SEO sitelinks) -->
       <a
         href="/cycling/"
         class="photo-toggle"
@@ -136,18 +136,18 @@
       >
         <span class="photo-stack" aria-hidden="true">
           <span class="mini-photo mini-photo--work">
-            <img src="/assets/avatars/work.png" alt="" width="40" height="40" />
+            <img src="/assets/avatars/work.png" alt="" width="34" height="34" />
           </span>
           <span class="mini-photo mini-photo--cycling">
-            <img src="/assets/avatars/cycling.png" alt="" width="40" height="40" />
+            <img src="/assets/avatars/cycling.png" alt="" width="34" height="34" />
           </span>
         </span>
-        <span class="photo-toggle-meta">
-          <span class="photo-toggle-mode">
-            <i class="mode-dot mode-dot--work" aria-hidden="true"></i>
-            Mobile Eng.
-          </span>
-          <span class="photo-toggle-sub">Switch to cycling &rlarr;</span>
+        <span class="photo-toggle-hint" aria-hidden="true">
+          <svg class="photo-toggle-arrow" viewBox="0 0 24 20" width="18" height="15" fill="none">
+            <path d="M21 15C15 13.5 10 10 5 5" stroke="var(--arrow)" stroke-width="2" stroke-linecap="round" />
+            <path d="M12 4.5H4.5V12" stroke="var(--arrow)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <span class="photo-toggle-label">Switch to cycling</span>
         </span>
       </a>
 
@@ -327,7 +327,7 @@
 
     <!-- EDITORIAL LETTER -->
     <section class="letter wrap-letter" id="intro" aria-label="Introduction">
-      <article class="prose up">
+      <article class="prose">
         <p>
           Hi, I'm
           <span class="inline-avatar" aria-hidden="true">
@@ -472,6 +472,6 @@
   <!-- Subtle Copy Toast -->
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-  <script type="module" src="/js/main.js?v=25"></script>
+  <script type="module" src="/js/main.js?v=29"></script>
 </body>
 </html>

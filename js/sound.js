@@ -5,6 +5,7 @@
 
 let ctx = null;
 let enabled = true;
+let lastHoverAt = 0;
 
 try {
   const saved = localStorage.getItem('arrazy-sound');
@@ -24,6 +25,17 @@ function getCtx() {
   return ctx;
 }
 
+/* Unlock Web Audio silently on first user gesture so subsequent icon hovers play immediately */
+function unlockAudio() {
+  if (!enabled) return;
+  getCtx();
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('pointerdown', unlockAudio, { once: true, capture: true, passive: true });
+  window.addEventListener('keydown', unlockAudio, { once: true, capture: true, passive: true });
+}
+
 export function isSoundEnabled() {
   return enabled;
 }
@@ -34,6 +46,34 @@ export function setSoundEnabled(next) {
     localStorage.setItem('arrazy-sound', enabled ? 'on' : 'off');
   } catch (_) {}
   if (enabled) playClick();
+}
+
+/** Soft tactile micro-tick when hovering interactive icons */
+export function playHover(pitch = 1) {
+  if (!enabled) return;
+  const nowMs = typeof performance !== 'undefined' ? performance.now() : Date.now();
+  if (nowMs - lastHoverAt < 36) return;
+
+  const audio = getCtx();
+  if (!audio || audio.state !== 'running') return;
+  lastHoverAt = nowMs;
+
+  const now = audio.currentTime;
+  const osc = audio.createOscillator();
+  const gain = audio.createGain();
+
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(560 * pitch, now);
+  osc.frequency.exponentialRampToValueAtTime(780 * pitch, now + 0.026);
+
+  gain.gain.setValueAtTime(0.032, now);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.034);
+
+  osc.connect(gain);
+  gain.connect(audio.destination);
+
+  osc.start(now);
+  osc.stop(now + 0.038);
 }
 
 /** Crisp tactile click for sticker taps & filter pills */

@@ -2,13 +2,14 @@ import {
   isSoundEnabled,
   setSoundEnabled,
   playClick,
+  playHover,
   playPop,
   playSwitch,
   playSuccess
-} from './sound.js';
-import { initMarkers, morphMarker, repaintAllMarkers } from './marker.js?v=7';
-import { initCyclingPhotos } from './photos.js?v=24';
-import { initTrophyCase } from './trophies.js?v=19';
+} from './sound.js?v=2';
+import { initMarkers, morphMarker, repaintAllMarkers } from './marker.js?v=10';
+import { initCyclingPhotos } from './photos.js?v=25';
+import { initTrophyCase } from './trophies.js?v=21';
 
 const root = document.documentElement;
 const EMAIL = 'hello@arrazyfathan.com';
@@ -31,12 +32,59 @@ function showToast(message) {
   }, 2000);
 }
 
-/* 2. Gentle Scroll Reveal (.up -> .in) */
+/* 2. Smooth Scroll Reveal (.up / .reveal -> .in) */
 let revealObserver = null;
 
+function markScrollRevealTargets() {
+  const singleSelectors = [
+    '.prose > p',
+    '.prose > .signature',
+    '.prose > .ride-stats',
+    '.photo-gallery-head',
+    '.watch-gallery',
+    '.trophy-head',
+    '.trophy-prs',
+    '.connect-head',
+    '.connect > .connect-label',
+    '.foot',
+  ];
+
+  singleSelectors.forEach((selector) => {
+    document.querySelectorAll(selector).forEach((el) => {
+      if (!el.classList.contains('reveal') && !el.classList.contains('up')) {
+        el.classList.add('reveal');
+      }
+    });
+  });
+
+  document.querySelectorAll('.connect-row').forEach((row) => {
+    row.querySelectorAll('.connect-pill').forEach((pill, i) => {
+      pill.classList.add('reveal');
+      pill.style.setProperty('--reveal-delay', `${i * 45}ms`);
+    });
+  });
+}
+
+function observeRevealEl(el) {
+  if (!el || el.classList.contains('in')) return;
+  if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    el.classList.add('in');
+    return;
+  }
+  if (el.offsetParent === null) return;
+  const rect = el.getBoundingClientRect();
+  if (rect.top < window.innerHeight * 0.92) {
+    el.classList.add('in');
+  } else if (revealObserver) {
+    revealObserver.observe(el);
+  }
+}
+
 function setupScrollReveal() {
-  if (!('IntersectionObserver' in window)) {
-    document.querySelectorAll('.up').forEach((el) => el.classList.add('in'));
+  markScrollRevealTargets();
+
+  if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.querySelectorAll('.up, .reveal').forEach((el) => el.classList.add('in'));
     return;
   }
 
@@ -49,22 +97,22 @@ function setupScrollReveal() {
         }
       });
     },
-    { threshold: 0.01, rootMargin: '0px 0px 80px 0px' }
+    { threshold: 0.06, rootMargin: '0px 0px -36px 0px' }
   );
 
-  observeVisibleReveals();
-}
-
-function observeVisibleReveals() {
-  document.querySelectorAll('.up:not(.in)').forEach((el) => {
-    if (el.offsetParent === null) return;
-    const rect = el.getBoundingClientRect();
-    if (rect.top < window.innerHeight + 80) {
-      el.classList.add('in');
-    } else if (revealObserver) {
-      revealObserver.observe(el);
-    }
+  document.querySelectorAll('.up:not(.in), .reveal:not(.in)').forEach((el) => {
+    observeRevealEl(el);
   });
+
+  /* Ensure bottom-most items (e.g. footer) always reveal if user reaches the end of the page */
+  window.addEventListener('scroll', () => {
+    const nearBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 28;
+    if (!nearBottom) return;
+    document.querySelectorAll('.up:not(.in), .reveal:not(.in)').forEach((el) => {
+      el.classList.add('in');
+      if (revealObserver) revealObserver.unobserve(el);
+    });
+  }, { passive: true });
 }
 
 /* 3. Smooth Profile Navigation & Card Swap Feedback (/, /cycling/, /connect/) */
@@ -633,10 +681,36 @@ function initInlineAppPopovers() {
   }, { passive: true });
 }
 
+/* 11. Subtle Tactile Hover Sounds Across All Content Icons */
+function initIconHoverSounds() {
+  const groups = [
+    '.fan-item',
+    '.inline-app-btn',
+    '.inline-cluster img',
+    '.inline-ico',
+    '.inline-avatar',
+    '.inline-company-ico',
+    '.connect-pill',
+    '.btn-resume, .btn-strava',
+    '.directory-card--link',
+    '#profile-photo-toggle',
+  ];
+
+  groups.forEach((selector) => {
+    document.querySelectorAll(selector).forEach((el, idx) => {
+      el.addEventListener('pointerenter', (e) => {
+        if (e.pointerType === 'touch') return;
+        playHover(0.94 + (idx % 6) * 0.055);
+      });
+    });
+  });
+}
+
 /* Boot */
 setupScrollReveal();
 initMarkers();
 initCyclingPhotos();
-initTrophyCase();
+initTrophyCase({ onReveal: observeRevealEl });
 initHeroScrollShrink();
 initInlineAppPopovers();
+initIconHoverSounds();

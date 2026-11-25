@@ -1,4 +1,4 @@
-import { playPop } from './sound.js';
+import { playPop, playHover } from './sound.js?v=2';
 
 const TILTS = [-3, 2.2, -2, 2.8, -1.6, 2.4, -1.8, 1.8, -2.6, 2.2];
 
@@ -111,14 +111,15 @@ function createPopoverController() {
   };
 }
 
-function renderShelf(container, trophies, popover) {
+function renderShelf(container, trophies, popover, onReveal) {
   if (!container) return;
   container.textContent = '';
 
   trophies.forEach((item, idx) => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'trophy-shelf-item';
+    btn.className = 'trophy-shelf-item reveal';
+    btn.style.setProperty('--reveal-delay', `${(idx % 5) * 45}ms`);
     btn.setAttribute('role', 'listitem');
     btn.setAttribute('aria-label', `${item.label}, ${item.date}`);
 
@@ -126,6 +127,14 @@ function renderShelf(container, trophies, popover) {
     art.className = 'trophy-shelf-art';
     art.style.setProperty('--rot', `${TILTS[idx % TILTS.length]}deg`);
     art.appendChild(createBadgeImg(item));
+
+    const glare = document.createElement('span');
+    glare.className = item.shape === 'square' ? 'trophy-glare trophy-glare--square' : 'trophy-glare';
+    glare.setAttribute('aria-hidden', 'true');
+    if (item.shape !== 'square') {
+      glare.style.setProperty('--badge-mask', `url("${item.image}")`);
+    }
+    art.appendChild(glare);
 
     const month = document.createElement('span');
     month.className = 'trophy-shelf-month';
@@ -136,6 +145,7 @@ function renderShelf(container, trophies, popover) {
 
     btn.addEventListener('pointerenter', (e) => {
       if (e.pointerType === 'touch') return;
+      playHover(0.92 + (idx % 5) * 0.055);
       popover.show(btn, item, { pin: false });
     });
 
@@ -145,11 +155,21 @@ function renderShelf(container, trophies, popover) {
       const nx = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
       const ny = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
       art.style.transform = `translateY(-7px) scale(1.16) rotateX(${(-ny * 12).toFixed(1)}deg) rotateY(${(nx * 14).toFixed(1)}deg)`;
+      const gx = (50 - nx * 36).toFixed(1);
+      const gy = (45 - ny * 36).toFixed(1);
+      glare.style.setProperty('--glare-x', `${gx}%`);
+      glare.style.setProperty('--glare-y', `${gy}%`);
+      glare.style.setProperty('--glare-tx', `${(-nx * 14).toFixed(1)}px`);
+      glare.style.setProperty('--glare-ty', `${(-ny * 10).toFixed(1)}px`);
     });
 
     btn.addEventListener('pointerleave', (e) => {
       if (e.pointerType === 'touch') return;
       art.style.transform = '';
+      glare.style.removeProperty('--glare-x');
+      glare.style.removeProperty('--glare-y');
+      glare.style.removeProperty('--glare-tx');
+      glare.style.removeProperty('--glare-ty');
       if (!popover.isPinned(btn)) popover.hide(false);
     });
 
@@ -172,6 +192,7 @@ function renderShelf(container, trophies, popover) {
     });
 
     container.appendChild(btn);
+    if (typeof onReveal === 'function') onReveal(btn);
   });
 }
 
@@ -213,7 +234,7 @@ function renderRecentPRs(prsEl, achievements) {
   prsEl.appendChild(list);
 }
 
-export async function initTrophyCase() {
+export async function initTrophyCase({ onReveal } = {}) {
   const shelfEl = document.getElementById('trophy-shelf-grid');
   const prsEl = document.getElementById('trophy-prs');
   if (!shelfEl) return;
@@ -230,7 +251,7 @@ export async function initTrophyCase() {
     const achievements = achievementsRes.ok ? await achievementsRes.json() : [];
 
     if (Array.isArray(trophies) && trophies.length) {
-      renderShelf(shelfEl, trophies, popover);
+      renderShelf(shelfEl, trophies, popover, onReveal);
     }
     renderRecentPRs(prsEl, achievements);
   } catch (_) {}

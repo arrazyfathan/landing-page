@@ -36,8 +36,8 @@ function drawStroke(el, seed) {
   if (elW < 4 || elH < 4) return;
 
   const isInlineSwipe = el.classList.contains('hl-swipe');
-  const padX = isInlineSwipe ? 6 : 8;
-  const padY = isInlineSwipe ? 4 : 8;
+  const padX = isInlineSwipe ? 8 : 12;
+  const padY = isInlineSwipe ? 6 : 12;
 
   const w = Math.ceil(elW + padX * 2);
   const h = Math.ceil(elH + padY * 2);
@@ -70,29 +70,35 @@ function drawStroke(el, seed) {
   const rand = mulberry32(seed);
   const color = getMarkerColor();
 
-  // Stroke geometry: thick rounded-cap highlighter path with gentle organic wave.
-  // Round caps extend by `radius` past leftX/rightX, so keep caps strictly within
-  // the element's bounds (never overlapping trailing punctuation).
-  const thickness = isInlineSwipe ? elH * 0.74 : elH * 0.84;
+  // Smooth hand-swiped highlighter stroke:
+  // Single solid rounded-cap bezier path with natural bottom-left-to-top-right slant
+  // and a subtle, silky pen-brushed wave (perfectly smooth rounded caps on every side).
+  const thickness = isInlineSwipe ? elH * 0.74 : elH * 0.85;
   const radius = thickness / 2;
-
-  const capInset = isInlineSwipe ? 2 : 1;
+  const capInset = isInlineSwipe ? 2 : 2;
   const leftX = Math.min(w / 2 - 1, padX + radius - capInset);
   const rightX = Math.max(w / 2 + 1, w - padX - radius + capInset);
-  const midY = h * (isInlineSwipe ? 0.56 : 0.49);
+  const span = Math.max(2, rightX - leftX);
+  const midY = h * (isInlineSwipe ? 0.55 : 0.50);
 
-  // Subtle upward hand-swipe tilt from left to right (matches reference close-up)
-  const tilt = isInlineSwipe ? 0.9 : Math.min(2.6, Math.max(1.2, w * 0.008));
-  const yStart = midY + tilt + (rand() - 0.5) * 1.4;
-  const yEnd = midY - tilt + (rand() - 0.5) * 1.4;
+  const tilt = isInlineSwipe
+    ? Math.min(2.0, Math.max(1.0, elW * 0.005))
+    : Math.min(4.6, Math.max(2.2, elW * 0.014));
+  const yStart = midY + tilt;
+  const yEnd = midY - tilt;
 
-  // Smooth organic S-curve control points
-  const cp1x = leftX + (rightX - leftX) * (0.3 + rand() * 0.08);
-  const cp1y = midY + (rand() - 0.5) * (isInlineSwipe ? 2.4 : 4.6);
-  const cp2x = leftX + (rightX - leftX) * (0.65 + rand() * 0.08);
-  const cp2y = midY + (rand() - 0.5) * (isInlineSwipe ? 2.4 : 4.6);
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const wave = isInlineSwipe
+    ? 1.5
+    : Math.min(3.4, Math.max(1.8, elW * 0.009));
+  const subtleSeed = (rand() - 0.5) * (isInlineSwipe ? 0.5 : 0.9);
 
-  // Primary bold rounded-cap marker stroke
+  // Subtle silky S-wave matching the gentle pen-brushed arch in the reference
+  const cp1x = leftX + span * 0.33;
+  const cp1y = lerp(yStart, yEnd, 0.33) - wave + subtleSeed;
+  const cp2x = leftX + span * 0.67;
+  const cp2y = lerp(yStart, yEnd, 0.67) + wave * 0.75 - subtleSeed;
+
   ctx.save();
   ctx.strokeStyle = color;
   ctx.lineWidth = thickness;
@@ -102,22 +108,6 @@ function drawStroke(el, seed) {
   ctx.beginPath();
   ctx.moveTo(leftX, yStart);
   ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, rightX, yEnd);
-  ctx.stroke();
-
-  // Subtle second overlapping brush pass for organic painterly edge variation
-  ctx.globalAlpha = 0.85;
-  ctx.lineWidth = thickness * 0.92;
-  const shift = (rand() - 0.5) * 2.2;
-  ctx.beginPath();
-  ctx.moveTo(leftX + 1.5, yStart + shift * 0.5);
-  ctx.bezierCurveTo(
-    cp1x,
-    cp1y - shift * 0.8,
-    cp2x,
-    cp2y + shift * 0.8,
-    rightX - 1.5,
-    yEnd - shift * 0.4
-  );
   ctx.stroke();
   ctx.restore();
   el.classList.add('has-marker');

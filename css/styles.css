@@ -133,6 +133,11 @@ html[data-profile="cycling"]::view-transition-image-pair(avatar-cycling) {
   --ok: #1F8A4C;
   --strava: #FC4C02;
 
+  /* Seamless periodic waveform underline SVG tiles (16x6 period) */
+  --wave-rest: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='rgba(23,21,15,0.28)' stroke-width='1.55'/%3E%3C/svg%3E");
+  --wave-accent: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='%230380FC' stroke-width='1.9'/%3E%3C/svg%3E");
+  --wave-popover: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='%23FBFAF7' stroke-width='1.6'/%3E%3C/svg%3E");
+
   /* Typography */
   --display: 'Gabarito', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --text: 'Geist', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -175,6 +180,9 @@ html[data-day="sun"] {
   --line-strong: rgba(244, 239, 228, 0.18);
   --accent: #1A8CFF;
   --arrow: #1A8CFF;
+  --wave-rest: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='rgba(244,239,228,0.28)' stroke-width='1.55'/%3E%3C/svg%3E");
+  --wave-accent: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='%231A8CFF' stroke-width='1.9'/%3E%3C/svg%3E");
+  --wave-popover: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='%2314120E' stroke-width='1.6'/%3E%3C/svg%3E");
   --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.30);
   --shadow-pill: 0 4px 16px rgba(0, 0, 0, 0.38);
   --shadow-photo: 0 3px 10px rgba(0, 0, 0, 0.45);
@@ -185,12 +193,19 @@ html[data-profile="cycling"] {
   --accent: #FFC629;
   --accent-ink: #17150F;
   --arrow: #D99B00;
+  --wave-accent: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='%23D99B00' stroke-width='1.9'/%3E%3C/svg%3E");
 }
 
 html[data-profile="cycling"][data-day="sun"] {
   --accent: #F5C128;
   --accent-ink: #17150F;
   --arrow: #F5C128;
+  --wave-accent: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='%23F5C128' stroke-width='1.9'/%3E%3C/svg%3E");
+}
+
+@keyframes wave-flow {
+  from { background-position: 0 100%; }
+  to   { background-position: 16px 100%; }
 }
 
 *, *::before, *::after {
@@ -281,11 +296,36 @@ html[data-profile="cycling"] .only-cycling-flex {
   margin-inline: auto;
 }
 
-/* Gentle Scroll Reveal (keep above-the-fold hero & connect header immediately visible for silky View Transitions) */
-html.js .up {
+/* Smooth Scroll Reveal (keep above-the-fold hero & connect header immediately visible for silky View Transitions) */
+html.js .up,
+html.js .reveal {
   opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 460ms var(--ease-out), transform 580ms var(--spring-soft);
+  transform: translate3d(0, 22px, 0) scale(0.985);
+  filter: blur(4px);
+  transition:
+    opacity 620ms cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms),
+    transform 760ms cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms),
+    filter 620ms cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms);
+  will-change: opacity, transform, filter;
+}
+
+/* Preserve 3D perspective/tilt on trophy badges during reveal (avoid filter flattening preserve-3d) */
+html.js .trophy-shelf-item.reveal {
+  transform: translate3d(0, 18px, 0) scale(0.92);
+  filter: none;
+  will-change: opacity, transform;
+}
+
+/* Preserve tactile hover transitions on connect pills */
+html.js .connect-pill.reveal {
+  filter: none;
+  transform: translate3d(0, 14px, 0) scale(0.96);
+  transition:
+    opacity 520ms cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms),
+    transform 640ms var(--spring-soft) var(--reveal-delay, 0ms),
+    border-color 160ms var(--ease-out),
+    color 160ms var(--ease-out);
+  will-change: opacity, transform;
 }
 
 html.js .hero .up,
@@ -293,11 +333,22 @@ html.js .connect-page-head.up,
 html.js .directory-list.up {
   opacity: 1;
   transform: none;
+  filter: none;
+  will-change: auto;
 }
 
-html.js .up.in {
+html.js .up.in,
+html.js .reveal.in {
   opacity: 1;
-  transform: translateY(0);
+  transform: none;
+  filter: none;
+  will-change: auto;
+}
+
+html.js .connect-pill.reveal.in:hover {
+  transition-delay: 0ms;
+  transition-duration: 280ms, 280ms, 160ms, 160ms;
+  transition-timing-function: var(--ease-out), var(--spring), var(--ease-out), var(--ease-out);
 }
 
 /* Smooth fallback transition when switching pages in browsers without MPA View Transitions */
@@ -324,49 +375,50 @@ body.is-switching main {
   gap: 16px;
 }
 
-/* Top-Left Stacked Photo Switcher (Mobile Eng. <-> On Two Wheels) */
+/* Top-Left Avatar-Only Profile Switcher + Curved Arrow Hint (label reveals on hover) */
 .photo-toggle {
+  position: relative;
   display: inline-flex;
-  align-items: center;
-  gap: 16px;
+  align-items: flex-end;
+  gap: 8px;
   min-width: 0;
-  padding: 6px 14px 6px 6px;
-  border-radius: 16px;
+  padding: 2px 2px 2px 0;
+  border-radius: 10px;
   text-align: left;
   text-decoration: none;
-  transition: transform 160ms var(--ease-out), background-color 180ms var(--ease-out);
+  transition: transform 160ms var(--ease-out);
 }
 
 .photo-toggle:active {
-  transform: scale(0.97);
+  transform: scale(0.96);
 }
 
 .photo-stack {
   position: relative;
-  width: 54px;
-  height: 46px;
+  width: 56px;
+  height: 44px;
   flex-shrink: 0;
 }
 
 .mini-photo {
   position: absolute;
-  top: 2px;
+  top: 1px;
   left: 0;
   width: 42px;
   height: 42px;
-  padding: 1px;
-  border-radius: 11px;
+  padding: 1.5px;
+  border-radius: 12px;
   background: var(--surface);
   border: 1px solid var(--line);
   box-shadow: var(--shadow-photo);
   overflow: hidden;
-  transition: transform 480ms var(--spring), opacity 220ms var(--ease-out), filter 220ms var(--ease-out);
+  transition: transform 440ms var(--spring), opacity 220ms var(--ease-out), filter 220ms var(--ease-out);
 }
 
 .mini-photo img {
   width: 100%;
   height: 100%;
-  border-radius: 9.5px;
+  border-radius: 10px;
   object-fit: cover;
 }
 
@@ -403,9 +455,9 @@ html[data-profile="work"] .mini-photo--work {
 
 html[data-profile="work"] .mini-photo--cycling {
   z-index: 1;
-  transform: translate(14px, 3px) rotate(9deg) scale(0.88);
-  opacity: 0.88;
-  filter: saturate(0.85);
+  transform: translate(14px, 2px) rotate(9deg) scale(0.88);
+  opacity: 0.9;
+  filter: saturate(0.88);
 }
 
 /* Cycling active stack choreography */
@@ -417,44 +469,86 @@ html[data-profile="cycling"] .mini-photo--cycling {
 
 html[data-profile="cycling"] .mini-photo--work {
   z-index: 1;
-  transform: translate(14px, 3px) rotate(-9deg) scale(0.88);
-  opacity: 0.88;
-  filter: saturate(0.85);
+  transform: translate(14px, 2px) rotate(-9deg) scale(0.88);
+  opacity: 0.9;
+  filter: saturate(0.88);
 }
 
-.photo-toggle-meta {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.25;
-  view-transition-name: toggle-meta;
-}
-
-.photo-toggle-mode {
+.photo-toggle-hint {
+  position: relative;
+  z-index: 3;
   display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-family: var(--display);
-  font-size: 15.5px;
-  font-weight: 700;
-  letter-spacing: -0.015em;
-  color: var(--ink);
-}
-
-.mode-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
+  align-items: flex-end;
   flex-shrink: 0;
+  margin-left: 2px;
+  margin-bottom: -5px;
+  transition: transform 420ms var(--spring);
 }
 
-.mode-dot--work { background: var(--b); }
-.mode-dot--cycling { background: var(--y); }
+.photo-toggle-arrow {
+  display: block;
+  width: 20px;
+  height: 17px;
+  opacity: 0.9;
+  transform-origin: center;
+  animation: photo-arrow-nudge 2.4s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+  transition: transform 380ms var(--spring), opacity 180ms var(--ease-out);
+}
 
-.photo-toggle-sub {
-  font-family: var(--mono);
-  font-size: 11px;
+@keyframes photo-arrow-nudge {
+  0%, 42%, 100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+    opacity: 0.78;
+  }
+  58% {
+    transform: translate3d(-3px, -2px, 0) rotate(-5deg);
+    opacity: 1;
+  }
+  70% {
+    transform: translate3d(-0.5px, -0.5px, 0) rotate(-1deg);
+    opacity: 0.88;
+  }
+  82% {
+    transform: translate3d(-2px, -1.5px, 0) rotate(-3deg);
+    opacity: 1;
+  }
+}
+
+.photo-toggle-label {
+  position: absolute;
+  left: calc(100% + 6px);
+  bottom: -2px;
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.2;
   color: var(--muted);
-  margin-top: 2px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(-8px, 0, 0);
+  filter: blur(3px);
+  transition:
+    opacity 220ms var(--ease-out),
+    transform 420ms var(--spring),
+    filter 220ms var(--ease-out),
+    color 180ms var(--ease-out);
+}
+
+.photo-toggle:focus-visible .photo-toggle-hint {
+  transform: translate3d(7px, 0, 0);
+}
+
+.photo-toggle:focus-visible .photo-toggle-arrow {
+  animation: none;
+  opacity: 1;
+  transform: translate3d(0, -1px, 0) rotate(-4deg);
+}
+
+.photo-toggle:focus-visible .photo-toggle-label {
+  opacity: 1;
+  color: var(--ink-2);
+  transform: translate3d(0, 0, 0);
+  filter: none;
 }
 
 /* Right Utility Controls: Icon Theme Toggle Switch + Circular Sound Icon */
@@ -1003,11 +1097,22 @@ html[data-day="sun"] .theme-opt--moon {
 .caption-link {
   color: var(--ink-2);
   font-weight: 600;
-  text-decoration: underline;
-  text-decoration-color: var(--line-strong);
-  text-decoration-thickness: 1.5px;
-  text-underline-offset: 3px;
-  transition: color 160ms var(--ease-out), text-decoration-color 160ms var(--ease-out);
+  text-decoration: none;
+  padding-bottom: 5px;
+  background-image: var(--wave-rest);
+  background-repeat: repeat-x;
+  background-position: 0 100%;
+  background-size: 16px 6px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  animation: wave-flow 1.4s linear infinite;
+  transition: color 180ms var(--ease-out);
+}
+
+.caption-link:focus-visible {
+  color: var(--ink);
+  background-image: var(--wave-accent);
+  animation-duration: 0.72s;
 }
 
 .status-dot {
@@ -1108,11 +1213,21 @@ html[data-profile="cycling"] .letter {
 .text-link {
   color: var(--ink);
   font-weight: 600;
-  text-decoration: underline;
-  text-decoration-color: var(--line-strong);
-  text-decoration-thickness: 1.5px;
-  text-underline-offset: 3px;
-  transition: text-decoration-color 160ms var(--ease-out);
+  text-decoration: none;
+  padding-bottom: 5px;
+  background-image: var(--wave-rest);
+  background-repeat: repeat-x;
+  background-position: 0 100%;
+  background-size: 16px 6px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  animation: wave-flow 1.4s linear infinite;
+  transition: color 180ms var(--ease-out);
+}
+
+.text-link:focus-visible {
+  background-image: var(--wave-accent);
+  animation-duration: 0.72s;
 }
 
 /* Tiny Inline Circular Avatar inside Letter */
@@ -1325,11 +1440,16 @@ html[data-day="sun"] .inline-avatar--cycling {
   gap: 5px;
   color: inherit;
   text-decoration: none;
+  padding-bottom: 4px;
+  background-repeat: repeat-x;
+  background-position: 0 100%;
+  background-size: 16px 5px;
 }
 
-.app-popover-link:hover {
-  text-decoration: underline;
-  text-underline-offset: 2px;
+.app-popover-link:hover,
+.app-popover-link:focus-visible {
+  background-image: var(--wave-popover);
+  animation: wave-flow 0.72s linear infinite;
 }
 
 .app-popover-arrow {
@@ -1803,7 +1923,17 @@ html[data-day="sun"] .viewer-backdrop {
   font-size: 11.5px;
   color: var(--quiet);
   text-decoration: none;
-  transition: color 160ms var(--ease-out);
+  padding-bottom: 5px;
+  background-repeat: repeat-x;
+  background-position: 0 100%;
+  background-size: 16px 6px;
+  transition: color 180ms var(--ease-out);
+}
+
+.trophy-strava-link:focus-visible {
+  color: var(--ink);
+  background-image: var(--wave-accent);
+  animation: wave-flow 0.72s linear infinite;
 }
 
 /* Die-cut / square trophy badge image framing */
@@ -1867,6 +1997,7 @@ html[data-day="sun"] .trophy-img--square {
 }
 
 .trophy-shelf-art {
+  position: relative;
   width: 78px;
   height: 78px;
   display: grid;
@@ -1877,8 +2008,97 @@ html[data-day="sun"] .trophy-img--square {
   will-change: transform;
 }
 
+/* Silhouette-masked glossy enamel reflection on hover / focus */
+.trophy-glare {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0;
+  -webkit-mask-image: var(--badge-mask);
+  mask-image: var(--badge-mask);
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  transition: opacity 220ms var(--ease-out);
+}
+
+.trophy-glare--square {
+  border-radius: 14px;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+/* Live pointer-tracking specular catchlight */
+.trophy-glare::before {
+  content: "";
+  position: absolute;
+  inset: -25%;
+  background:
+    radial-gradient(
+      circle at var(--glare-x, 32%) var(--glare-y, 24%),
+      rgba(255, 255, 255, 0.56) 0%,
+      rgba(255, 255, 255, 0.18) 32%,
+      transparent 62%
+    ),
+    linear-gradient(
+      118deg,
+      transparent 28%,
+      rgba(255, 255, 255, 0.08) 40%,
+      rgba(255, 255, 255, 0.34) 49%,
+      rgba(255, 255, 255, 0.1) 56%,
+      transparent 66%
+    );
+  transform: translate3d(var(--glare-tx, 0px), var(--glare-ty, 0px), 0);
+  transition: transform 80ms linear;
+}
+
+/* Crisp metallic sheen sweep across badge on hover entry */
+.trophy-glare::after {
+  content: "";
+  position: absolute;
+  inset: -45%;
+  background: linear-gradient(
+    115deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.16) 44%,
+    rgba(255, 255, 255, 0.82) 50%,
+    rgba(255, 255, 255, 0.16) 56%,
+    transparent 65%
+  );
+  transform: translate3d(-90%, 0, 0);
+}
+
 .trophy-shelf-item.is-active .trophy-shelf-art {
   transform: translateY(-7px) scale(1.16) rotate(0deg);
+}
+
+.trophy-shelf-item.is-active .trophy-img:not(.trophy-img--square) {
+  filter: drop-shadow(0 12px 18px rgba(23, 21, 15, 0.22));
+}
+
+html[data-day="sun"] .trophy-shelf-item.is-active .trophy-img:not(.trophy-img--square) {
+  filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.62));
+}
+
+.trophy-shelf-item.is-active .trophy-img--square {
+  box-shadow: 0 12px 20px rgba(23, 21, 15, 0.22), 0 0 0 1px var(--line-strong);
+}
+
+html[data-day="sun"] .trophy-shelf-item.is-active .trophy-img--square {
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.62), 0 0 0 1px rgba(244, 239, 228, 0.2);
+}
+
+.trophy-shelf-item.is-active .trophy-glare {
+  opacity: 1;
+}
+
+.trophy-shelf-item.is-active .trophy-glare::after {
+  transform: translate3d(90%, 0, 0);
+  transition: transform 640ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .trophy-shelf-item:active .trophy-shelf-art {
@@ -2026,11 +2246,18 @@ html[data-day="sun"] .trophy-img--square {
   font-size: 11.5px;
   color: var(--muted);
   text-decoration: none;
-  transition: color 160ms var(--ease-out);
+  padding-bottom: 5px;
+  background-repeat: repeat-x;
+  background-position: 0 100%;
+  background-size: 16px 6px;
+  transition: color 180ms var(--ease-out);
 }
 
-.connect-more:hover {
+.connect-more:hover,
+.connect-more:focus-visible {
   color: var(--ink);
+  background-image: var(--wave-accent);
+  animation: wave-flow 0.72s linear infinite;
 }
 
 .connect-label {
@@ -2185,15 +2412,22 @@ html[data-day="sun"] .trophy-img--square {
   text-decoration: none;
   color: var(--muted);
   font-weight: 500;
-  transition: color 160ms var(--ease-out);
+  padding-bottom: 5px;
+  background-repeat: repeat-x;
+  background-position: 0 100%;
+  background-size: 16px 6px;
+  transition: color 180ms var(--ease-out);
 }
 
 .foot-nav a:hover,
-.foot-nav a[aria-current="page"] {
+.foot-nav a:focus-visible {
   color: var(--ink);
+  background-image: var(--wave-accent);
+  animation: wave-flow 0.72s linear infinite;
 }
 
 .foot-nav a[aria-current="page"] {
+  color: var(--ink);
   font-weight: 600;
 }
 
@@ -2308,15 +2542,23 @@ html[data-day="sun"] .trophy-img--square {
 
 .foot-link {
   color: var(--ink-2);
-  text-decoration: underline;
-  text-decoration-color: var(--line-strong);
-  text-underline-offset: 3px;
-  transition: color 160ms var(--ease-out), text-decoration-color 160ms var(--ease-out);
+  text-decoration: none;
+  padding-bottom: 5px;
+  background-image: var(--wave-rest);
+  background-repeat: repeat-x;
+  background-position: 0 100%;
+  background-size: 16px 6px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  animation: wave-flow 1.4s linear infinite;
+  transition: color 180ms var(--ease-out);
 }
 
-.foot-link:hover {
+.foot-link:hover,
+.foot-link:focus-visible {
   color: var(--ink);
-  text-decoration-color: var(--accent);
+  background-image: var(--wave-accent);
+  animation-duration: 0.72s;
 }
 
 /* Toast */
@@ -2348,18 +2590,39 @@ html[data-day="sun"] .trophy-img--square {
    Pointer-Fine Hover Polish
    ========================================================================== */
 @media (hover: hover) and (pointer: fine) {
-  .photo-toggle:hover {
-    background: var(--sunken);
+  .photo-toggle:hover .photo-toggle-hint {
+    transform: translate3d(7px, 0, 0);
+  }
+
+  .photo-toggle:hover .photo-toggle-arrow {
+    animation: none;
+    opacity: 1;
+    transform: translate3d(0, -1px, 0) rotate(-4deg);
+  }
+
+  .photo-toggle:hover .photo-toggle-label {
+    opacity: 1;
+    color: var(--ink-2);
+    transform: translate3d(0, 0, 0);
+    filter: none;
+  }
+
+  html[data-profile="work"] .photo-toggle:hover .mini-photo--work {
+    transform: translate(-1px, -1px) rotate(-6deg) scale(1.02);
   }
 
   html[data-profile="work"] .photo-toggle:hover .mini-photo--cycling {
-    transform: translate(18px, 0px) rotate(12deg) scale(0.94);
+    transform: translate(20px, -1px) rotate(13deg) scale(0.95);
     opacity: 1;
     filter: saturate(1);
   }
 
+  html[data-profile="cycling"] .photo-toggle:hover .mini-photo--cycling {
+    transform: translate(-1px, -1px) rotate(6deg) scale(1.02);
+  }
+
   html[data-profile="cycling"] .photo-toggle:hover .mini-photo--work {
-    transform: translate(18px, 0px) rotate(-12deg) scale(0.94);
+    transform: translate(20px, -1px) rotate(-13deg) scale(0.95);
     opacity: 1;
     filter: saturate(1);
   }
@@ -2413,8 +2676,8 @@ html[data-day="sun"] .trophy-img--square {
   .text-link:hover,
   .caption-link:hover {
     color: var(--ink);
-    text-decoration-color: var(--accent);
-    text-decoration-thickness: 2.5px;
+    background-image: var(--wave-accent);
+    animation-duration: 0.72s;
   }
 
   /* Playful spring bounce when hovering inline editorial icons */
@@ -2494,6 +2757,8 @@ html[data-day="sun"] .trophy-img--square {
 
   .trophy-strava-link:hover {
     color: var(--ink);
+    background-image: var(--wave-accent);
+    animation: wave-flow 0.72s linear infinite;
   }
 }
 
@@ -2565,7 +2830,8 @@ html[data-day="sun"] .trophy-img--square {
     height: 54px;
   }
 
-  .trophy-shelf-art .trophy-img--square {
+  .trophy-shelf-art .trophy-img--square,
+  .trophy-shelf-art .trophy-glare--square {
     border-radius: 10px;
   }
 
@@ -2586,17 +2852,42 @@ html[data-day="sun"] .trophy-img--square {
   }
 
   .photo-toggle {
-    gap: 11px;
-    padding: 4px 8px 4px 4px;
+    gap: 6px;
+    padding: 2px 2px 2px 0;
   }
 
-  .photo-toggle-mode {
-    font-size: 14.5px;
+  .photo-stack {
+    width: 48px;
+    height: 37px;
   }
 
-  .photo-toggle-sub {
-    display: block;
-    font-size: 10.5px;
+  .mini-photo {
+    width: 35px;
+    height: 35px;
+    padding: 1.5px;
+    border-radius: 10px;
+  }
+
+  .mini-photo img {
+    border-radius: 8px;
+  }
+
+  html[data-profile="work"] .mini-photo--cycling {
+    transform: translate(12px, 2px) rotate(9deg) scale(0.88);
+  }
+
+  html[data-profile="cycling"] .mini-photo--work {
+    transform: translate(12px, 2px) rotate(-9deg) scale(0.88);
+  }
+
+  .photo-toggle-hint {
+    margin-left: 2px;
+    margin-bottom: -4px;
+  }
+
+  .photo-toggle-arrow {
+    width: 18px;
+    height: 15px;
   }
 
   .hero {
@@ -2857,10 +3148,18 @@ html[data-day="sun"] .trophy-img--square {
 /* Reduced Motion & Reduced Transparency */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  html.js .up { transform: none; transition: opacity 200ms ease; }
+  html.js .up,
+  html.js .reveal {
+    transform: none;
+    filter: none;
+    transition: opacity 200ms ease;
+    will-change: auto;
+  }
   .status-dot::after { animation: none; opacity: 0; }
-  .scroll-cue-arrow { animation: none; }
-  .mini-photo, .fan-item, .swap-pill, .connect-pill, .watch-tile, .watch-hud-pill, .watch-reset-btn, .viewer-backdrop, .viewer-img, .viewer-bar, .inline-ico, .inline-avatar, .inline-company-ico, .inline-cluster img { transition-duration: 100ms !important; transition-delay: 0ms !important; }
+  .scroll-cue-arrow, .photo-toggle-arrow { animation: none !important; }
+  .text-link, .caption-link, .foot-link, .connect-more, .trophy-strava-link, .foot-nav a, .app-popover-link { animation: none !important; }
+  .trophy-glare::after { display: none; }
+  .mini-photo, .photo-toggle-arrow, .photo-toggle-label, .text-link, .caption-link, .foot-link, .connect-more, .trophy-strava-link, .foot-nav a, .app-popover-link, .trophy-glare, .fan-item, .swap-pill, .connect-pill, .watch-tile, .watch-hud-pill, .watch-reset-btn, .viewer-backdrop, .viewer-img, .viewer-bar, .inline-ico, .inline-avatar, .inline-company-ico, .inline-cluster img { transition-duration: 100ms !important; transition-delay: 0ms !important; }
   ::view-transition-group(*),
   ::view-transition-old(*),
   ::view-transition-new(*),

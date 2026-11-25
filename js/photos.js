@@ -1,4 +1,4 @@
-import { playClick, playPop } from './sound.js';
+import { playClick, playPop } from './sound.js?v=2';
 
 let photos = [];
 let tileStates = [];

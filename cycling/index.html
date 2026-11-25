@@ -42,7 +42,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png" />
   <link rel="manifest" href="/site.webmanifest" />
   <link rel="prefetch" href="/" />
-  <link rel="stylesheet" href="/css/styles.css?v=21" />
+  <link rel="stylesheet" href="/css/styles.css?v=33" />
 
   <!-- Structured Data (JSON-LD: WebPage + BreadcrumbList) -->
   <script type="application/ld+json">
@@ -108,18 +108,18 @@
       >
         <span class="photo-stack" aria-hidden="true">
           <span class="mini-photo mini-photo--work">
-            <img src="/assets/avatars/work.png" alt="" width="40" height="40" />
+            <img src="/assets/avatars/work.png" alt="" width="34" height="34" />
           </span>
           <span class="mini-photo mini-photo--cycling">
-            <img src="/assets/avatars/cycling.png" alt="" width="40" height="40" />
+            <img src="/assets/avatars/cycling.png" alt="" width="34" height="34" />
           </span>
         </span>
-        <span class="photo-toggle-meta">
-          <span class="photo-toggle-mode">
-            <i class="mode-dot mode-dot--cycling" aria-hidden="true"></i>
-            On Two Wheels
-          </span>
-          <span class="photo-toggle-sub">Switch to work &rlarr;</span>
+        <span class="photo-toggle-hint" aria-hidden="true">
+          <svg class="photo-toggle-arrow" viewBox="0 0 24 20" width="18" height="15" fill="none">
+            <path d="M21 15C15 13.5 10 10 5 5" stroke="var(--arrow)" stroke-width="2" stroke-linecap="round" />
+            <path d="M12 4.5H4.5V12" stroke="var(--arrow)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <span class="photo-toggle-label">Switch to work</span>
         </span>
       </a>
 
@@ -270,7 +270,7 @@
 
     <!-- CYCLING EDITORIAL LETTER -->
     <section class="letter wrap-letter" id="intro" aria-label="About my cycling">
-      <article class="prose up">
+      <article class="prose">
         <p>
           Off the clock, I'm
           <span class="inline-avatar inline-avatar--cycling" aria-hidden="true">
@@ -305,7 +305,7 @@
     </section>
 
     <!-- WATCHOS RADIAL LENS ROAD PHOTO GALLERY -->
-    <section class="photo-gallery-section up" id="ride-photos" aria-label="Cycling photos">
+    <section class="photo-gallery-section" id="ride-photos" aria-label="Cycling photos">
       <div class="photo-gallery-head">
         <span class="connect-label">SHOTS FROM THE ROAD</span>
         <div class="photo-gallery-head-meta">
@@ -358,7 +358,7 @@
     </section>
 
     <!-- STRAVA TROPHY CASE & RECENT PRs -->
-    <section class="trophy-section wrap-letter up" id="trophy-case" aria-label="Strava trophy case">
+    <section class="trophy-section wrap-letter" id="trophy-case" aria-label="Strava trophy case">
       <div class="trophy-head">
         <span class="connect-label">TROPHY CASE</span>
         <a
@@ -453,6 +453,6 @@
   <!-- Subtle Copy Toast -->
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-  <script type="module" src="/js/main.js?v=24"></script>
+  <script type="module" src="/js/main.js?v=29"></script>
 </body>
 </html>
