@@ -42,7 +42,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png" />
   <link rel="manifest" href="/site.webmanifest" />
   <link rel="prefetch" href="/" />
-  <link rel="stylesheet" href="/css/styles.css?v=39" />
+  <link rel="stylesheet" href="/css/styles.css?v=45" />
 
   <!-- Structured Data (JSON-LD: WebPage + BreadcrumbList) -->
   <script type="application/ld+json">
@@ -380,6 +380,23 @@
       </div>
     </section>
 
+    <!-- TOP 10 PODCASTS WHILE RIDING -->
+    <section class="podcast-section wrap-letter" id="ride-podcasts" aria-label="Top 10 podcasts while riding">
+      <div class="podcast-head">
+        <div class="podcast-head-top">
+          <span class="connect-label">IN MY EARS</span>
+          <span class="podcast-sub-meta">Top 10 &middot; Spotify</span>
+        </div>
+        <p class="podcast-desc">
+          Football banter, Javanese comedy, and long-form conversations that keep the cadence steady on solo morning loops.
+        </p>
+      </div>
+
+      <div class="podcast-stage" id="podcast-stage">
+        <!-- Populated from /assets/podcasts/podcasts.json by /js/podcasts.js -->
+      </div>
+    </section>
+
     <!-- MINIMAL CONNECT ROW -->
     <section class="connect wrap-letter" id="connect" aria-label="Connect">
       <div class="connect-label">CONNECT</div>
@@ -453,6 +470,6 @@
   <!-- Subtle Copy Toast -->
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-  <script type="module" src="/js/main.js?v=31"></script>
+  <script type="module" src="/js/main.js?v=36"></script>
 </body>
 </html>

@@ -1,0 +1,72 @@
+[
+  {
+    "index": 1,
+    "name": "The Rest Is Football",
+    "publisher": "Goalhanger",
+    "link": "https://open.spotify.com/show/2fDn3EgvJZ5J1k5rrBwrlZ",
+    "image": "/assets/podcasts/01-the-rest-is-football.webp"
+  },
+  {
+    "index": 2,
+    "name": "Overlap Daily",
+    "publisher": "The Overlap",
+    "link": "https://open.spotify.com/show/7eyJgU9qdRS91Hy2otbEUQ",
+    "image": "/assets/podcasts/02-overlap-daily.webp"
+  },
+  {
+    "index": 3,
+    "name": "Mandan Kenthir",
+    "publisher": "Mandan Kenthir",
+    "link": "https://open.spotify.com/show/2sxybg5g57McwJwKBYivBS",
+    "image": "/assets/podcasts/03-mandan-kenthir.webp"
+  },
+  {
+    "index": 4,
+    "name": "BKR Brothers",
+    "publisher": "BKR Brothers",
+    "link": "https://open.spotify.com/show/4uI2QsiFOwEecgUX8b1yg2",
+    "image": "/assets/podcasts/04-bkr-brothers.webp"
+  },
+  {
+    "index": 5,
+    "name": "WORK LIFE TRAMPOLINE",
+    "publisher": "Pandji Pragiwaksono",
+    "link": "https://open.spotify.com/show/53a5Yoq9U5heWDjRGSARF7",
+    "image": "/assets/podcasts/05-work-life-trampoline.webp"
+  },
+  {
+    "index": 6,
+    "name": "Box2Box Football Podcast",
+    "publisher": "Box2BoxID",
+    "link": "https://open.spotify.com/show/1hUrLTyWl3XzOFYjMcYYgU",
+    "image": "/assets/podcasts/06-box2box-football-podcast.webp"
+  },
+  {
+    "index": 7,
+    "name": "Podcast Seminggu",
+    "publisher": "Podkesmas Asia",
+    "link": "https://open.spotify.com/show/2RXY5kEKWQobky1Y2dSUyF",
+    "image": "/assets/podcasts/07-podcast-seminggu.webp"
+  },
+  {
+    "index": 8,
+    "name": "MENDOAN",
+    "publisher": "DONOTIAN",
+    "link": "https://open.spotify.com/show/1EYmQLqYuhzaBEvGlhtqEZ",
+    "image": "/assets/podcasts/08-mendoan.webp"
+  },
+  {
+    "index": 9,
+    "name": "Podcast Awal Minggu",
+    "publisher": "Adriano Qalbi",
+    "link": "https://open.spotify.com/show/6srNn7W2aEAI8DZCDGCKEE",
+    "image": "/assets/podcasts/09-podcast-awal-minggu.webp"
+  },
+  {
+    "index": 10,
+    "name": "The Joe Rogan Experience",
+    "publisher": "Joe Rogan",
+    "link": "https://open.spotify.com/show/4rOoJ6Egrf8K2IrywzwOMk",
+    "image": "/assets/podcasts/10-the-joe-rogan-experience.webp"
+  }
+]

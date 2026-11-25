@@ -115,6 +115,7 @@ html[data-profile="cycling"]::view-transition-image-pair(avatar-cycling) {
 :root {
   /* Light ("Sat") — pure warm archival paper */
   --bg: #FBFAF7;
+  --bg-rgb: 251, 250, 247;
   --surface: #FFFFFF;
   --sunken: #F2F0EA;
   --ink: #17150F;
@@ -171,6 +172,7 @@ html[data-profile="cycling"]::view-transition-image-pair(avatar-cycling) {
 /* Dark ("Sun") — warm charcoal paper */
 html[data-day="sun"] {
   --bg: #14120E;
+  --bg-rgb: 20, 18, 14;
   --surface: #1D1B16;
   --sunken: #24211B;
   --ink: #F4EFE4;
@@ -2143,11 +2145,11 @@ html[data-day="sun"] .trophy-shelf-item.is-active .trophy-img--square {
 }
 
 .trophy-prs-label {
-  font-family: var(--mono);
-  font-size: 10.5px;
-  font-weight: 500;
-  letter-spacing: 0.09em;
-  color: var(--quiet);
+  font-family: var(--text);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--muted);
 }
 
 .trophy-prs-list {
@@ -2233,6 +2235,395 @@ html[data-day="sun"] .trophy-shelf-item.is-active .trophy-img--square {
 }
 
 /* ==========================================================================
+   Top 10 Podcasts While Riding — Cover Rail + Broadcast Disc Hover
+   ========================================================================== */
+.podcast-section {
+  position: relative;
+  z-index: 2;
+  background-color: var(--bg);
+  padding-top: 28px;
+  padding-bottom: 44px;
+  border-top: 1px solid var(--line);
+}
+
+.podcast-head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.podcast-head-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.podcast-head .connect-label {
+  margin-bottom: 0;
+}
+
+.podcast-sub-meta {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--quiet);
+}
+
+.podcast-desc {
+  margin: 0;
+  max-width: 560px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+/* Glossy Sleeve Sheen */
+.pod-sleeve-sheen {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(128deg, rgba(255, 255, 255, 0.36) 0%, rgba(255, 255, 255, 0.08) 38%, transparent 56%);
+  opacity: 0;
+  transition: opacity 220ms var(--ease-out);
+}
+
+/* Horizontal Cover Rail + Hover Podcast Broadcast Disc Slide-Out */
+.pod-rail-wrap {
+  position: relative;
+}
+
+.pod-rail-viewport {
+  position: relative;
+}
+
+.pod-rail {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scroll-padding-left: 44px;
+  padding: 16px 64px 14px 2px;
+  scrollbar-width: none;
+}
+
+.pod-rail::-webkit-scrollbar {
+  display: none;
+}
+
+.pod-rail-fade {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 72px;
+  pointer-events: none;
+  z-index: 18;
+  will-change: opacity;
+  backdrop-filter: blur(2.5px);
+  -webkit-backdrop-filter: blur(2.5px);
+}
+
+.pod-rail-fade--left {
+  left: -2px;
+  opacity: var(--fade-left, 0);
+  background: linear-gradient(
+    to right,
+    rgba(var(--bg-rgb), 1) 0%,
+    rgba(var(--bg-rgb), 0.92) 24%,
+    rgba(var(--bg-rgb), 0.56) 54%,
+    rgba(var(--bg-rgb), 0.16) 80%,
+    rgba(var(--bg-rgb), 0) 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    #000 0%,
+    rgba(0, 0, 0, 0.92) 24%,
+    rgba(0, 0, 0, 0.52) 56%,
+    rgba(0, 0, 0, 0.14) 82%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    #000 0%,
+    rgba(0, 0, 0, 0.92) 24%,
+    rgba(0, 0, 0, 0.52) 56%,
+    rgba(0, 0, 0, 0.14) 82%,
+    transparent 100%
+  );
+}
+
+.pod-rail-fade--right {
+  right: -2px;
+  opacity: var(--fade-right, 1);
+  background: linear-gradient(
+    to left,
+    rgba(var(--bg-rgb), 1) 0%,
+    rgba(var(--bg-rgb), 0.92) 24%,
+    rgba(var(--bg-rgb), 0.56) 54%,
+    rgba(var(--bg-rgb), 0.16) 80%,
+    rgba(var(--bg-rgb), 0) 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to left,
+    #000 0%,
+    rgba(0, 0, 0, 0.92) 24%,
+    rgba(0, 0, 0, 0.52) 56%,
+    rgba(0, 0, 0, 0.14) 82%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to left,
+    #000 0%,
+    rgba(0, 0, 0, 0.92) 24%,
+    rgba(0, 0, 0, 0.52) 56%,
+    rgba(0, 0, 0, 0.14) 82%,
+    transparent 100%
+  );
+}
+
+.pod-rail-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 122px;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  text-decoration: none;
+  transform: translate3d(var(--rail-shift, 0px), 0, 0);
+  transition: transform 420ms var(--spring);
+}
+
+.pod-rail-card.is-hovered {
+  z-index: 12;
+}
+
+.pod-rail-stage {
+  position: relative;
+  display: block;
+  width: 122px;
+  height: 122px;
+  margin-bottom: 9px;
+}
+
+/* Matte-dark Podcast Broadcast Disc (slides out behind cover on hover) */
+.pod-rail-disc {
+  position: absolute;
+  top: 7px;
+  left: 8px;
+  z-index: 1;
+  width: 108px;
+  height: 108px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%, #2b2822 0%, #191713 58%, #100f0c 100%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 8px 20px rgba(23, 21, 15, 0.28);
+  overflow: hidden;
+  opacity: 0;
+  transform: translate3d(0, 0, 0) scale(0.86);
+  transition:
+    transform 460ms var(--spring),
+    opacity 220ms var(--ease-out);
+  pointer-events: none;
+}
+
+html[data-day="sun"] .pod-rail-disc {
+  background: radial-gradient(circle at 38% 32%, #312d25 0%, #1e1b16 60%, #13110e 100%);
+  border-color: rgba(244, 239, 228, 0.18);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.65);
+}
+
+/* Subtle concentric podcast acoustic signal rings */
+.pod-rail-disc-rings {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: repeating-radial-gradient(
+    circle at 64% 50%,
+    transparent 0px,
+    transparent 9px,
+    rgba(255, 198, 41, 0.15) 9.5px,
+    transparent 11px
+  );
+}
+
+/* Studio Condenser Mic + Pulsing Broadcast Waves in the exposed right crescent */
+.pod-rail-disc-badge {
+  position: absolute;
+  right: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+}
+
+.pod-mic-wave {
+  opacity: 0.45;
+  transform-origin: 14px 14px;
+}
+
+.pod-rail-card.is-hovered .pod-mic-wave--1 {
+  animation: pod-signal-pulse 1.3s ease-in-out infinite;
+}
+
+.pod-rail-card.is-hovered .pod-mic-wave--2 {
+  animation: pod-signal-pulse 1.3s ease-in-out 0.28s infinite;
+}
+
+@keyframes pod-signal-pulse {
+  0%, 100% { opacity: 0.28; }
+  50% { opacity: 1; }
+}
+
+.pod-rail-art {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: 122px;
+  height: 122px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--sunken);
+  border: 1px solid var(--line);
+  box-shadow: 0 4px 12px rgba(23, 21, 15, 0.13);
+  transition: transform 400ms var(--spring), box-shadow 220ms var(--ease-out), border-color 180ms var(--ease-out);
+}
+
+html[data-day="sun"] .pod-rail-art {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+}
+
+.pod-rail-art > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.pod-rail-card.is-hovered .pod-rail-disc {
+  opacity: 1;
+  transform: translate3d(52px, -4px, 0) scale(1);
+}
+
+.pod-rail-card.is-hovered .pod-rail-art {
+  transform: translateY(-6px) rotate(-2deg) scale(1.03);
+  border-color: var(--line-strong);
+  box-shadow: 0 14px 26px rgba(23, 21, 15, 0.22);
+}
+
+.pod-rail-card.is-hovered .pod-sleeve-sheen {
+  opacity: 0.85;
+}
+
+.pod-rail-card.is-hovered .pod-rail-play {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.pod-rail-rank {
+  position: absolute;
+  top: 7px;
+  left: 7px;
+  padding: 2px 6px;
+  border-radius: 7px;
+  background: rgba(20, 18, 14, 0.78);
+  color: #FBFAF7;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.pod-rail-play {
+  position: absolute;
+  right: 7px;
+  bottom: 7px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-ink);
+  box-shadow: 0 4px 12px rgba(23, 21, 15, 0.25);
+  opacity: 0;
+  transform: translateY(4px) scale(0.88);
+  transition: opacity 180ms var(--ease-out), transform 280ms var(--spring);
+}
+
+.pod-rail-play img {
+  width: 18px;
+  height: 18px;
+  display: block;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.pod-rail-title {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ink);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.pod-rail-pub {
+  margin-top: 2px;
+  font-size: 11.5px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pod-rail-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.pod-rail-hint {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--quiet);
+}
+
+.pod-rail-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pod-rail-btn {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--ink-2);
+  font-family: var(--mono);
+  font-size: 12px;
+  transition: border-color 160ms var(--ease-out), color 160ms var(--ease-out), transform 140ms var(--ease-out), opacity 160ms var(--ease-out);
+}
+
+.pod-rail-btn:disabled {
+  opacity: 0.32;
+  cursor: default;
+}
+
+.pod-rail-btn:active:not(:disabled) {
+  transform: scale(0.92);
+}
+
+/* ==========================================================================
    Minimal Connect Row & Dedicated /connect/ Directory Page
    ========================================================================== */
 .connect {
@@ -2276,11 +2667,11 @@ html[data-day="sun"] .trophy-shelf-item.is-active .trophy-img--square {
 }
 
 .connect-label {
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  color: var(--quiet);
+  font-family: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--ink-2);
   margin-bottom: 14px;
 }
 
@@ -2775,6 +3166,11 @@ html[data-day="sun"] .trophy-shelf-item.is-active .trophy-img--square {
     background-image: var(--wave-accent);
     animation: wave-flow 0.72s linear infinite;
   }
+
+  .pod-rail-btn:hover:not(:disabled) {
+    border-color: var(--line-strong);
+    color: var(--ink);
+  }
 }
 
 /* ==========================================================================
@@ -2856,6 +3252,55 @@ html[data-day="sun"] .trophy-shelf-item.is-active .trophy-img--square {
 
   .trophy-pr-pill {
     font-size: 11.5px;
+  }
+
+  /* Mobile Podcasts */
+  .podcast-head {
+    margin-bottom: 12px;
+  }
+
+  .podcast-desc {
+    font-size: 13.5px;
+  }
+
+  .pod-rail {
+    gap: 12px;
+    scroll-padding-left: 24px;
+    padding: 10px 36px 12px 0;
+  }
+
+  .pod-rail-fade {
+    width: 44px;
+  }
+
+  .pod-rail-card,
+  .pod-rail-stage,
+  .pod-rail-art {
+    width: 108px;
+  }
+
+  .pod-rail-stage,
+  .pod-rail-art {
+    height: 108px;
+    border-radius: 14px;
+  }
+
+  .pod-rail-disc {
+    display: none;
+  }
+
+  .pod-rail-play {
+    width: 24px;
+    height: 24px;
+    right: 6px;
+    bottom: 6px;
+    opacity: 1;
+    transform: none;
+  }
+
+  .pod-rail-play img {
+    width: 15px;
+    height: 15px;
   }
 
   .topbar {
@@ -3172,7 +3617,7 @@ html[data-day="sun"] .trophy-shelf-item.is-active .trophy-img--square {
     will-change: auto;
   }
   .status-dot::after { animation: none; opacity: 0; }
-  .scroll-cue-arrow, .photo-toggle-arrow { animation: none !important; }
+  .scroll-cue-arrow, .photo-toggle-arrow, .pod-mic-wave { animation: none !important; }
   .text-link, .caption-link, .foot-link, .connect-more, .trophy-strava-link, .foot-nav a, .app-popover-link { animation: none !important; }
   .trophy-glare::after { display: none; }
   .mini-photo, .topbar-inner, .photo-toggle-arrow, .photo-toggle-label, .text-link, .caption-link, .foot-link, .connect-more, .trophy-strava-link, .foot-nav a, .app-popover-link, .trophy-glare, .fan-item, .swap-pill, .connect-pill, .watch-tile, .watch-hud-pill, .watch-reset-btn, .viewer-backdrop, .viewer-img, .viewer-bar, .inline-ico, .inline-avatar, .inline-company-ico, .inline-cluster img { transition-duration: 100ms !important; transition-delay: 0ms !important; }

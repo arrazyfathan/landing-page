@@ -8,6 +8,7 @@ let drawOrder = [];
 let activeIndex = 0;
 let isOpen = false;
 let isClosing = false;
+let openedAt = 0;
 let closeTimer = null;
 let hiddenTileIndex = -1;
 
@@ -1134,6 +1135,7 @@ function openLightbox(index) {
 
   isOpen = true;
   isClosing = false;
+  openedAt = performance.now();
   viewer.removeAttribute('data-closing');
   viewer.classList.remove('is-open');
   viewer.hidden = false;
@@ -1593,6 +1595,22 @@ function wireEvents() {
 
   if (resetBtnEl) {
     resetBtnEl.addEventListener('click', recenterGallery);
+  }
+
+  // Swallow the mobile browser's delayed synthetic `click` fired right after
+  // the opening touch `pointerup`, which would otherwise land on the newly
+  // shown lightbox backdrop/image and close it immediately.
+  if (viewer) {
+    viewer.addEventListener(
+      'click',
+      (e) => {
+        if (performance.now() - openedAt < 420) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      },
+      true
+    );
   }
 
   if (lbPrev) {

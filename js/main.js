@@ -8,8 +8,9 @@ import {
   playSuccess
 } from './sound.js?v=2';
 import { initMarkers, morphMarker, repaintAllMarkers } from './marker.js?v=10';
-import { initCyclingPhotos } from './photos.js?v=25';
+import { initCyclingPhotos } from './photos.js?v=26';
 import { initTrophyCase } from './trophies.js?v=21';
+import { initRidePodcasts } from './podcasts.js?v=5';
 
 const root = document.documentElement;
 const EMAIL = 'hello@arrazyfathan.com';
@@ -44,6 +45,8 @@ function markScrollRevealTargets() {
     '.watch-gallery',
     '.trophy-head',
     '.trophy-prs',
+    '.podcast-head',
+    '.podcast-stage',
     '.connect-head',
     '.connect > .connect-label',
     '.foot',
@@ -804,6 +807,7 @@ setupScrollReveal();
 initMarkers();
 initCyclingPhotos();
 initTrophyCase({ onReveal: observeRevealEl });
+initRidePodcasts({ onReveal: observeRevealEl });
 initHeroScrollShrink();
 initInlineAppPopovers();
 initIconHoverSounds();
