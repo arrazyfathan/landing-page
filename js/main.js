@@ -97,22 +97,28 @@ function setupScrollReveal() {
         }
       });
     },
-    { threshold: 0.06, rootMargin: '0px 0px -36px 0px' }
+    { threshold: 0.04, rootMargin: '0px 0px -24px 0px' }
   );
 
+  /* Footer uses positive bottom margin so it reliably reveals at page bottom with zero scroll listener */
+  const footEl = document.querySelector('.foot.reveal:not(.in)');
+  if (footEl) {
+    const footObserver = new IntersectionObserver(
+      (entries) => {
+        if (entries[0] && entries[0].isIntersecting) {
+          footEl.classList.add('in');
+          footObserver.disconnect();
+        }
+      },
+      { threshold: 0, rootMargin: '0px 0px 40px 0px' }
+    );
+    footObserver.observe(footEl);
+  }
+
   document.querySelectorAll('.up:not(.in), .reveal:not(.in)').forEach((el) => {
+    if (el === footEl) return;
     observeRevealEl(el);
   });
-
-  /* Ensure bottom-most items (e.g. footer) always reveal if user reaches the end of the page */
-  window.addEventListener('scroll', () => {
-    const nearBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 28;
-    if (!nearBottom) return;
-    document.querySelectorAll('.up:not(.in), .reveal:not(.in)').forEach((el) => {
-      el.classList.add('in');
-      if (revealObserver) revealObserver.unobserve(el);
-    });
-  }, { passive: true });
 }
 
 /* 3. Smooth Profile Navigation & Card Swap Feedback (/, /cycling/, /connect/) */
@@ -476,7 +482,7 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
-/* 9. Full-Viewport Hero Scroll-Driven Shrink Transition */
+/* 9. Full-Viewport Hero Scroll-Driven Shrink Transition (zero blur / zero layout reads in scroll) */
 function initHeroScrollShrink() {
   const hero = document.querySelector('.hero');
   const inner = hero && hero.querySelector('.hero-inner');
@@ -489,39 +495,98 @@ function initHeroScrollShrink() {
     });
   }
 
+  const reducedMotionMq = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let reducedMotion = reducedMotionMq.matches;
+  let range = Math.max(260, hero.offsetHeight * 0.95);
+  let rafId = 0;
+  let lastRaw = -1;
+  let cueHidden = false;
+  let heroHidden = false;
+  let pointerDisabled = false;
+
+  if (reducedMotionMq.addEventListener) {
+    reducedMotionMq.addEventListener('change', (e) => {
+      reducedMotion = e.matches;
+      lastRaw = -1;
+      scheduleUpdate();
+    });
+  }
+
+  function measureRange() {
+    range = Math.max(260, hero.offsetHeight * 0.95);
+    lastRaw = -1;
+    scheduleUpdate();
+  }
+
   function applyHeroScroll() {
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
-    const range = Math.max(260, hero.offsetHeight * 0.95);
-    const raw = Math.min(1, Math.max(0, scrollY / range));
+    rafId = 0;
+    const scrollY = window.scrollY || 0;
+    const raw = reducedMotion ? 0 : Math.min(1, Math.max(0, scrollY / range));
     heroScrollProgress = raw;
 
     if (scrollCue) {
-      scrollCue.classList.toggle('is-hidden', scrollY > 36);
+      const shouldHideCue = scrollY > 36;
+      if (shouldHideCue !== cueHidden) {
+        cueHidden = shouldHideCue;
+        scrollCue.classList.toggle('is-hidden', cueHidden);
+      }
     }
 
-    if (reducedMotion || raw <= 0.002) {
-      inner.style.transform = '';
-      inner.style.opacity = '';
-      inner.style.filter = '';
-      hero.style.pointerEvents = '';
+    if (Math.abs(raw - lastRaw) < 0.0004) return;
+    lastRaw = raw;
+
+    if (raw <= 0.001) {
+      inner.style.transform = 'translate3d(0, 0, 0) scale(1)';
+      inner.style.opacity = '1';
+      if (heroHidden) {
+        heroHidden = false;
+        inner.style.visibility = '';
+      }
+      if (pointerDisabled) {
+        pointerDisabled = false;
+        hero.style.pointerEvents = '';
+      }
       return;
     }
 
-    // Sticky hero smoothly shrinks and fades across the full rise of the intro section
-    const scale = 1 - raw * 0.30;           // 1.00 -> 0.70
-    const translateY = -raw * 24;           // 0 -> -24px gentle lift
-    const opacity = Math.max(0, 1 - raw * 1.08); // 1.00 -> 0.00 smoothly
-    const blur = raw * 4;                   // 0 -> 4px soft depth-of-field
+    const shouldDisablePointer = raw > 0.72;
+    if (shouldDisablePointer !== pointerDisabled) {
+      pointerDisabled = shouldDisablePointer;
+      hero.style.pointerEvents = pointerDisabled ? 'none' : '';
+    }
 
-    inner.style.transform = `translate3d(0, ${translateY.toFixed(1)}px, 0) scale(${scale.toFixed(4)})`;
+    if (raw >= 0.998) {
+      inner.style.opacity = '0';
+      if (!heroHidden) {
+        heroHidden = true;
+        inner.style.visibility = 'hidden';
+      }
+      return;
+    }
+
+    if (heroHidden) {
+      heroHidden = false;
+      inner.style.visibility = '';
+    }
+
+    // Pure GPU-composited shrink & fade (no filter: blur, no layout reads)
+    const scale = 1 - raw * 0.24;               // 1.00 -> 0.76
+    const translateY = -raw * 22;               // 0 -> -22px gentle recess
+    const fade = raw * raw * 0.35 + raw * 0.65; // smooth ease-in-out fade
+    const opacity = Math.max(0, 1 - fade * 1.04);
+
+    inner.style.transform = `translate3d(0, ${translateY.toFixed(2)}px, 0) scale(${scale.toFixed(4)})`;
     inner.style.opacity = opacity.toFixed(3);
-    inner.style.filter = blur > 0.15 ? `blur(${blur.toFixed(2)}px)` : '';
-    hero.style.pointerEvents = raw > 0.75 ? 'none' : '';
   }
 
-  window.addEventListener('scroll', applyHeroScroll, { passive: true });
-  window.addEventListener('resize', applyHeroScroll, { passive: true });
+  function scheduleUpdate() {
+    if (!rafId) {
+      rafId = requestAnimationFrame(applyHeroScroll);
+    }
+  }
+
+  window.addEventListener('scroll', scheduleUpdate, { passive: true });
+  window.addEventListener('resize', measureRange, { passive: true });
   applyHeroScroll();
 }
 
