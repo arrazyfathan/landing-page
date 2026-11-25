@@ -9,7 +9,7 @@ import {
 } from './sound.js?v=2';
 import { initMarkers, morphMarker, repaintAllMarkers } from './marker.js?v=11';
 import { initCyclingPhotos } from './photos.js?v=26';
-import { initTrophyCase } from './trophies.js?v=21';
+import { initTrophyCase } from './trophies.js?v=23';
 import { initRidePodcasts } from './podcasts.js?v=5';
 
 const root = document.documentElement;

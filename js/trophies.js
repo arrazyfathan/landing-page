@@ -1,9 +1,94 @@
 import { playPop, playHover } from './sound.js?v=2';
 
 const TILTS = [-3, 2.2, -2, 2.8, -1.6, 2.4, -1.8, 1.8, -2.6, 2.2];
+const KUDOS_ICON_SRC = '/assets/icons/cycling/kudos.svg';
+let activeKudosCount = 0;
 
 function prefersReducedMotion() {
   return Boolean(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+}
+
+function isDesktopPointer() {
+  return Boolean(
+    window.matchMedia &&
+      window.matchMedia('(hover: hover) and (pointer: fine)').matches &&
+      window.innerWidth > 600
+  );
+}
+
+function spawnKudosBurst(originX, originY) {
+  if (activeKudosCount >= 24) return;
+  const reduced = prefersReducedMotion();
+  const specs = reduced
+    ? [{ dx: 0, dy: -22, rot: -6, scale: 1, delay: 0, dur: 420, sm: false }]
+    : [
+        {
+          dx: (Math.random() - 0.5) * 14,
+          dy: -68 - Math.random() * 18,
+          rot: (Math.random() - 0.5) * 20,
+          scale: 1.06,
+          delay: 0,
+          dur: 820,
+          sm: false,
+        },
+        {
+          dx: -24 - Math.random() * 14,
+          dy: -50 - Math.random() * 20,
+          rot: -14 - Math.random() * 12,
+          scale: 0.86,
+          delay: 45,
+          dur: 760,
+          sm: true,
+        },
+        {
+          dx: 24 + Math.random() * 14,
+          dy: -52 - Math.random() * 20,
+          rot: 14 + Math.random() * 12,
+          scale: 0.82,
+          delay: 90,
+          dur: 780,
+          sm: true,
+        },
+      ];
+
+  const frag = document.createDocumentFragment();
+
+  specs.forEach((s) => {
+    const node = document.createElement('span');
+    node.className = s.sm ? 'trophy-kudos trophy-kudos--sm' : 'trophy-kudos';
+    node.setAttribute('aria-hidden', 'true');
+    node.style.left = `${Math.round(originX)}px`;
+    node.style.top = `${Math.round(originY)}px`;
+    node.style.setProperty('--kx', `${s.dx.toFixed(1)}px`);
+    node.style.setProperty('--ky', `${s.dy.toFixed(1)}px`);
+    node.style.setProperty('--krot', `${s.rot.toFixed(1)}deg`);
+    node.style.setProperty('--kscale', String(s.scale));
+    node.style.setProperty('--kdelay', `${s.delay}ms`);
+    node.style.setProperty('--kdur', `${s.dur}ms`);
+
+    const img = document.createElement('img');
+    img.src = KUDOS_ICON_SRC;
+    img.alt = '';
+    img.width = s.sm ? 13 : 16;
+    img.height = s.sm ? 13 : 16;
+    img.decoding = 'async';
+    node.appendChild(img);
+
+    activeKudosCount += 1;
+    let removed = false;
+    const cleanup = () => {
+      if (removed) return;
+      removed = true;
+      activeKudosCount = Math.max(0, activeKudosCount - 1);
+      node.remove();
+    };
+    node.addEventListener('animationend', cleanup, { once: true });
+    setTimeout(cleanup, s.dur + s.delay + 120);
+
+    frag.appendChild(node);
+  });
+
+  document.body.appendChild(frag);
 }
 
 function createBadgeImg(item) {
@@ -181,11 +266,28 @@ function renderShelf(container, trophies, popover, onReveal) {
       if (!popover.isPinned(btn)) popover.hide(false);
     });
 
+    let comboCount = 0;
+    let comboTimer = null;
+
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
-      playPop(0.98 + (idx % 5) * 0.04);
-      if (popover.isPinned(btn)) {
-        popover.hide(true);
+
+      clearTimeout(comboTimer);
+      comboCount = Math.min(6, comboCount + 1);
+      comboTimer = setTimeout(() => {
+        comboCount = 0;
+      }, 700);
+
+      playPop(1.0 + comboCount * 0.045);
+
+      const artRect = art.getBoundingClientRect();
+      const hasPoint = e.clientX !== 0 || e.clientY !== 0;
+      const originX = hasPoint ? e.clientX : artRect.left + artRect.width / 2;
+      const originY = hasPoint ? e.clientY - 8 : artRect.top + artRect.height * 0.35;
+      spawnKudosBurst(originX, originY);
+
+      if (isDesktopPointer()) {
+        popover.show(btn, item, { pin: false });
       } else {
         popover.show(btn, item, { pin: true });
       }
@@ -238,6 +340,10 @@ export async function initTrophyCase({ onReveal } = {}) {
   const shelfEl = document.getElementById('trophy-shelf-grid');
   const prsEl = document.getElementById('trophy-prs');
   if (!shelfEl) return;
+
+  const preload = new Image();
+  preload.decoding = 'async';
+  preload.src = KUDOS_ICON_SRC;
 
   const popover = createPopoverController();
 
