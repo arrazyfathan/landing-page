@@ -482,12 +482,30 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
-/* 9. Full-Viewport Hero Scroll-Driven Shrink Transition (zero blur / zero layout reads in scroll) */
+/* 9. Full-Viewport Hero Scroll-Driven Shrink Transition + Sticky Topbar Alignment */
 function initHeroScrollShrink() {
+  const topbar = document.querySelector('.topbar');
   const hero = document.querySelector('.hero');
   const inner = hero && hero.querySelector('.hero-inner');
   const scrollCue = hero && hero.querySelector('.scroll-cue');
-  if (!hero || !inner) return;
+  if (!hero || !inner) {
+    if (!topbar) return;
+    let topbarScrolled = false;
+    let rafId = 0;
+    const syncTopbar = () => {
+      rafId = 0;
+      const next = (window.scrollY || 0) > 24;
+      if (next !== topbarScrolled) {
+        topbarScrolled = next;
+        topbar.classList.toggle('is-scrolled', topbarScrolled);
+      }
+    };
+    window.addEventListener('scroll', () => {
+      if (!rafId) rafId = requestAnimationFrame(syncTopbar);
+    }, { passive: true });
+    syncTopbar();
+    return;
+  }
 
   if (scrollCue) {
     scrollCue.addEventListener('click', () => {
@@ -501,6 +519,7 @@ function initHeroScrollShrink() {
   let rafId = 0;
   let lastRaw = -1;
   let cueHidden = false;
+  let topbarScrolled = false;
   let heroHidden = false;
   let pointerDisabled = false;
 
@@ -521,8 +540,17 @@ function initHeroScrollShrink() {
   function applyHeroScroll() {
     rafId = 0;
     const scrollY = window.scrollY || 0;
-    const raw = reducedMotion ? 0 : Math.min(1, Math.max(0, scrollY / range));
+    const progress = Math.min(1, Math.max(0, scrollY / range));
+    const raw = reducedMotion ? 0 : progress;
     heroScrollProgress = raw;
+
+    if (topbar) {
+      const shouldAlignTopbar = progress > 0.35;
+      if (shouldAlignTopbar !== topbarScrolled) {
+        topbarScrolled = shouldAlignTopbar;
+        topbar.classList.toggle('is-scrolled', topbarScrolled);
+      }
+    }
 
     if (scrollCue) {
       const shouldHideCue = scrollY > 36;
