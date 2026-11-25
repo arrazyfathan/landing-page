@@ -42,7 +42,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png" />
   <link rel="manifest" href="/site.webmanifest" />
   <link rel="prefetch" href="/cycling/" />
-  <link rel="stylesheet" href="/css/styles.css?v=13" />
+  <link rel="stylesheet" href="/css/styles.css?v=25" />
 
   <!-- Structured Data (JSON-LD: Person + WebSite) -->
   <script type="application/ld+json">
@@ -223,11 +223,13 @@
 
         <h1 class="hero-headline up">
           <span class="line-strong">
-            Shipping
+            <span class="swap-verb" id="hero-lead-verb"><span class="swap-verb-inner">Building</span></span>
             <button
               type="button"
               class="swap-pill"
-              data-swap="Android &amp;::iOS apps|Play Store apps|App Store apps|Mobile Apps"
+              data-verb-target="hero-lead-verb"
+              data-verbs="Building|Shipping to|Shipping to|Building"
+              data-swap="Android &amp;::iOS apps|Play Store|App Store|Mobile Apps"
               data-swap-mobile="Android &amp;::iOS|Play Store|App Store|Mobile Apps"
               data-icons="/assets/icons/platform/android.svg|/assets/icons/platform/playstore.svg|/assets/icons/platform/appstore.svg|/assets/icons/platform/flutter.svg"
               data-icons-mid="/assets/icons/platform/apple.svg|||"
@@ -470,6 +472,6 @@
   <!-- Subtle Copy Toast -->
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-  <script type="module" src="/js/main.js?v=13"></script>
+  <script type="module" src="/js/main.js?v=25"></script>
 </body>
 </html>

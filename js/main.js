@@ -176,6 +176,12 @@ const mobileSwapQuery = window.matchMedia('(max-width: 600px)');
 document.querySelectorAll('.swap-pill').forEach((btn) => {
   const desktopWords = (btn.getAttribute('data-swap') || '').split('|').filter(Boolean);
   const mobileWords = (btn.getAttribute('data-swap-mobile') || '').split('|').filter(Boolean);
+  const verbs = btn.hasAttribute('data-verbs')
+    ? (btn.getAttribute('data-verbs') || '').split('|')
+    : [];
+  const verbTargetId = btn.getAttribute('data-verb-target');
+  const verbEl = verbTargetId ? document.getElementById(verbTargetId) : null;
+  const verbInnerEl = verbEl ? verbEl.querySelector('.swap-verb-inner') : null;
   const icons = (btn.getAttribute('data-icons') || '').split('|');
   const iconsMid = btn.hasAttribute('data-icons-mid')
     ? (btn.getAttribute('data-icons-mid') || '').split('|')
@@ -191,6 +197,12 @@ document.querySelectorAll('.swap-pill').forEach((btn) => {
   let swapSeq = 0;
   let exitTimer = null;
   let settleTimer = null;
+
+  function applyVerb(i) {
+    if (verbInnerEl && verbs[i]) {
+      verbInnerEl.textContent = verbs[i];
+    }
+  }
 
   function applyContent(word, i) {
     if (iconEl && icons[i]) {
@@ -228,12 +240,15 @@ document.querySelectorAll('.swap-pill').forEach((btn) => {
   function syncWordForViewport() {
     const word = getActiveWords()[idx];
     applyContent(word, idx);
+    applyVerb(idx);
     btn.style.width = '';
+    if (verbEl) verbEl.style.width = '';
     morphMarker(btn, 80, { reseed: false });
   }
 
-  // Sync initial word & icons immediately
+  // Sync initial word, verb & icons immediately
   applyContent(getActiveWords()[idx], idx);
+  applyVerb(idx);
 
   function triggerSwap({ manual = true } = {}) {
     const seq = ++swapSeq;
@@ -241,7 +256,11 @@ document.querySelectorAll('.swap-pill').forEach((btn) => {
     clearTimeout(settleTimer);
 
     const activeWords = getActiveWords();
+    const prevVerb = verbs[idx] || '';
     idx = (idx + 1) % activeWords.length;
+    const nextVerb = verbs[idx] || '';
+    const verbChanged = Boolean(verbEl && verbInnerEl && nextVerb && nextVerb !== prevVerb);
+
     if (manual) {
       totalSwaps += 1;
       updateSwapHints();
@@ -252,6 +271,7 @@ document.querySelectorAll('.swap-pill').forEach((btn) => {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reducedMotion) {
       applyContent(activeWords[idx], idx);
+      applyVerb(idx);
       morphMarker(btn, 60, { reseed: true });
       return;
     }
@@ -259,6 +279,11 @@ document.querySelectorAll('.swap-pill').forEach((btn) => {
     // 1. Capture current live unscaled layout width (immune to ancestor scroll scale)
     const oldWidth = btn.offsetWidth;
     btn.style.width = `${oldWidth}px`;
+    if (verbChanged) {
+      verbEl.style.width = `${verbEl.offsetWidth}px`;
+      verbEl.classList.remove('is-entering');
+      verbEl.classList.add('is-exiting');
+    }
 
     // 2. Quick blur-up exit on current content
     btn.classList.remove('is-entering');
@@ -267,21 +292,31 @@ document.querySelectorAll('.swap-pill').forEach((btn) => {
     exitTimer = setTimeout(() => {
       if (seq !== swapSeq) return;
 
-      // 3. Swap word & icon(s) and measure exact unscaled target width
+      // 3. Swap word, verb & icon(s) and measure exact unscaled target width
       applyContent(getActiveWords()[idx], idx);
+      if (verbChanged) applyVerb(idx);
 
       const cs = getComputedStyle(btn);
       const padH = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
       const targetWidth = Math.ceil(innerEl.offsetWidth + padH);
+      const targetVerbWidth = verbChanged ? Math.ceil(verbInnerEl.offsetWidth) : 0;
 
       // 4. Prep enter state (blurred & slightly below) with no transition
       btn.classList.remove('is-exiting');
       btn.classList.add('is-entering');
+      if (verbChanged) {
+        verbEl.classList.remove('is-exiting');
+        verbEl.classList.add('is-entering');
+      }
       void btn.offsetWidth; // flush pre-enter styles
 
       // 5. Release into crisp blur-in + silky width morph + gentle icon hop + live canvas morph
       btn.classList.remove('is-entering');
       btn.style.width = `${targetWidth}px`;
+      if (verbChanged) {
+        verbEl.classList.remove('is-entering');
+        verbEl.style.width = `${targetVerbWidth}px`;
+      }
 
       [iconEl, iconMidEl].forEach((el) => {
         if (el && !el.hidden) {
@@ -297,6 +332,7 @@ document.querySelectorAll('.swap-pill').forEach((btn) => {
       settleTimer = setTimeout(() => {
         if (seq !== swapSeq) return;
         btn.style.width = '';
+        if (verbEl) verbEl.style.width = '';
         if (iconEl) iconEl.classList.remove('is-wiggle');
         if (iconMidEl) iconMidEl.classList.remove('is-wiggle');
       }, 550);
