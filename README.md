@@ -1,24 +1,36 @@
-# Ar Razy Fathan Rabbani — Personal Landing Page
+# Ar Razy Fathan Rabbani — Personal Website
 
-A minimal, zero-framework personal landing page introducing my work as a **Mobile Engineer (Android & iOS)** alongside my cycling hobby (**On Two Wheels**) in Surakarta, Indonesia.
+A minimal, zero-framework personal website introducing my work as a **Mobile Engineer (Android & iOS)** alongside my cycling journal (**On Two Wheels**) in Surakarta, Indonesia.
 
 Design and interaction craft inspired by [muhraufan.com](https://muhraufan.com/) and [theweekendproject.club](https://theweekendproject.club/).
 
 ---
 
-## Tech Stack
+## Pages & Routes
 
-- **Core:** Vanilla HTML5, CSS3, and native ES Modules (`<script type="module">`) — no frameworks, no bundler, no build step.
-- **Typography:** `Gabarito` (display), `Geist` (body), `Geist Mono` (metadata), and `Caveat` (signature).
-- **Motion & Tactile UI:**
-  - Native CSS `linear()` spring physics curves (`--spring`, `--spring-soft`) and custom cubic-bezier curves.
-  - Interactive tappable headline words with spring width morphing, vertical blur-slide swaps, icon hops, and live retina HTML5 `<canvas>` hand-drawn highlighter strokes (`js/marker.js`).
-  - Shared-element FLIP zoom-in / fly-back photo viewer (`js/photos.js`) with frosted translucent backdrop (`480ms` open / `300ms` asymmetric close).
-  - Zero-dependency procedural Web Audio API sound synthesizer (`js/sound.js`).
-- **Dual Profile Palette & Themes:**
-  - **Mobile Eng. (`#work`):** Electric blue marker (`#0380FC` / `#1A8CFF` dark) + white ink.
-  - **On Two Wheels (`#cycling`):** Warm yellow marker (`#FFC629` / `#F5C128` dark) + dark ink.
-  - Light (`Sat`, `#FBFAF7`) and Dark (`Sun`, `#14120E`) warm paper themes, persisted in `localStorage`.
+| Route | Purpose |
+| :--- | :--- |
+| `/` ([index.html](./index.html)) | **Mobile Engineer** — interactive swappable hero, editorial bio with shipped product & open-source icon popovers, resume link, and connect pills |
+| `/cycling/` ([cycling/index.html](./cycling/index.html)) | **On Two Wheels** — cycling bio & Strava snapshot, watchOS-style radial lens photo gallery (37 photos), Strava Trophy Case & recent PRs, and Top 10 Riding Podcasts Cover Rail |
+| `/connect/` ([connect/index.html](./connect/index.html)) | **Where to Find Me** — clean link directory with one-click email copy |
+
+---
+
+## Tech Stack & Craft
+
+- **Core:** Vanilla HTML5, CSS3, and native ES Modules (`<script type="module">`) — zero frameworks, zero bundler, zero build step.
+- **Typography:** `Gabarito` (display), `Geist` (body & semibold uppercase section labels), `Geist Mono` (metadata & counters), and `Caveat` (handwritten signature).
+- **Navigation & Themes:**
+  - Sticky top bar with feathered paper fade (`--topbar-fade`), stacked avatar profile switcher with cross-document CSS View Transitions (`@view-transition`), and desktop scroll-aligned column width (`820px → 700px`).
+  - Dual profile accents: **Work** electric blue (`#0380FC` / `#1A8CFF` dark) and **Cycling** yellow jersey (`#FFC629` / `#F5C128` dark).
+  - Warm archival paper Light (`Sat`, `#FBFAF7`) and Dark (`Sun`, `#14120E`) themes — defaults to Light on fresh visits and persists within the session via `sessionStorage`.
+- **Interactive Modules:**
+  - **Swappable Hero & Canvas Markers (`js/main.js`, `js/marker.js`):** Tappable and auto-cycling headline highlights with synced leading verb (`Building` / `Shipping to`), spring width morphing, icon hops, and live retina `<canvas>` hand-drawn highlighter strokes.
+  - **Hero Scroll Shrink & Scroll Reveals (`js/main.js`):** Full-viewport sticky hero that smoothly scales & fades on scroll using GPU `transform`/`opacity` only, paired with `IntersectionObserver` scroll reveals and mobile-tuned performance (static wavy link underlines at rest, dynamic `will-change` cleanup, URL-bar resize guard, and `128×128` WebP avatar thumbnails).
+  - **WatchOS Radial Lens Photo Gallery (`js/photos.js`):** Single-atlas opaque `<canvas>` renderer with pre-baked Gaussian edge blur, direct-manipulation drag/momentum panning, mobile scroll-safe horizontal/2D pan toggle, and a shared-element FLIP lightbox with touch swipes, keyboard navigation, and ghost-click protection.
+  - **Strava Trophy Case (`js/trophies.js`):** 5×2 trophy shelf with 3D pointer tilt, specular glare sweeps, floating badge tooltips, and a recent Strava PRs strip.
+  - **Top 10 Riding Podcasts Cover Rail (`js/podcasts.js`):** Horizontal snap rail with smooth scroll-ramped feathered blur/paper edge fades, custom Spotify badge, and a hover **Podcast Broadcast Disc** (concentric acoustic rings + pulsing studio condenser mic) that slides out while parting neighbor covers.
+  - **Procedural Audio (`js/sound.js`):** Zero-dependency Web Audio API synthesizer for subtle click, hover, pop, switch, and copy chimes (toggleable from the top bar).
 
 ---
 
@@ -26,29 +38,33 @@ Design and interaction craft inspired by [muhraufan.com](https://muhraufan.com/)
 
 ```text
 landing-page/
-├── index.html                  # Home — Mobile Engineer (https://arrazyfathan.com/)
+├── index.html                    # Home — Mobile Engineer (/)
 ├── cycling/
-│   └── index.html              # On Two Wheels — Strava stats & 37-photo gallery (/cycling/)
+│   └── index.html                # On Two Wheels — Cycling, Photos, Trophies & Podcasts (/cycling/)
 ├── connect/
-│   └── index.html              # Where You Can Find Me — direct links directory (/connect/)
+│   └── index.html                # Where to Find Me — Links Directory (/connect/)
 ├── css/
-│   └── styles.css              # Design tokens, spring curves, view transitions & viewer styles
+│   └── styles.css                # Design tokens, spring physics, view transitions & responsive layout
 ├── js/
-│   ├── main.js                 # Theme/SFX switches, word swap choreography & shortcuts
-│   ├── marker.js               # Retina <canvas> organic highlighter stroke renderer & live morph loop
-│   ├── photos.js               # Staggered gallery renderer + FLIP lightbox with keyboard navigation
-│   └── sound.js                # Procedural Web Audio API click, pop, switch & copy chimes
+│   ├── main.js                   # Theme/SFX toggles, hero swap & scroll shrink, popovers, reveals & shortcuts
+│   ├── marker.js                 # Retina <canvas> organic highlighter stroke renderer & live morph loop
+│   ├── photos.js                 # Single-atlas watchOS radial lens gallery & frosted FLIP lightbox
+│   ├── trophies.js               # Strava trophy shelf (3D tilt + glare) & recent PRs renderer
+│   ├── podcasts.js               # Top 10 riding podcasts Cover Rail & Broadcast Disc hover interactions
+│   └── sound.js                  # Procedural Web Audio API tactile UI sound synthesizer
 ├── assets/
-│   ├── avatars/                # work.png & cycling.png transparent portrait illustrations
-│   ├── icons/                  # Custom die-cut sticker SVGs, multi-size favicons & gamatechno.png
-│   ├── photos/                 # GPS-stripped WebP cycling shots (*-640.webp, *-1600.webp) & photos.json
-│   ├── og-image.png            # 1200x630 Open Graph preview card (Mobile Engineer)
-│   └── og-cycling.png          # 1200x630 Open Graph preview card (Cycling)
+│   ├── avatars/                  # Full PNG avatars (SEO/JSON-LD) + 128x128 WebP thumbnails for UI
+│   ├── icons/                    # Die-cut SVG/WebP/PNG icons (platform, lang, products, projects, cycling, connect) & favicons
+│   ├── photos/                   # GPS-stripped WebP cycling shots (*-280.webp, *-640.webp, *-1600.webp) & photos.json
+│   ├── trophies/                 # Strava challenge badge WebPs, PR medal SVGs, trophies.json & achievements.json
+│   ├── podcasts/                 # 260x260 WebP podcast covers (01..10) & podcasts.json
+│   ├── og-image.png              # 1200x630 Open Graph preview card (Mobile Engineer)
+│   └── og-cycling.png            # 1200x630 Open Graph preview card (Cycling)
 ├── scripts/
-│   └── optimize-photos.sh      # Batch resizer & EXIF/GPS stripper using macOS sips + cwebp
-├── robots.txt                  # Crawler directives & sitemap reference
-├── sitemap.xml                 # Indexable URLs (/, /cycling/, /connect/) for Google Sitelinks
-├── site.webmanifest            # Web app manifest
+│   └── optimize-photos.sh        # Batch photo resizer & EXIF/GPS stripper using macOS sips + cwebp
+├── robots.txt                    # Crawler directives & sitemap reference
+├── sitemap.xml                   # Indexable URLs (/, /cycling/, /connect/) for Google Sitelinks
+├── site.webmanifest              # Web app manifest
 ├── .gitignore
 └── README.md
 ```
@@ -57,56 +73,78 @@ landing-page/
 
 ## Local Development
 
-Because the site uses native ES Modules (`type="module"`) and fetches `assets/photos/photos.json`, serve the folder over HTTP instead of opening `index.html` via `file://`:
+Because the site uses native ES Modules (`type="module"`) and fetches local JSON manifests (`photos.json`, `trophies.json`, `achievements.json`, `podcasts.json`), serve `landing-page/` over HTTP rather than opening files via `file://`:
 
 ```bash
-python3 -m http.server 4173
+python3 -m http.server 8765
 ```
 
 Then open:
-- Work profile: `http://localhost:4173/#work`
-- Cycling profile: `http://localhost:4173/#cycling`
+- Work profile: `http://localhost:8765/`
+- Cycling profile: `http://localhost:8765/cycling/`
+- Links directory: `http://localhost:8765/connect/`
 
 ### Keyboard Shortcuts
+
 | Key | Action |
 | :--- | :--- |
-| `W` | Switch to **Mobile Eng.** profile |
-| `C` | Switch to **On Two Wheels** (Cycling) profile |
-| `D` | Toggle Light (`Sat`) / Dark (`Sun`) theme |
+| `W` | Switch to **Mobile Engineer** (`/`) |
+| `C` | Switch to **Cycling & Photos** (`/cycling/`) |
+| `D` | Toggle Light (`Sat`) / Dark (`Sun`) paper theme |
 | `←` / `→` | Previous / Next photo when the lightbox is open |
-| `Esc` | Close the photo lightbox |
+| `Esc` | Close the photo lightbox or open app popover |
 
 ---
 
 ## Updating Content
 
-### 1. Updating Cycling Photos (WebP + EXIF/GPS Stripping)
-Keep raw phone photos outside this repo (e.g. `../shoot-cycling/`), then convert them into two lightweight WebP sizes (`640px` thumbnails + `1600px` full-res) with all EXIF/GPS metadata stripped:
+### 1. Cycling Photos (`assets/photos/`)
+Keep raw phone photos outside the repo (e.g. `../shoot-cycling/`), then generate EXIF/GPS-stripped WebP variants (`-280.webp` for the canvas atlas, `-640.webp` preview, `-1600.webp` full-res):
 
 ```bash
 ./scripts/optimize-photos.sh "../shoot-cycling"
 ```
 
-*(Requires macOS built-in `sips` and `cwebp` via `brew install webp`.)*
+*(Requires macOS `sips` and `cwebp` via `brew install webp`.)*
 
-Then add each photo entry to `assets/photos/photos.json`:
+Add each entry to `assets/photos/photos.json`:
 
 ```json
 {
   "id": "20261101_163436",
-  "thumb": "./assets/photos/20261101_163436-640.webp",
-  "full": "./assets/photos/20261101_163436-1600.webp",
+  "grid": "/assets/photos/20261101_163436-280.webp",
+  "thumb": "/assets/photos/20261101_163436-640.webp",
+  "full": "/assets/photos/20261101_163436-1600.webp",
   "date": "Nov 1, 2026",
-  "camera": "Galaxy A54 5G"
+  "camera": "Galaxy A54 5G",
+  "w": 360,
+  "h": 640
 }
 ```
 
-### 2. Updating Strava Stats & Bio Copy
-Edit the copy, Strava stats, and `"Updated ..."` dates directly in `index.html`.
-- Tappable hero highlights use `data-swap="Option 1|Option 2"` and matching `data-icons="./path1.svg|./path2.svg"`.
+### 2. Strava Trophies & PRs (`assets/trophies/`)
+- Add optimized WebP badges to `assets/trophies/` and update `assets/trophies/trophies.json` (`index`, `label`, `date`, `image`, `shape`: `"diecut"` or `"square"`).
+- Update recent Strava personal records in `assets/trophies/achievements.json`.
+
+### 3. Top 10 Riding Podcasts (`assets/podcasts/`)
+- Add `260×260` WebP cover artwork to `assets/podcasts/` and update `assets/podcasts/podcasts.json`:
+
+```json
+{
+  "index": 1,
+  "name": "The Rest Is Football",
+  "publisher": "Goalhanger",
+  "link": "https://open.spotify.com/show/2fDn3EgvJZ5J1k5rrBwrlZ",
+  "image": "/assets/podcasts/01-the-rest-is-football.webp"
+}
+```
+
+### 4. Copy, Hero Swaps & Strava Stats
+- Edit Work bio, inline product/project popovers (`data-app-name`, `data-app-url`), and tappable hero highlights (`data-swap`, `data-swap-mobile`, `data-verbs`, `data-icons`) in `index.html`.
+- Edit cycling narrative, Strava stats, and `"Updated ..."` date directly in `cycling/index.html`.
 
 ---
 
 ## Deployment
 
-This folder is 100% static with zero build step. Deploy `landing-page/` directly to **Cloudflare Pages**, **GitHub Pages**, **Vercel**, or **Netlify** with the output directory set to `.` (root).
+This directory is 100% static with no build step. Deploy `landing-page/` directly to **Cloudflare Pages**, **GitHub Pages**, **Vercel**, or **Netlify** with the output directory set to `.` (root).
