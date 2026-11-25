@@ -194,6 +194,7 @@ export function initMarkers() {
     observer = new ResizeObserver((entries) => {
       entries.forEach((entry) => {
         const el = entry.target;
+        if (morphTimers.has(el)) return;
         drawStroke(el, seedMap.get(el) || 1337);
       });
     });

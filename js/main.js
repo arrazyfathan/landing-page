@@ -7,7 +7,7 @@ import {
   playSwitch,
   playSuccess
 } from './sound.js?v=2';
-import { initMarkers, morphMarker, repaintAllMarkers } from './marker.js?v=10';
+import { initMarkers, morphMarker, repaintAllMarkers } from './marker.js?v=11';
 import { initCyclingPhotos } from './photos.js?v=26';
 import { initTrophyCase } from './trophies.js?v=21';
 import { initRidePodcasts } from './podcasts.js?v=5';
@@ -348,6 +348,15 @@ document.querySelectorAll('.swap-pill').forEach((btn) => {
 
     exitTimer = setTimeout(() => {
       if (seq !== swapSeq) return;
+      if (!manual && heroScrollProgress > 0.05) {
+        btn.classList.remove('is-exiting');
+        btn.style.width = '';
+        if (verbEl) {
+          verbEl.classList.remove('is-exiting');
+          verbEl.style.width = '';
+        }
+        return;
+      }
 
       // 3. Swap word, verb & icon(s) and measure exact unscaled target width
       applyContent(getActiveWords()[idx], idx);
@@ -414,7 +423,7 @@ if (mobileSwapQuery.addEventListener) {
 function runAutoSwapCycle() {
   if (
     autoSwapPaused ||
-    heroScrollProgress > 0.15 ||
+    heroScrollProgress > 0.05 ||
     document.hidden ||
     window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
     document.querySelector('.photo-viewer:not([hidden])')
@@ -425,7 +434,7 @@ function runAutoSwapCycle() {
   // Cascade each marker smoothly with a gentle 220ms wave
   swapControllers.forEach((ctrl, i) => {
     setTimeout(() => {
-      if (autoSwapPaused || document.hidden) return;
+      if (autoSwapPaused || heroScrollProgress > 0.05 || document.hidden) return;
       ctrl.triggerSwap({ manual: false });
     }, i * 220);
   });
@@ -518,12 +527,14 @@ function initHeroScrollShrink() {
 
   const reducedMotionMq = window.matchMedia('(prefers-reduced-motion: reduce)');
   let reducedMotion = reducedMotionMq.matches;
+  let lastViewportW = window.innerWidth;
   let range = Math.max(260, hero.offsetHeight * 0.95);
   let rafId = 0;
   let lastRaw = -1;
   let cueHidden = false;
   let topbarScrolled = false;
   let heroHidden = false;
+  let heroWillChange = false;
   let pointerDisabled = false;
 
   if (reducedMotionMq.addEventListener) {
@@ -535,7 +546,14 @@ function initHeroScrollShrink() {
   }
 
   function measureRange() {
+    // Ignore vertical-only resizes caused by mobile Chrome's collapsing URL bar mid-scroll
+    if (window.innerWidth === lastViewportW) return;
+    lastViewportW = window.innerWidth;
     range = Math.max(260, hero.offsetHeight * 0.95);
+    if (topbar && lastViewportW <= 760 && topbarScrolled) {
+      topbarScrolled = false;
+      topbar.classList.remove('is-scrolled');
+    }
     lastRaw = -1;
     scheduleUpdate();
   }
@@ -547,7 +565,7 @@ function initHeroScrollShrink() {
     const raw = reducedMotion ? 0 : progress;
     heroScrollProgress = raw;
 
-    if (topbar) {
+    if (topbar && lastViewportW > 760) {
       const shouldAlignTopbar = progress > 0.35;
       if (shouldAlignTopbar !== topbarScrolled) {
         topbarScrolled = shouldAlignTopbar;
@@ -569,6 +587,10 @@ function initHeroScrollShrink() {
     if (raw <= 0.001) {
       inner.style.transform = 'translate3d(0, 0, 0) scale(1)';
       inner.style.opacity = '1';
+      if (heroWillChange) {
+        heroWillChange = false;
+        inner.style.willChange = '';
+      }
       if (heroHidden) {
         heroHidden = false;
         inner.style.visibility = '';
@@ -588,6 +610,10 @@ function initHeroScrollShrink() {
 
     if (raw >= 0.998) {
       inner.style.opacity = '0';
+      if (heroWillChange) {
+        heroWillChange = false;
+        inner.style.willChange = '';
+      }
       if (!heroHidden) {
         heroHidden = true;
         inner.style.visibility = 'hidden';
@@ -598,6 +624,10 @@ function initHeroScrollShrink() {
     if (heroHidden) {
       heroHidden = false;
       inner.style.visibility = '';
+    }
+    if (!heroWillChange) {
+      heroWillChange = true;
+      inner.style.willChange = 'transform, opacity';
     }
 
     // Pure GPU-composited shrink & fade (no filter: blur, no layout reads)
