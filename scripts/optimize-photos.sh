@@ -32,12 +32,13 @@ for img in "$SRC_DIR"/*.{jpg,jpeg,png,heic,webp}; do
 
   # Resize via sips (handles HEIC/JPEG/PNG + EXIF orientation) then encode WebP with -metadata none (strips GPS/EXIF)
   sips -s format png -Z 640 "$img" --out "$TMP_DIR/${base}-640.png" >/dev/null
+  cwebp -q 80 -metadata none -quiet -resize 200 0 "$TMP_DIR/${base}-640.png" -o "$OUT_DIR/${base}-280.webp"
   cwebp -q 80 -metadata none -quiet "$TMP_DIR/${base}-640.png" -o "$OUT_DIR/${base}-640.webp"
 
   sips -s format png -Z 1600 "$img" --out "$TMP_DIR/${base}-1600.png" >/dev/null
   cwebp -q 82 -metadata none -quiet "$TMP_DIR/${base}-1600.png" -o "$OUT_DIR/${base}-1600.webp"
 
-  echo "✓ ${base}-640.webp & ${base}-1600.webp"
+  echo "✓ ${base}-280.webp, ${base}-640.webp & ${base}-1600.webp"
   count=$((count + 1))
 done
 

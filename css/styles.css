@@ -1438,153 +1438,36 @@ html[data-day="sun"] .inline-avatar--cycling {
   width: 100%;
   height: clamp(500px, 64vh, 570px);
   overflow: hidden;
-  isolation: isolate;
-  contain: layout paint;
+  contain: strict;
   cursor: grab;
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
 }
 
+.watch-viewport.is-pointer {
+  cursor: zoom-in;
+}
+
 .watch-viewport.is-dragging {
   cursor: grabbing;
 }
 
-/* WatchOS Honeycomb Photo Tile */
-.watch-tile {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: var(--tile-w);
-  height: var(--tile-h);
-  margin-left: calc(var(--tile-w) * -0.5);
-  margin-top: calc(var(--tile-h) * -0.5);
-  padding: 0;
-  border-radius: var(--tile-r);
-  background: var(--sunken);
-  overflow: hidden;
-  cursor: zoom-in;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  box-shadow:
-    0 2px 8px rgba(23, 21, 15, 0.10),
-    0 0 0 1px rgba(23, 21, 15, 0.08);
-  will-change: transform, opacity;
-  transition: box-shadow 220ms var(--ease-out);
-}
-
-html[data-day="sun"] .watch-tile {
-  box-shadow:
-    0 3px 10px rgba(0, 0, 0, 0.42),
-    0 0 0 1px rgba(244, 239, 228, 0.12);
-}
-
-/* Subtle Apple-style top glass specular edge on each photo tile */
-.watch-tile::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
-  pointer-events: none;
-  opacity: 0.7;
-  transition: opacity 180ms var(--ease-out);
-}
-
-.watch-tile img {
+.watch-canvas {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
   pointer-events: none;
-  user-select: none;
-  -webkit-user-drag: none;
-  opacity: 0;
-  transition: opacity 280ms var(--ease-out);
 }
 
-.watch-tile img.is-loaded {
-  opacity: 1;
-}
-
-/* Elevated, razor-sharp state when hovered or keyboard-focused */
-.watch-tile.is-hovered,
-.watch-tile:focus-visible {
-  box-shadow:
-    0 20px 44px rgba(23, 21, 15, 0.22),
-    0 5px 14px rgba(23, 21, 15, 0.11),
-    0 0 0 1.4px var(--surface),
-    0 0 0 2.1px rgba(23, 21, 15, 0.14);
-}
-
-html[data-day="sun"] .watch-tile.is-hovered,
-html[data-day="sun"] .watch-tile:focus-visible {
-  box-shadow:
-    0 24px 52px rgba(0, 0, 0, 0.68),
-    0 7px 18px rgba(0, 0, 0, 0.42),
-    0 0 0 1.4px var(--surface),
-    0 0 0 2.1px rgba(244, 239, 228, 0.22);
-}
-
-.watch-tile.is-hovered::after,
-.watch-tile:focus-visible::after {
-  opacity: 1;
-}
-
-.watch-viewport.is-dragging .watch-tile {
-  cursor: grabbing;
-}
-
-/* Multi-layer Radial Progressive Blur (z-index: 20 — hovered tile pops above at z-index: 40) */
-.watch-blur-layer {
+/* Visually-hidden accessible button list so keyboard Tab & screen readers reach all 37 photos */
+.watch-a11y-list {
   position: absolute;
-  inset: 0;
-  z-index: 20;
-  pointer-events: none;
-}
-
-.watch-blur-layer--1 {
-  backdrop-filter: blur(1.5px);
-  -webkit-backdrop-filter: blur(1.5px);
-  mask-image: radial-gradient(ellipse 48% 48% at 50% 50%, transparent 45%, rgba(0, 0, 0, 0.92) 70%, #000 100%);
-  -webkit-mask-image: radial-gradient(ellipse 48% 48% at 50% 50%, transparent 45%, rgba(0, 0, 0, 0.92) 70%, #000 100%);
-}
-
-.watch-blur-layer--2 {
-  backdrop-filter: blur(3.5px);
-  -webkit-backdrop-filter: blur(3.5px);
-  mask-image: radial-gradient(ellipse 51% 50% at 50% 50%, transparent 58%, rgba(0, 0, 0, 0.96) 82%, #000 100%);
-  -webkit-mask-image: radial-gradient(ellipse 51% 50% at 50% 50%, transparent 58%, rgba(0, 0, 0, 0.96) 82%, #000 100%);
-}
-
-.watch-blur-layer--3 {
-  backdrop-filter: blur(6.5px);
-  -webkit-backdrop-filter: blur(6.5px);
-  mask-image: radial-gradient(ellipse 54% 52% at 50% 50%, transparent 70%, #000 92%);
-  -webkit-mask-image: radial-gradient(ellipse 54% 52% at 50% 50%, transparent 70%, #000 92%);
-}
-
-.watch-blur-layer--4 {
-  backdrop-filter: blur(10.5px);
-  -webkit-backdrop-filter: blur(10.5px);
-  mask-image: radial-gradient(ellipse 57% 54% at 50% 50%, transparent 80%, #000 98%);
-  -webkit-mask-image: radial-gradient(ellipse 57% 54% at 50% 50%, transparent 80%, #000 98%);
-}
-
-/* Progressive Radial Paper Opacity Vignette (melts cluster seamlessly into --bg) */
-.watch-radial-fade {
-  position: absolute;
-  inset: 0;
-  z-index: 21;
-  pointer-events: none;
-  background: radial-gradient(
-    ellipse 52% 51% at 50% 50%,
-    transparent 45%,
-    color-mix(in srgb, var(--bg) 14%, transparent) 62%,
-    color-mix(in srgb, var(--bg) 48%, transparent) 78%,
-    color-mix(in srgb, var(--bg) 84%, transparent) 90%,
-    var(--bg) 99%
-  );
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 /* Minimal Editorial Focal HUD below the lens */
@@ -1707,28 +1590,6 @@ html[data-day="sun"] .watch-tile:focus-visible {
 
   .watch-pan-btn {
     display: inline-flex;
-  }
-}
-
-/* Mobile GPU optimization: collapse 4 backdrop-filter rings into 2 lightweight progressive layers */
-@media (max-width: 600px), (hover: none) and (pointer: coarse) {
-  .watch-blur-layer--1 {
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
-    mask-image: radial-gradient(ellipse 47% 47% at 50% 50%, transparent 44%, #000 76%);
-    -webkit-mask-image: radial-gradient(ellipse 47% 47% at 50% 50%, transparent 44%, #000 76%);
-  }
-
-  .watch-blur-layer--2,
-  .watch-blur-layer--4 {
-    display: none;
-  }
-
-  .watch-blur-layer--3 {
-    backdrop-filter: blur(6.5px);
-    -webkit-backdrop-filter: blur(6.5px);
-    mask-image: radial-gradient(ellipse 52% 52% at 50% 50%, transparent 66%, #000 94%);
-    -webkit-mask-image: radial-gradient(ellipse 52% 52% at 50% 50%, transparent 66%, #000 94%);
   }
 }
 

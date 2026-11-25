@@ -1,24 +1,29 @@
 import { playClick, playPop } from './sound.js';
 
 let photos = [];
-let thumbImgs = [];
-let tileNodes = [];
 let tileStates = [];
+let a11yButtons = [];
+let drawOrder = [];
 
 let activeIndex = 0;
 let isOpen = false;
 let isClosing = false;
 let closeTimer = null;
-let hiddenThumb = null;
+let hiddenTileIndex = -1;
 
 // WatchOS Radial Lens DOM
 const galleryEl = document.getElementById('watch-gallery');
 const viewportEl = document.getElementById('watch-viewport');
+const canvasEl = document.getElementById('watch-canvas');
+const a11yListEl = document.getElementById('watch-a11y-list');
 const countEl = document.getElementById('photo-count');
 const hudDateEl = document.getElementById('watch-hud-date');
 const hudIndexEl = document.getElementById('watch-hud-index');
 const panBtnEl = document.getElementById('watch-pan-btn');
 const resetBtnEl = document.getElementById('watch-reset-btn');
+
+// Opaque canvas (alpha: false) eliminates full-viewport compositor alpha blending every frame
+const ctx = canvasEl ? canvasEl.getContext('2d', { alpha: false }) : null;
 
 // Frosted FLIP Lightbox DOM
 const viewer = document.getElementById('photo-lightbox');
@@ -50,17 +55,65 @@ let dragStartX = 0;
 let dragStartY = 0;
 let dragOriginPanX = 0;
 let dragOriginPanY = 0;
-let lastPointerX = 0;
-let lastPointerY = 0;
 let velocitySamples = [];
-let suppressClickUntil = 0;
 
 let hoveredIndex = -1;
 let focusedIndex = -1;
 let pointerInside = false;
-let pointerLocalX = 0;
-let pointerLocalY = 0;
+let pendingClientX = 0;
+let pendingClientY = 0;
+let hoverCheckDirty = false;
+
+// Cached viewport geometry & theme tokens
+let vpCenterX = 0;
+let vpCenterY = 0;
+let vpRectDirty = true;
+let dpr = 1;
+
+let theme = {
+  isDark: false,
+  bgHex: '#FBFAF7',
+  bgRgb: '251, 250, 247',
+  surface: '#FFFFFF',
+  sunken: '#F2F0EA',
+  accent: '#FFC629',
+  tileRim: 'rgba(23, 21, 15, 0.10)',
+  hoverRim: 'rgba(23, 21, 15, 0.16)',
+  hoverShadow: 'rgba(23, 21, 15, 0.22)',
+};
+
+// Pre-rendered shared GPU sprites (ONE texture atlas + 1 shadow sprite + 1 half-res vignette)
+let sharpAtlas = null;
+let sharpAtlasCtx = null;
+let blurAtlas = null;
+let blurAtlasCtx = null;
+let shadowSprite = null;
+let vignetteCanvas = null;
+
+// Single-atlas cell dimensions (packed grid: 8 columns x 5 rows = up to 40 photos in ONE GPU texture!)
+const ATLAS_COLS = 8;
+const SHARP_W = 164;
+const SHARP_H = 200;
+const SHARP_R = 28;
+
+// Padded true-Gaussian blurred cells in blurAtlas (soft left, deep right)
+const BLUR_W = 96;
+const BLUR_H = 116;
+const BLUR_PAD_RATIO = 0.28;
+
+// Pre-baked shadow sprite dimensions (eliminates runtime ctx.shadowBlur completely!)
+const SHADOW_W = 180;
+const SHADOW_H = 212;
+const SHADOW_PAD_X = 0.26;
+const SHADOW_PAD_Y = 0.24;
+
 let lastHudIndex = -1;
+let lastResetHidden = true;
+let lastGalleryHover = false;
+let lastPointerCursor = false;
+let lastLensPanX = NaN;
+let lastLensPanY = NaN;
+let lastClosestIdx = 0;
 let rafId = null;
 let lastFrameTime = 0;
 
@@ -69,9 +122,12 @@ let metrics = {
   vpH: 540,
   tileW: 80,
   tileH: 98,
+  tileR: 14,
   spacingX: 94,
   spacingY: 112,
   hoverScale: 1.72,
+  lensRx: 410,
+  lensRy: 248,
 };
 
 function prefersReducedMotion() {
@@ -79,7 +135,7 @@ function prefersReducedMotion() {
 }
 
 function clamp(v, min, max) {
-  return Math.max(min, Math.min(max, v));
+  return v < min ? min : v > max ? max : v;
 }
 
 function smoothstep(edge0, edge1, x) {
@@ -89,6 +145,21 @@ function smoothstep(edge0, edge1, x) {
 
 function lerp(a, b, t) {
   return a + (b - a) * t;
+}
+
+function traceRoundedRect(c, x, y, w, h, r) {
+  const rr = Math.min(r, w * 0.5, h * 0.5);
+  c.beginPath();
+  if (typeof c.roundRect === 'function') {
+    c.roundRect(x, y, w, h, rr);
+  } else {
+    c.moveTo(x + rr, y);
+    c.arcTo(x + w, y, x + w, y + h, rr);
+    c.arcTo(x + w, y + h, x, y + h, rr);
+    c.arcTo(x, y + h, x, y, rr);
+    c.arcTo(x, y, x + w, y, rr);
+    c.closePath();
+  }
 }
 
 /** Apple fluid-interface progressive rubber-banding at pan boundaries */
@@ -104,8 +175,8 @@ function applyBoundsWithRubberband(raw, limit, dimension) {
 
 /**
  * Centered orthogonal rectangular grid ordered from center outward.
- * For 37 photos this yields a 100% symmetric 9x5 landscape rectangle (5, 9, 9, 9, 5)
- * with strictly aligned horizontal rows & vertical columns and Photo #1 at (0, 0).
+ * For 37 photos: 100% symmetric 9x5 landscape rectangle (5, 9, 9, 9, 5)
+ * with straight rows & columns and Photo #1 at (0, 0).
  */
 function buildRectCoords(count) {
   let cols = Math.max(5, Math.ceil(Math.sqrt(count * 1.75)));
@@ -137,59 +208,359 @@ function buildRectCoords(count) {
   return cells.slice(0, count);
 }
 
-function readMetrics() {
-  if (!viewportEl) return;
+function initAtlases(count) {
+  const rows = Math.ceil(count / ATLAS_COLS);
+
+  sharpAtlas = document.createElement('canvas');
+  sharpAtlas.width = ATLAS_COLS * SHARP_W;
+  sharpAtlas.height = rows * SHARP_H;
+  sharpAtlasCtx = sharpAtlas.getContext('2d');
+  sharpAtlasCtx.imageSmoothingEnabled = true;
+  sharpAtlasCtx.imageSmoothingQuality = 'high';
+
+  // blurAtlas stores BOTH soft (left col) and deep (right col) in one tiny texture
+  blurAtlas = document.createElement('canvas');
+  blurAtlas.width = ATLAS_COLS * BLUR_W * 2;
+  blurAtlas.height = rows * BLUR_H;
+  blurAtlasCtx = blurAtlas.getContext('2d');
+  blurAtlasCtx.imageSmoothingEnabled = true;
+  blurAtlasCtx.imageSmoothingQuality = 'high';
+}
+
+// Scratch canvases reused during one-time baking (zero extra allocations)
+let tmpCard = null;
+let tmpCardCtx = null;
+let tmpBlur = null;
+let tmpBlurCtx = null;
+let supportsCanvasFilter = null;
+
+function ensureBakeScratch() {
+  if (tmpCard) return;
+  tmpCard = document.createElement('canvas');
+  tmpCard.width = SHARP_W;
+  tmpCard.height = SHARP_H;
+  tmpCardCtx = tmpCard.getContext('2d');
+  tmpCardCtx.imageSmoothingEnabled = true;
+  tmpCardCtx.imageSmoothingQuality = 'high';
+
+  tmpBlur = document.createElement('canvas');
+  tmpBlur.width = BLUR_W;
+  tmpBlur.height = BLUR_H;
+  tmpBlurCtx = tmpBlur.getContext('2d');
+  tmpBlurCtx.imageSmoothingEnabled = true;
+  tmpBlurCtx.imageSmoothingQuality = 'high';
+
+  // Feature-detect real ctx.filter support once
+  supportsCanvasFilter = typeof tmpBlurCtx.filter === 'string';
+}
+
+/**
+ * Bake one photo into the shared GPU sprite atlases ONCE on load:
+ *  - sharpAtlas cell: crisp @2x rounded-rect card + hairline rim + top specular gleam
+ *  - blurAtlas soft & deep cells: true optical Gaussian blur with generous halo padding
+ * Zero runtime performance cost: tick() still blits the exact same 1-2 atlas quads!
+ */
+function bakePhotoIntoAtlases(img, idx) {
+  if (!sharpAtlasCtx || !blurAtlasCtx) return;
+  ensureBakeScratch();
+
+  const col = idx % ATLAS_COLS;
+  const row = Math.floor(idx / ATLAS_COLS);
+
+  const nw = img.naturalWidth || 200;
+  const nh = img.naturalHeight || 355;
+  const srcRatio = nw / nh;
+  const dstRatio = SHARP_W / SHARP_H;
+
+  let sx = 0;
+  let sy = 0;
+  let sw = nw;
+  let sh = nh;
+  if (srcRatio > dstRatio) {
+    sw = nh * dstRatio;
+    sx = (nw - sw) * 0.5;
+  } else {
+    sh = nw / dstRatio;
+    sy = (nh - sh) * 0.5;
+  }
+
+  // 1. Draw crisp rounded card into reusable scratch canvas
+  tmpCardCtx.clearRect(0, 0, SHARP_W, SHARP_H);
+  tmpCardCtx.save();
+  traceRoundedRect(tmpCardCtx, 0, 0, SHARP_W, SHARP_H, SHARP_R);
+  tmpCardCtx.clip();
+  tmpCardCtx.drawImage(img, sx, sy, sw, sh, 0, 0, SHARP_W, SHARP_H);
+
+  // Subtle top specular highlight
+  const gleam = tmpCardCtx.createLinearGradient(0, 0, 0, 5);
+  gleam.addColorStop(0, 'rgba(255, 255, 255, 0.28)');
+  gleam.addColorStop(1, 'rgba(255, 255, 255, 0)');
+  tmpCardCtx.fillStyle = gleam;
+  tmpCardCtx.fillRect(0, 0, SHARP_W, 5);
+
+  // Subtle inner hairline rim baked right in
+  traceRoundedRect(tmpCardCtx, 0.8, 0.8, SHARP_W - 1.6, SHARP_H - 1.6, SHARP_R - 0.8);
+  tmpCardCtx.lineWidth = 1.6;
+  tmpCardCtx.strokeStyle = 'rgba(23, 21, 15, 0.12)';
+  tmpCardCtx.stroke();
+  tmpCardCtx.restore();
+
+  // Copy crisp card into sharpAtlas
+  const sharpX = col * SHARP_W;
+  const sharpY = row * SHARP_H;
+  sharpAtlasCtx.clearRect(sharpX, sharpY, SHARP_W, SHARP_H);
+  sharpAtlasCtx.drawImage(tmpCard, sharpX, sharpY);
+
+  // 2. Bake silky optical Gaussian blur cells into blurAtlas (isolated per-cell so zero bleed!)
+  const innerW = BLUR_W / (1 + BLUR_PAD_RATIO * 2);
+  const innerH = BLUR_H / (1 + BLUR_PAD_RATIO * 2);
+  const padX = (BLUR_W - innerW) * 0.5;
+  const padY = (BLUR_H - innerH) * 0.5;
+
+  function bakeGaussianCell(blurPx, destX, destY) {
+    tmpBlurCtx.save();
+    tmpBlurCtx.clearRect(0, 0, BLUR_W, BLUR_H);
+
+    if (supportsCanvasFilter) {
+      tmpBlurCtx.filter = `blur(${blurPx}px)`;
+      tmpBlurCtx.drawImage(tmpCard, padX, padY, innerW, innerH);
+      tmpBlurCtx.filter = 'none';
+    } else {
+      // Smooth radial 12-tap Gaussian fallback for browsers without ctx.filter
+      tmpBlurCtx.globalAlpha = 0.22;
+      tmpBlurCtx.drawImage(tmpCard, padX, padY, innerW, innerH);
+      const taps = 12;
+      tmpBlurCtx.globalAlpha = 0.78 / taps;
+      for (let t = 0; t < taps; t++) {
+        const ang = (t / taps) * Math.PI * 2;
+        const rad = blurPx * (t % 2 === 0 ? 0.95 : 0.48);
+        tmpBlurCtx.drawImage(
+          tmpCard,
+          padX + Math.cos(ang) * rad,
+          padY + Math.sin(ang) * rad,
+          innerW,
+          innerH
+        );
+      }
+    }
+
+    tmpBlurCtx.restore();
+    blurAtlasCtx.clearRect(destX, destY, BLUR_W, BLUR_H);
+    blurAtlasCtx.drawImage(tmpBlur, destX, destY);
+  }
+
+  const blurBaseX = col * BLUR_W * 2;
+  const blurBaseY = row * BLUR_H;
+  bakeGaussianCell(3.2, blurBaseX, blurBaseY); // silky soft optical blur
+  bakeGaussianCell(7.2, blurBaseX + BLUR_W, blurBaseY); // velvety deep radial mist
+
+  const st = tileStates[idx];
+  if (st) {
+    st.sharpX = sharpX;
+    st.sharpY = sharpY;
+    st.softX = blurBaseX;
+    st.softY = blurBaseY;
+    st.deepX = blurBaseX + BLUR_W;
+    st.deepY = blurBaseY;
+    st.loaded = true;
+  }
+}
+
+/** Pre-bake ONE soft elevation shadow sprite on theme change (ZERO runtime ctx.shadowBlur!) */
+function rebuildShadowSprite() {
+  if (!shadowSprite) shadowSprite = document.createElement('canvas');
+  shadowSprite.width = SHADOW_W;
+  shadowSprite.height = SHADOW_H;
+  const c = shadowSprite.getContext('2d');
+  c.clearRect(0, 0, SHADOW_W, SHADOW_H);
+
+  const cardW = SHADOW_W / (1 + SHADOW_PAD_X * 2);
+  const cardH = SHADOW_H / (1 + SHADOW_PAD_Y * 2);
+  const ox = (SHADOW_W - cardW) * 0.5;
+  const oy = (SHADOW_H - cardH) * 0.5;
+
+  // Inset the shadow caster by 2px on all sides so ONLY the soft blurred shadow peeks out — never a solid white edge
+  c.save();
+  c.shadowColor = theme.hoverShadow;
+  c.shadowBlur = 22;
+  c.shadowOffsetX = 0;
+  c.shadowOffsetY = 8;
+  c.fillStyle = theme.hoverShadow;
+  traceRoundedRect(c, ox + 2, oy + 2, cardW - 4, cardH - 4, 15);
+  c.fill();
+  c.restore();
+
+  // Punch out the interior card area so shadow never tints the card edge unevenly
+  c.save();
+  c.globalCompositeOperation = 'destination-out';
+  traceRoundedRect(c, ox + 1, oy + 1, cardW - 2, cardH - 2, 16);
+  c.fill();
+  c.restore();
+}
+
+function readTheme() {
+  const isDark = document.documentElement.getAttribute('data-day') === 'sun';
+  theme = isDark
+    ? {
+        isDark: true,
+        bgHex: '#14120E',
+        bgRgb: '20, 18, 14',
+        surface: '#1D1B16',
+        sunken: '#24211B',
+        accent: '#F5C128',
+        tileRim: 'rgba(244, 239, 228, 0.14)',
+        hoverRim: 'rgba(244, 239, 228, 0.24)',
+        hoverShadow: 'rgba(0, 0, 0, 0.62)',
+      }
+    : {
+        isDark: false,
+        bgHex: '#FBFAF7',
+        bgRgb: '251, 250, 247',
+        surface: '#FFFFFF',
+        sunken: '#F2F0EA',
+        accent: '#FFC629',
+        tileRim: 'rgba(23, 21, 15, 0.09)',
+        hoverRim: 'rgba(23, 21, 15, 0.16)',
+        hoverShadow: 'rgba(23, 21, 15, 0.22)',
+      };
+  rebuildShadowSprite();
+  rebuildVignetteCanvas();
+}
+
+/** Pre-render half-res elliptical radial paper opacity vignette (4x faster GPU blit, visually identical!) */
+function rebuildVignetteCanvas() {
+  const w = Math.max(1, Math.round(metrics.vpW * 0.5));
+  const h = Math.max(1, Math.round(metrics.vpH * 0.5));
+  if (!vignetteCanvas) vignetteCanvas = document.createElement('canvas');
+  vignetteCanvas.width = w;
+  vignetteCanvas.height = h;
+
+  const vCtx = vignetteCanvas.getContext('2d');
+  vCtx.clearRect(0, 0, w, h);
+
+  const cx = w * 0.5;
+  const cy = h * 0.5;
+  const rx = w * 0.52;
+  const ry = h * 0.51;
+
+  vCtx.save();
+  vCtx.translate(cx, cy);
+  vCtx.scale(rx, ry);
+
+  const grad = vCtx.createRadialGradient(0, 0, 0.44, 0, 0, 1.02);
+  grad.addColorStop(0.0, `rgba(${theme.bgRgb}, 0)`);
+  grad.addColorStop(0.28, `rgba(${theme.bgRgb}, 0.15)`);
+  grad.addColorStop(0.58, `rgba(${theme.bgRgb}, 0.52)`);
+  grad.addColorStop(0.82, `rgba(${theme.bgRgb}, 0.86)`);
+  grad.addColorStop(1.0, `rgba(${theme.bgRgb}, 1)`);
+
+  vCtx.fillStyle = grad;
+  vCtx.fillRect(-2, -2, 4, 4);
+  vCtx.restore();
+}
+
+function refreshViewportCenter() {
+  if (!viewportEl) return null;
   const rect = viewportEl.getBoundingClientRect();
+  vpCenterX = rect.left + rect.width * 0.5;
+  vpCenterY = rect.top + rect.height * 0.5;
+  vpRectDirty = false;
+  return rect;
+}
+
+function readMetrics() {
+  if (!viewportEl || !canvasEl || !ctx) return;
+  const rect = refreshViewportCenter();
   const vw = window.innerWidth;
 
+  let vpW;
+  let vpH;
+  let tileW;
+  let tileH;
+  let tileR;
+  let spacingX;
+  let spacingY;
+  let hoverScale;
+
   if (vw <= 600) {
-    metrics = {
-      vpW: rect.width || vw - 16,
-      vpH: rect.height || 368,
-      tileW: 54,
-      tileH: 66,
-      spacingX: 64,
-      spacingY: 74,
-      hoverScale: 1.44,
-    };
+    vpW = rect.width || vw - 16;
+    vpH = rect.height || 368;
+    tileW = 56;
+    tileH = 68;
+    tileR = 11;
+    spacingX = 66;
+    spacingY = 76;
+    hoverScale = 1.44;
   } else if (vw <= 900) {
-    metrics = {
-      vpW: rect.width || vw - 24,
-      vpH: rect.height || 460,
-      tileW: 70,
-      tileH: 86,
-      spacingX: 82,
-      spacingY: 98,
-      hoverScale: 1.62,
-    };
+    vpW = rect.width || vw - 24;
+    vpH = rect.height || 460;
+    tileW = 72;
+    tileH = 88;
+    tileR = 13;
+    spacingX = 86;
+    spacingY = 102;
+    hoverScale = 1.60;
   } else {
-    metrics = {
-      vpW: rect.width || 1000,
-      vpH: rect.height || 540,
-      tileW: 80,
-      tileH: 98,
-      spacingX: 94,
-      spacingY: 112,
-      hoverScale: 1.72,
-    };
+    vpW = rect.width || 1000;
+    vpH = rect.height || 540;
+    tileW = 84;
+    tileH = 102;
+    tileR = 15;
+    spacingX = 100;
+    spacingY = 118;
+    hoverScale = 1.68;
   }
+
+  const isCompact = vpW <= 600;
+  metrics = {
+    vpW,
+    vpH,
+    tileW,
+    tileH,
+    tileR,
+    spacingX,
+    spacingY,
+    hoverScale,
+    lensRx: isCompact
+      ? Math.max(vpW * 0.47, spacingX * 2.45)
+      : Math.max(vpW * 0.43, spacingX * 3.9),
+    lensRy: isCompact
+      ? Math.max(vpH * 0.49, spacingY * 2.15)
+      : Math.max(vpH * 0.46, spacingY * 2.18),
+  };
+
+  // Cap DPR to 1.5 on large desktop canvases (visually razor-sharp while cutting fill-rate 44%)
+  const rawDpr = window.devicePixelRatio || 1;
+  dpr = Math.min(rawDpr, vw > 600 ? 1.5 : 2);
+  const pixelW = Math.max(1, Math.round(vpW * dpr));
+  const pixelH = Math.max(1, Math.round(vpH * dpr));
+  if (canvasEl.width !== pixelW || canvasEl.height !== pixelH) {
+    canvasEl.width = pixelW;
+    canvasEl.height = pixelH;
+  }
+
+  rebuildVignetteCanvas();
 
   let farthestX = 0;
   let farthestY = 0;
 
-  tileStates.forEach((st) => {
-    st.baseX = st.col * metrics.spacingX;
-    st.baseY = st.row * metrics.spacingY;
-    farthestX = Math.max(farthestX, Math.abs(st.baseX));
-    farthestY = Math.max(farthestY, Math.abs(st.baseY));
-  });
+  for (let i = 0; i < tileStates.length; i++) {
+    const st = tileStates[i];
+    st.baseX = st.col * spacingX;
+    st.baseY = st.row * spacingY;
+    const ax = Math.abs(st.baseX);
+    const ay = Math.abs(st.baseY);
+    if (ax > farthestX) farthestX = ax;
+    if (ay > farthestY) farthestY = ay;
+  }
 
-  // Allow panning every outer photo right into the center focal spot
   maxPanX = Math.max(120, farthestX * 0.94);
   maxPanY = Math.max(100, farthestY * 0.94);
 
   panX = clamp(panX, -maxPanX, maxPanX);
   panY = clamp(panY, -maxPanY, maxPanY);
+  lastLensPanX = NaN;
+  lastLensPanY = NaN;
 }
 
 function updateHud(idx) {
@@ -208,8 +579,11 @@ function updateHud(idx) {
 
 function syncResetButton() {
   if (!resetBtnEl) return;
-  const distFromCenter = Math.hypot(panX, panY);
-  resetBtnEl.hidden = distFromCenter < 34;
+  const shouldHide = panX * panX + panY * panY < 1156;
+  if (shouldHide !== lastResetHidden) {
+    lastResetHidden = shouldHide;
+    resetBtnEl.hidden = shouldHide;
+  }
 }
 
 function getActiveHighlightIndex() {
@@ -219,51 +593,36 @@ function getActiveHighlightIndex() {
   return -1;
 }
 
-function computeLensPosition(st, px, py) {
+function computeLensInto(st, px, py) {
   const rx = st.baseX + px;
   const ry = st.baseY + py;
+  const invRx = rx / metrics.lensRx;
+  const invRy = ry / metrics.lensRy;
+  const normDist = Math.sqrt(invRx * invRx + invRy * invRy);
 
-  const isCompact = metrics.vpW <= 600;
-  const lensRx = isCompact
-    ? Math.max(metrics.vpW * 0.47, metrics.spacingX * 2.45)
-    : Math.max(metrics.vpW * 0.43, metrics.spacingX * 3.9);
-  const lensRy = isCompact
-    ? Math.max(metrics.vpH * 0.49, metrics.spacingY * 2.15)
-    : Math.max(metrics.vpH * 0.46, metrics.spacingY * 2.18);
-
-  const normDist = Math.hypot(rx / lensRx, ry / lensRy);
-
-  // Subtle WatchOS curved-crystal pull-in that keeps rectangular rows & columns crisp
   const pull = 1 - 0.14 * smoothstep(0.22, 1.18, normDist);
-  const lensX = rx * pull;
-  const lensY = ry * pull;
+  st.lensX = rx * pull;
+  st.lensY = ry * pull;
+  st.normDist = normDist;
 
-  // WatchOS spherical dome scale falloff
-  const edgeT = smoothstep(0.16, 1.14, normDist);
-  const baseScale = lerp(1.06, 0.52, edgeT) * (1 - 0.14 * smoothstep(1.08, 1.58, normDist));
+  const edgeT = smoothstep(0.08, 1.12, normDist);
+  st.baseScale = lerp(1.14, 0.52, edgeT) * (1 - 0.14 * smoothstep(1.08, 1.58, normDist));
 
-  // Progressive radial opacity falloff toward the blurred perimeter
   const opT = smoothstep(0.36, 1.15, normDist);
-  const baseOpacity = lerp(1.0, 0.28, opT) * (1 - smoothstep(1.16, 1.62, normDist));
+  st.baseOpacity = lerp(1.0, 0.28, opT) * (1 - smoothstep(1.16, 1.62, normDist));
 
-  return { lensX, lensY, normDist, baseScale, baseOpacity };
+  st.blurLevel = smoothstep(0.42, 1.04, normDist);
 }
 
-/**
- * Deterministic, flicker-free hit-testing evaluated ONLY on user pointer movement.
- * Keeps the active hovered tile sticky across its visual zoomed card + resting footprint
- * so shrinking/repelling tiles can never ping-pong under a stationary cursor.
- */
-function resolveHoveredTile(px, py) {
-  if (!pointerInside || isDragging || isOpen || !tileStates.length) return -1;
+function resolveTileAt(px, py, stickyIndex) {
+  if (!tileStates.length) return -1;
 
-  if (hoveredIndex >= 0 && hoveredIndex < tileStates.length) {
-    const cur = tileStates[hoveredIndex];
-    const lp = computeLensPosition(cur, panX, panY);
-    const restHalfW = metrics.tileW * lp.baseScale * 0.5 + 4;
-    const restHalfH = metrics.tileH * lp.baseScale * 0.5 + 4;
+  if (stickyIndex >= 0 && stickyIndex < tileStates.length) {
+    const cur = tileStates[stickyIndex];
+    const restHalfW = metrics.tileW * cur.baseScale * 0.5 + 4;
+    const restHalfH = metrics.tileH * cur.baseScale * 0.5 + 4;
     const inRest =
-      Math.abs(px - lp.lensX) <= restHalfW && Math.abs(py - lp.lensY) <= restHalfH;
+      Math.abs(px - cur.lensX) <= restHalfW && Math.abs(py - cur.lensY) <= restHalfH;
 
     const visHalfW = metrics.tileW * cur.lastScale * 0.5 + 2;
     const visHalfH = metrics.tileH * cur.lastScale * 0.5 + 2;
@@ -271,7 +630,7 @@ function resolveHoveredTile(px, py) {
       Math.abs(px - cur.lastX) <= visHalfW && Math.abs(py - cur.lastY) <= visHalfH;
 
     if (inRest || inVisual) {
-      return hoveredIndex;
+      return stickyIndex;
     }
   }
 
@@ -279,16 +638,18 @@ function resolveHoveredTile(px, py) {
   let bestScore = Infinity;
 
   for (let i = 0; i < tileStates.length; i++) {
-    const lp = computeLensPosition(tileStates[i], panX, panY);
-    if (lp.baseOpacity < 0.04) continue;
+    const st = tileStates[i];
+    if (st.baseOpacity < 0.04) continue;
 
-    const halfW = metrics.tileW * lp.baseScale * 0.5 + 3;
-    const halfH = metrics.tileH * lp.baseScale * 0.5 + 3;
-    const dx = Math.abs(px - lp.lensX);
-    const dy = Math.abs(py - lp.lensY);
+    const halfW = metrics.tileW * st.baseScale * 0.5 + 3;
+    const halfH = metrics.tileH * st.baseScale * 0.5 + 3;
+    const dx = Math.abs(px - st.lensX);
+    const dy = Math.abs(py - st.lensY);
 
     if (dx <= halfW && dy <= halfH) {
-      const score = Math.hypot(dx / halfW, dy / halfH);
+      const nx = dx / halfW;
+      const ny = dy / halfH;
+      const score = nx * nx + ny * ny;
       if (score < bestScore) {
         bestScore = score;
         bestIdx = i;
@@ -299,6 +660,88 @@ function resolveHoveredTile(px, py) {
   return bestIdx;
 }
 
+/**
+ * Ultra-fast tile blit from shared GPU sprite atlases:
+ * - ZERO ctx.shadowBlur (uses pre-baked shadowSprite!)
+ * - ZERO ctx.clip()
+ * - ZERO vector strokes on resting tiles
+ */
+function drawTile(st, idx, cx, cy, isActiveHover, isKeyboardFocused) {
+  if (idx === hiddenTileIndex) return;
+
+  const alpha = st.lastOpacity * st.loadAlpha;
+  if (alpha < 0.015) return;
+
+  const w = metrics.tileW * st.lastScale;
+  const h = metrics.tileH * st.lastScale;
+  const x = cx + st.lastX - w * 0.5;
+  const y = cy + st.lastY - h * 0.5;
+
+  if (x + w < -24 || x > metrics.vpW + 24 || y + h < -24 || y > metrics.vpH + 24) return;
+
+  if (!st.loaded) {
+    ctx.globalAlpha = alpha * 0.7;
+    ctx.fillStyle = theme.sunken;
+    traceRoundedRect(ctx, x, y, w, h, metrics.tileR * st.lastScale);
+    ctx.fill();
+    return;
+  }
+
+  const hp = clamp(st.hoverProg, 0, 1);
+  const blur = st.blurLevel * (1 - hp);
+
+  // Pre-baked soft elevation shadow ONLY on the hovered/settling tile (pure GPU blit, zero shadowBlur!)
+  if (isActiveHover && hp > 0.06 && shadowSprite) {
+    const sw = w * (1 + SHADOW_PAD_X * 2);
+    const sh = h * (1 + SHADOW_PAD_Y * 2);
+    ctx.globalAlpha = alpha * hp;
+    ctx.drawImage(shadowSprite, x - w * SHADOW_PAD_X, y - h * SHADOW_PAD_Y, sw, sh);
+  }
+
+  // Blit from shared sharpAtlas / blurAtlas (fast hardware bilinear sampling)
+  if (blur <= 0.03) {
+    ctx.globalAlpha = alpha;
+    ctx.drawImage(sharpAtlas, st.sharpX, st.sharpY, SHARP_W, SHARP_H, x, y, w, h);
+  } else if (blur < 0.52) {
+    const t = blur / 0.52;
+    const padW = w * BLUR_PAD_RATIO;
+    const padH = h * BLUR_PAD_RATIO;
+    if (1 - t > 0.03) {
+      ctx.globalAlpha = alpha * (1 - t);
+      ctx.drawImage(sharpAtlas, st.sharpX, st.sharpY, SHARP_W, SHARP_H, x, y, w, h);
+    }
+    ctx.globalAlpha = alpha * t;
+    ctx.drawImage(blurAtlas, st.softX, st.softY, BLUR_W, BLUR_H, x - padW, y - padH, w + padW * 2, h + padH * 2);
+  } else {
+    const t = (blur - 0.52) / 0.48;
+    const padW = w * BLUR_PAD_RATIO;
+    const padH = h * BLUR_PAD_RATIO;
+    if (1 - t > 0.03) {
+      ctx.globalAlpha = alpha * (1 - t);
+      ctx.drawImage(blurAtlas, st.softX, st.softY, BLUR_W, BLUR_H, x - padW, y - padH, w + padW * 2, h + padH * 2);
+    }
+    ctx.globalAlpha = alpha * t;
+    ctx.drawImage(blurAtlas, st.deepX, st.deepY, BLUR_W, BLUR_H, x - padW, y - padH, w + padW * 2, h + padH * 2);
+  }
+
+  // Uniform archival mat border ONLY on the single active hovered/focused tile (identical width on all 4 sides)
+  if (isActiveHover && hp > 0.08) {
+    const r = metrics.tileR * st.lastScale;
+    const matW = 2.0 * hp;
+    ctx.globalAlpha = alpha;
+    traceRoundedRect(ctx, x - matW * 0.5, y - matW * 0.5, w + matW, h + matW, r + matW * 0.5);
+    ctx.lineWidth = matW;
+    ctx.strokeStyle = theme.surface;
+    ctx.stroke();
+
+    const outerOff = matW + 0.4;
+    traceRoundedRect(ctx, x - outerOff, y - outerOff, w + outerOff * 2, h + outerOff * 2, r + outerOff);
+    ctx.lineWidth = isKeyboardFocused ? 2.2 : 1.0;
+    ctx.strokeStyle = isKeyboardFocused ? theme.accent : theme.hoverRim;
+    ctx.stroke();
+  }
+}
+
 function wakeLoop() {
   if (rafId !== null) return;
   lastFrameTime = performance.now();
@@ -307,6 +750,8 @@ function wakeLoop() {
 
 function tick(now) {
   rafId = null;
+  if (!ctx) return;
+
   const rawDt = (now - lastFrameTime) / 1000;
   lastFrameTime = now;
   const dt = Math.min(0.04, Math.max(0.004, rawDt));
@@ -326,12 +771,10 @@ function tick(now) {
         targetPanX = null;
         targetPanY = null;
       } else {
-        const k = 165;
-        const c = 25.5;
-        const ax = (targetPanX - panX) * k - panVelX * c;
-        const ay = (targetPanY - panY) * k - panVelY * c;
-        panVelX += ax * dt;
-        panVelY += ay * dt;
+        const k = 185;
+        const c = 27;
+        panVelX += ((targetPanX - panX) * k - panVelX * c) * dt;
+        panVelY += ((targetPanY - panY) * k - panVelY * c) * dt;
         panX += panVelX * dt;
         panY += panVelY * dt;
 
@@ -350,7 +793,6 @@ function tick(now) {
         }
       }
     } else {
-      // Momentum glide + soft boundary spring
       const clampedX = clamp(panX, -maxPanX, maxPanX);
       const clampedY = clamp(panY, -maxPanY, maxPanY);
       const outX = panX - clampedX;
@@ -363,22 +805,21 @@ function tick(now) {
           panVelX = 0;
           panVelY = 0;
         } else {
-          const k = 210;
-          const c = 28;
+          const k = 220;
+          const c = 29;
           panVelX += (-outX * k - panVelX * c) * dt;
           panVelY += (-outY * k - panVelY * c) * dt;
           panX += panVelX * dt;
           panY += panVelY * dt;
           needsMoreFrames = true;
         }
-      } else if (Math.hypot(panVelX, panVelY) > 4) {
+      } else if (panVelX * panVelX + panVelY * panVelY > 16) {
         const friction = Math.pow(0.925, dt60);
         panVelX *= friction;
         panVelY *= friction;
         panX += panVelX * dt;
         panY += panVelY * dt;
 
-        // Soft brake when momentum pushes past bounds
         if (panX > maxPanX || panX < -maxPanX) panVelX *= Math.pow(0.7, dt60);
         if (panY > maxPanY || panY < -maxPanY) panVelY *= Math.pow(0.7, dt60);
         needsMoreFrames = true;
@@ -393,53 +834,80 @@ function tick(now) {
 
   syncResetButton();
 
-  const activeHi = getActiveHighlightIndex();
-  if (galleryEl) {
-    galleryEl.classList.toggle('has-hover', activeHi >= 0);
-  }
+  // 2. Update spherical lens coordinates ONLY when pan or metrics changed
+  if (panX !== lastLensPanX || panY !== lastLensPanY) {
+    lastLensPanX = panX;
+    lastLensPanY = panY;
+    let closestIdx = 0;
+    let closestDist = Infinity;
 
-  // First pass: compute base spherical lens coordinates for every tile
-  let closestIdx = 0;
-  let closestDist = Infinity;
-  const lensPositions = new Array(tileStates.length);
-
-  for (let i = 0; i < tileStates.length; i++) {
-    const lp = computeLensPosition(tileStates[i], panX, panY);
-    lensPositions[i] = lp;
-    if (lp.normDist < closestDist) {
-      closestDist = lp.normDist;
-      closestIdx = i;
+    for (let i = 0; i < tileStates.length; i++) {
+      const st = tileStates[i];
+      computeLensInto(st, panX, panY);
+      if (st.normDist < closestDist) {
+        closestDist = st.normDist;
+        closestIdx = i;
+      }
     }
+    lastClosestIdx = closestIdx;
+    // Re-sort drawOrder only when pan actually changed!
+    drawOrder.sort((a, b) => tileStates[b].normDist - tileStates[a].normDist);
   }
 
-  // Update editorial bottom HUD with hovered photo or centered focal photo
-  updateHud(activeHi >= 0 ? activeHi : closestIdx);
+  // 3. Coalesced hover resolution (at most once per frame, zero layout reads)
+  if (hoverCheckDirty && !isDragging && !isOpen) {
+    hoverCheckDirty = false;
+    if (vpRectDirty) refreshViewportCenter();
+    hoveredIndex = resolveTileAt(
+      pendingClientX - vpCenterX,
+      pendingClientY - vpCenterY,
+      hoveredIndex
+    );
+  }
 
-  const hiPos = activeHi >= 0 ? lensPositions[activeHi] : null;
-  const repelRadius = metrics.spacingX * 2.25;
+  const activeHi = getActiveHighlightIndex();
+  const hasHover = activeHi >= 0;
+
+  if (galleryEl && hasHover !== lastGalleryHover) {
+    lastGalleryHover = hasHover;
+    galleryEl.classList.toggle('has-hover', hasHover);
+  }
+  if (viewportEl && hasHover !== lastPointerCursor) {
+    lastPointerCursor = hasHover;
+    viewportEl.classList.toggle('is-pointer', hasHover);
+  }
+
+  updateHud(hasHover ? activeHi : lastClosestIdx);
+
+  const hiState = hasHover ? tileStates[activeHi] : null;
+  const repelRadius = metrics.spacingX * 2.2;
+  const repelRadiusSq = repelRadius * repelRadius;
   const halfVpW = metrics.vpW * 0.5;
   const halfVpH = metrics.vpH * 0.5;
+  const follow = 1 - Math.exp(-18 * dt);
 
-  // Second pass: spring hover zoom, neighbor magnetic nudge, and GPU transform update
+  // 4. Advance snappy hover springs (zero lag/delay) and gentle neighbor repulsion
   for (let i = 0; i < tileStates.length; i++) {
     const st = tileStates[i];
-    const el = tileNodes[i];
-    const lp = lensPositions[i];
-
     const targetHover = i === activeHi ? 1 : 0;
+
+    if (st.loaded && st.loadAlpha < 1) {
+      st.loadAlpha = reduced ? 1 : Math.min(1, st.loadAlpha + dt * 5.8);
+      if (st.loadAlpha < 1) needsMoreFrames = true;
+    }
 
     if (reduced) {
       st.hoverProg = targetHover;
       st.hoverVel = 0;
-    } else {
-      // Snappy critically-damped Apple spring for hover magnification
-      const stiffness = targetHover === 1 ? 300 : 240;
-      const damping = targetHover === 1 ? 29 : 27;
+    } else if (st.hoverProg !== targetHover || st.hoverVel !== 0) {
+      // Crisp, immediate critically-damped Apple spring (~150ms response, zero sluggishness)
+      const stiffness = targetHover === 1 ? 440 : 360;
+      const damping = targetHover === 1 ? 35 : 32;
       const force = (targetHover - st.hoverProg) * stiffness - st.hoverVel * damping;
       st.hoverVel += force * dt;
       st.hoverProg += st.hoverVel * dt;
 
-      if (Math.abs(targetHover - st.hoverProg) < 0.002 && Math.abs(st.hoverVel) < 0.01) {
+      if (Math.abs(targetHover - st.hoverProg) < 0.003 && Math.abs(st.hoverVel) < 0.02) {
         st.hoverProg = targetHover;
         st.hoverVel = 0;
       } else {
@@ -447,26 +915,26 @@ function tick(now) {
       }
     }
 
-    const hp = clamp(st.hoverProg, 0, 1.08);
+    const hp = clamp(st.hoverProg, 0, 1.05);
 
-    // Calculate magnetic repulsion from hovered photo OR gentle safe-margin clamp for the hovered photo itself
     let targetNudgeX = 0;
     let targetNudgeY = 0;
 
     if (i === activeHi) {
-      const zoomedHalfW = (metrics.tileW * metrics.hoverScale) * 0.5 + 16;
-      const zoomedHalfH = (metrics.tileH * metrics.hoverScale) * 0.5 + 16;
-      const clampedX = clamp(lp.lensX, -halfVpW + zoomedHalfW, halfVpW - zoomedHalfW);
-      const clampedY = clamp(lp.lensY, -halfVpH + zoomedHalfH, halfVpH - zoomedHalfH);
-      targetNudgeX = clampedX - lp.lensX;
-      targetNudgeY = clampedY - lp.lensY;
-    } else if (hiPos) {
-      const dx = lp.lensX - hiPos.lensX;
-      const dy = lp.lensY - hiPos.lensY;
-      const dist = Math.hypot(dx, dy);
-      if (dist > 1 && dist < repelRadius) {
+      const zoomedHalfW = metrics.tileW * metrics.hoverScale * 0.5 + 16;
+      const zoomedHalfH = metrics.tileH * metrics.hoverScale * 0.5 + 16;
+      const clampedX = clamp(st.lensX, -halfVpW + zoomedHalfW, halfVpW - zoomedHalfW);
+      const clampedY = clamp(st.lensY, -halfVpH + zoomedHalfH, halfVpH - zoomedHalfH);
+      targetNudgeX = clampedX - st.lensX;
+      targetNudgeY = clampedY - st.lensY;
+    } else if (hiState) {
+      const dx = st.lensX - hiState.lensX;
+      const dy = st.lensY - hiState.lensY;
+      const distSq = dx * dx + dy * dy;
+      if (distSq > 1 && distSq < repelRadiusSq) {
+        const dist = Math.sqrt(distSq);
         const falloff = 1 - dist / repelRadius;
-        const push = falloff * falloff * 18;
+        const push = falloff * falloff * 16;
         targetNudgeX = (dx / dist) * push;
         targetNudgeY = (dy / dist) * push;
       }
@@ -475,60 +943,65 @@ function tick(now) {
     if (reduced) {
       st.nudgeX = targetNudgeX;
       st.nudgeY = targetNudgeY;
-    } else {
-      const follow = 1 - Math.exp(-14 * dt);
+    } else if (st.nudgeX !== targetNudgeX || st.nudgeY !== targetNudgeY) {
       st.nudgeX += (targetNudgeX - st.nudgeX) * follow;
       st.nudgeY += (targetNudgeY - st.nudgeY) * follow;
-      if (Math.abs(targetNudgeX - st.nudgeX) > 0.15 || Math.abs(targetNudgeY - st.nudgeY) > 0.15) {
+      if (Math.abs(targetNudgeX - st.nudgeX) <= 0.15 && Math.abs(targetNudgeY - st.nudgeY) <= 0.15) {
+        st.nudgeX = targetNudgeX;
+        st.nudgeY = targetNudgeY;
+      } else {
         needsMoreFrames = true;
       }
     }
 
-    const finalX = lp.lensX + st.nudgeX;
-    const finalY = lp.lensY + st.nudgeY;
-    const finalScale = lerp(lp.baseScale, metrics.hoverScale, hp);
+    st.lastX = st.lensX + st.nudgeX;
+    st.lastY = st.lensY + st.nudgeY;
+    st.lastScale = lerp(st.baseScale, metrics.hoverScale, hp);
 
-    st.lastX = finalX;
-    st.lastY = finalY;
-    st.lastScale = finalScale;
-
-    // Gently quiet non-hovered tiles when inspecting one photo so it stands out cleanly
-    const dimFactor = activeHi >= 0 && i !== activeHi ? 0.84 : 1;
-    const finalOpacity = clamp(lerp(lp.baseOpacity * dimFactor, 1.0, clamp(hp, 0, 1)), 0, 1);
-
-    // Mobile GPU culling: hide completely dissolved off-rim tiles to skip unnecessary rasterization
-    const shouldBeVisible = finalOpacity > 0.015 || i === activeHi;
-    if (st.isVisible !== shouldBeVisible) {
-      st.isVisible = shouldBeVisible;
-      el.style.visibility = shouldBeVisible ? '' : 'hidden';
-    }
-
-    if (shouldBeVisible) {
-      el.style.transform = `translate3d(${finalX.toFixed(2)}px, ${finalY.toFixed(2)}px, 0) scale(${finalScale.toFixed(4)})`;
-      el.style.opacity = finalOpacity.toFixed(3);
-    }
-
-    // Stable compositor layering with zero filter toggling (avoids GPU layer reallocation flicker)
-    let nextZ;
-    if (i === activeHi) {
-      nextZ = 40;
-    } else if (hp > 0.14) {
-      nextZ = 30;
-    } else {
-      nextZ = 1 + Math.round((1 - clamp(lp.normDist, 0, 1)) * 9);
-    }
-
-    if (st.zIndex !== nextZ) {
-      st.zIndex = nextZ;
-      el.style.zIndex = String(nextZ);
-    }
-
-    const isHighlighted = i === activeHi;
-    if (st.isHighlighted !== isHighlighted) {
-      st.isHighlighted = isHighlighted;
-      el.classList.toggle('is-hovered', isHighlighted);
-    }
+    const dimFactor = hasHover && i !== activeHi ? 0.85 : 1;
+    st.lastOpacity = clamp(lerp(st.baseOpacity * dimFactor, 1.0, clamp(hp, 0, 1)), 0, 1);
   }
+
+  // 5. Render entire frame via fast hardware bilinear atlas blits (opaque fill, zero shadowBlur!)
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'low'; // hardware GPU bilinear (sprites already @2x high-quality baked!)
+
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = theme.bgHex;
+  ctx.fillRect(0, 0, metrics.vpW, metrics.vpH);
+
+  const cx = metrics.vpW * 0.5;
+  const cy = metrics.vpH * 0.5;
+
+  // Background tiles (behind radial paper vignette)
+  for (let k = 0; k < drawOrder.length; k++) {
+    const idx = drawOrder[k];
+    const st = tileStates[idx];
+    if (idx === activeHi || st.hoverProg > 0.08) continue;
+    drawTile(st, idx, cx, cy, false, false);
+  }
+
+  // Pre-rendered half-res radial paper opacity vignette (1 GPU quad)
+  if (vignetteCanvas) {
+    ctx.globalAlpha = 1;
+    ctx.drawImage(vignetteCanvas, 0, 0, metrics.vpW, metrics.vpH);
+  }
+
+  // Departing/settling tiles (smoothly shrinking back without shadowBlur!)
+  for (let k = 0; k < drawOrder.length; k++) {
+    const idx = drawOrder[k];
+    const st = tileStates[idx];
+    if (idx === activeHi || st.hoverProg <= 0.08) continue;
+    drawTile(st, idx, cx, cy, false, false);
+  }
+
+  // Active hovered / keyboard-focused tile on top (1 pre-baked shadow quad + crisp atlas quad)
+  if (hasHover) {
+    drawTile(tileStates[activeHi], activeHi, cx, cy, true, focusedIndex === activeHi);
+  }
+
+  ctx.globalAlpha = 1;
 
   if (needsMoreFrames) {
     rafId = requestAnimationFrame(tick);
@@ -577,25 +1050,28 @@ function recenterGallery() {
 }
 
 /* ==========================================================================
-   Frosted FLIP Photo Viewer (preserved seamless zoom from live watchOS tile)
+   Frosted FLIP Photo Viewer (exact pixel-aligned launch from canvas tile rect)
    ========================================================================== */
-function setHiddenThumb(imgEl) {
-  if (hiddenThumb && hiddenThumb !== imgEl) {
-    hiddenThumb.style.visibility = '';
-  }
-  hiddenThumb = imgEl || null;
-  if (hiddenThumb) {
-    hiddenThumb.style.visibility = 'hidden';
-  }
+function getTileScreenRect(index) {
+  const st = tileStates[index];
+  if (!st || !viewportEl) return null;
+  refreshViewportCenter();
+  const w = metrics.tileW * st.lastScale;
+  const h = metrics.tileH * st.lastScale;
+  const left = vpCenterX + st.lastX - w * 0.5;
+  const top = vpCenterY + st.lastY - h * 0.5;
+  return { left, top, width: w, height: h, bottom: top + h };
+}
+
+function setHiddenTile(idx) {
+  if (hiddenTileIndex === idx) return;
+  hiddenTileIndex = idx;
+  wakeLoop();
 }
 
 function getPhotoAspectRatio(index) {
   const item = photos[index];
   if (item && item.w && item.h) return item.w / item.h;
-  const srcThumb = thumbImgs[index];
-  if (srcThumb && srcThumb.naturalHeight > 0) {
-    return srcThumb.naturalWidth / srcThumb.naturalHeight;
-  }
   return 9 / 16;
 }
 
@@ -646,27 +1122,22 @@ function openLightbox(index) {
 
   activeIndex = (index + photos.length) % photos.length;
   const item = photos[activeIndex];
-  const srcTile = tileNodes[activeIndex];
-  const srcThumb = thumbImgs[activeIndex];
-  const fromRect = srcTile ? srcTile.getBoundingClientRect() : null;
-
+  const fromRect = getTileScreenRect(activeIndex);
   const ratio = getPhotoAspectRatio(activeIndex);
   const toRect = getTargetRect(ratio);
 
-  // Release hover cleanly once lightbox takes over
   hoveredIndex = -1;
-  wakeLoop();
-
+  hoverCheckDirty = false;
   updateMeta(activeIndex);
   lbImg.alt = `Cycling photo — ${item.date}`;
-  lbImg.src = item.thumb;
+  lbImg.src = item.grid || item.thumb;
 
   isOpen = true;
   isClosing = false;
   viewer.removeAttribute('data-closing');
   viewer.classList.remove('is-open');
   viewer.hidden = false;
-  setHiddenThumb(srcThumb);
+  setHiddenTile(activeIndex);
   playPop(1.02);
 
   lbImg.style.width = `${toRect.width}px`;
@@ -697,16 +1168,13 @@ function stepLightbox(delta) {
   if (!isOpen || isClosing || !photos.length || !lbImg) return;
   activeIndex = (activeIndex + delta + photos.length) % photos.length;
   const item = photos[activeIndex];
-  const srcThumb = thumbImgs[activeIndex];
   const ratio = getPhotoAspectRatio(activeIndex);
   const toRect = getTargetRect(ratio);
 
   playClick();
-  setHiddenThumb(srcThumb);
+  setHiddenTile(activeIndex);
   updateMeta(activeIndex);
   updateHud(activeIndex);
-
-  // Quietly glide the honeycomb behind the frosted backdrop so closing FLIPs to a crisp centered tile
   panToPhoto(activeIndex, false);
 
   lbImg.classList.add('is-swapping');
@@ -716,7 +1184,7 @@ function stepLightbox(delta) {
     lbImg.style.width = `${toRect.width}px`;
     lbImg.style.height = `${toRect.height}px`;
     lbImg.style.transform = `translate3d(${toRect.left}px, ${toRect.top}px, 0) scale(1, 1)`;
-    lbImg.src = item.thumb;
+    lbImg.src = item.grid || item.thumb;
     lbImg.alt = `Cycling photo — ${item.date}`;
     void lbImg.offsetWidth;
     lbImg.style.transition = '';
@@ -730,8 +1198,7 @@ function closeLightbox() {
   isClosing = true;
   playClick();
 
-  const srcTile = tileNodes[activeIndex];
-  const backRect = srcTile ? srcTile.getBoundingClientRect() : null;
+  const backRect = getTileScreenRect(activeIndex);
   const curW = parseFloat(lbImg.style.width) || lbImg.getBoundingClientRect().width;
   const curH = parseFloat(lbImg.style.height) || lbImg.getBoundingClientRect().height;
 
@@ -754,7 +1221,7 @@ function closeLightbox() {
   closeTimer = setTimeout(() => {
     viewer.hidden = true;
     viewer.removeAttribute('data-closing');
-    setHiddenThumb(null);
+    setHiddenTile(-1);
     isOpen = false;
     isClosing = false;
   }, exitDuration);
@@ -773,117 +1240,148 @@ function repositionOpenImage() {
 }
 
 /* ==========================================================================
-   Build WatchOS Honeycomb Tiles
+   Build Shared GPU Sprite Atlases & Keyboard Accessibility List
    ========================================================================== */
-function renderWatchGallery() {
-  if (!viewportEl || !photos.length) return;
+function loadTileImages() {
+  // Stagger atlas baking across frames so initial scroll never hitches
+  const bakeQueue = [];
+  let bakeScheduled = false;
 
-  // Remove any previously rendered tiles while keeping the radial blur & vignette overlays
-  viewportEl.querySelectorAll('.watch-tile').forEach((el) => el.remove());
+  function flushBakeQueue() {
+    bakeScheduled = false;
+    const deadline = performance.now() + 4.5; // max 4.5ms budget per frame
+    while (bakeQueue.length && performance.now() < deadline) {
+      const { img, idx } = bakeQueue.shift();
+      bakePhotoIntoAtlases(img, idx);
+      tileStates[idx].loadAlpha = prefersReducedMotion() ? 1 : 0.01;
+    }
+    wakeLoop();
+    if (bakeQueue.length) {
+      bakeScheduled = true;
+      requestAnimationFrame(flushBakeQueue);
+    }
+  }
+
+  function enqueueBake(img, idx) {
+    bakeQueue.push({ img, idx });
+    if (!bakeScheduled) {
+      bakeScheduled = true;
+      requestAnimationFrame(flushBakeQueue);
+    }
+  }
+
+  tileStates.forEach((st, idx) => {
+    const item = photos[idx];
+    const img = new Image();
+    img.decoding = 'async';
+    img.src = item.grid || item.thumb;
+
+    if (img.complete && img.naturalWidth > 0) {
+      enqueueBake(img, idx);
+    } else {
+      img.addEventListener('load', () => enqueueBake(img, idx), { once: true });
+    }
+  });
+}
+
+function renderWatchGallery() {
+  if (!viewportEl || !canvasEl || !ctx || !photos.length) return;
+
+  initAtlases(photos.length);
 
   const coords = buildRectCoords(photos.length);
-  const firstOverlay = viewportEl.querySelector('.watch-blur-layer');
-
-  tileNodes = new Array(photos.length);
-  thumbImgs = new Array(photos.length);
   tileStates = new Array(photos.length);
+  drawOrder = new Array(photos.length);
+  a11yButtons = new Array(photos.length);
 
+  if (a11yListEl) a11yListEl.textContent = '';
   const frag = document.createDocumentFragment();
 
   photos.forEach((item, idx) => {
     const { col, row, ring } = coords[idx];
+    drawOrder[idx] = idx;
 
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'watch-tile';
-    btn.setAttribute('aria-label', `Open road photo from ${item.date} (${idx + 1} of ${photos.length})`);
-
-    const img = document.createElement('img');
-    img.src = item.thumb;
-    img.alt = `Cycling photo taken ${item.date}`;
-    if (item.w && item.h) {
-      img.width = item.w;
-      img.height = item.h;
-    }
-    img.loading = ring <= 1 ? 'eager' : 'lazy';
-    img.decoding = 'async';
-    img.draggable = false;
-
-    const markLoaded = () => img.classList.add('is-loaded');
-    if (img.complete && img.naturalWidth > 0) {
-      markLoaded();
-    } else {
-      img.addEventListener('load', markLoaded, { once: true });
-    }
-
-    btn.appendChild(img);
-
-    btn.addEventListener('focus', () => {
-      // Only elevate/pan on keyboard navigation (:focus-visible), never on mouse click
-      if (!btn.matches(':focus-visible')) return;
-      focusedIndex = idx;
-      const st = tileStates[idx];
-      if (st && Math.hypot(st.baseX + panX, st.baseY + panY) > metrics.spacingX * 1.8) {
-        panToPhoto(idx, false);
-      }
-      wakeLoop();
-    });
-
-    btn.addEventListener('blur', () => {
-      if (focusedIndex === idx) {
-        focusedIndex = -1;
-        wakeLoop();
-      }
-    });
-
-    btn.addEventListener('click', (e) => {
-      if (performance.now() < suppressClickUntil) {
-        e.preventDefault();
-        return;
-      }
-      openLightbox(idx);
-    });
-
-    tileNodes[idx] = btn;
-    thumbImgs[idx] = img;
     tileStates[idx] = {
       col,
       row,
       ring,
       baseX: 0,
       baseY: 0,
+      lensX: 0,
+      lensY: 0,
+      normDist: 0,
+      baseScale: 1,
+      baseOpacity: 1,
+      blurLevel: 0,
       lastX: 0,
       lastY: 0,
       lastScale: 1,
+      lastOpacity: 1,
       hoverProg: 0,
       hoverVel: 0,
       nudgeX: 0,
       nudgeY: 0,
-      zIndex: -1,
-      isVisible: true,
-      isHighlighted: false,
+      loadAlpha: 0,
+      loaded: false,
+      sharpX: 0,
+      sharpY: 0,
+      softX: 0,
+      softY: 0,
+      deepX: 0,
+      deepY: 0,
     };
 
-    frag.appendChild(btn);
+    if (a11yListEl) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.setAttribute('role', 'listitem');
+      btn.setAttribute('aria-label', `Open road photo from ${item.date} (${idx + 1} of ${photos.length})`);
+      btn.addEventListener('focus', () => {
+        focusedIndex = idx;
+        const st = tileStates[idx];
+        if (st && Math.hypot(st.baseX + panX, st.baseY + panY) > metrics.spacingX * 1.8) {
+          panToPhoto(idx, false);
+        }
+        wakeLoop();
+      });
+      btn.addEventListener('blur', () => {
+        if (focusedIndex === idx) {
+          focusedIndex = -1;
+          wakeLoop();
+        }
+      });
+      btn.addEventListener('click', () => openLightbox(idx));
+      a11yButtons[idx] = btn;
+      frag.appendChild(btn);
+    }
   });
 
-  if (firstOverlay) {
-    viewportEl.insertBefore(frag, firstOverlay);
-  } else {
-    viewportEl.appendChild(frag);
-  }
+  if (a11yListEl) a11yListEl.appendChild(frag);
+  if (countEl) countEl.textContent = `${photos.length} photos`;
 
-  if (countEl) {
-    countEl.textContent = `${photos.length} photos`;
-  }
-
+  readTheme();
   readMetrics();
   updateHud(0);
   tick(performance.now());
+
+  if ('IntersectionObserver' in window) {
+    const obs = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          loadTileImages();
+          obs.disconnect();
+        }
+      },
+      { rootMargin: '600px 0px' }
+    );
+    obs.observe(viewportEl);
+  } else {
+    loadTileImages();
+  }
 }
 
 /* ==========================================================================
-   Direct Manipulation Drag + Momentum Physics (Apple Fluid Interfaces)
+   Direct Manipulation Drag, Momentum & Instant Canvas Click
    ========================================================================== */
 function wirePanGestures() {
   if (!viewportEl) return;
@@ -894,13 +1392,10 @@ function wirePanGestures() {
 
     isPointerDown = true;
     isDragging = false;
-    // Desktop mouse/pen always pans in 2D; touch defaults to horizontal-only so vertical swipes scroll the page natively unless 2D pan is toggled on
     dragAllowVertical = e.pointerType !== 'touch' || isFreePan;
     activePointerId = e.pointerId;
     dragStartX = e.clientX;
     dragStartY = e.clientY;
-    lastPointerX = e.clientX;
-    lastPointerY = e.clientY;
     dragOriginPanX = panX;
     dragOriginPanY = panY;
     panVelX = 0;
@@ -917,7 +1412,6 @@ function wirePanGestures() {
     const dy = e.clientY - dragStartY;
 
     if (!isDragging) {
-      // On touch in default scroll-safe mode, immediately yield vertical drags to native page scrolling
       if (!dragAllowVertical && Math.abs(dy) > 8 && Math.abs(dy) > Math.abs(dx) * 1.1) {
         isPointerDown = false;
         activePointerId = null;
@@ -931,6 +1425,7 @@ function wirePanGestures() {
       if (movedEnough) {
         isDragging = true;
         hoveredIndex = -1;
+        hoverCheckDirty = false;
         viewportEl.classList.add('is-dragging');
         try {
           viewportEl.setPointerCapture(e.pointerId);
@@ -949,13 +1444,10 @@ function wirePanGestures() {
 
     const now = performance.now();
     velocitySamples.push({ x: e.clientX, y: e.clientY, t: now });
-    // Keep a short ~80ms sliding window for clean flick release velocity
     while (velocitySamples.length > 2 && now - velocitySamples[0].t > 80) {
       velocitySamples.shift();
     }
 
-    lastPointerX = e.clientX;
-    lastPointerY = e.clientY;
     wakeLoop();
   });
 
@@ -976,9 +1468,6 @@ function wirePanGestures() {
     } catch (_) {}
 
     if (wasDragging) {
-      suppressClickUntil = performance.now() + 180;
-
-      // Hand off pointer velocity smoothly into momentum glide
       if (velocitySamples.length >= 2) {
         const first = velocitySamples[0];
         const last = velocitySamples[velocitySamples.length - 1];
@@ -987,6 +1476,16 @@ function wirePanGestures() {
         panVelY = allowV ? clamp((last.y - first.y) / dtSec, -1800, 1800) : 0;
       }
       wakeLoop();
+    } else if (e.type === 'pointerup') {
+      if (vpRectDirty) refreshViewportCenter();
+      const clickedIdx = resolveTileAt(
+        e.clientX - vpCenterX,
+        e.clientY - vpCenterY,
+        hoveredIndex
+      );
+      if (clickedIdx >= 0) {
+        openLightbox(clickedIdx);
+      }
     }
   }
 
@@ -995,29 +1494,26 @@ function wirePanGestures() {
 
   viewportEl.addEventListener('pointermove', (e) => {
     if (e.pointerType === 'touch' || isDragging || isOpen) return;
-    const rect = viewportEl.getBoundingClientRect();
     pointerInside = true;
-    pointerLocalX = e.clientX - (rect.left + rect.width * 0.5);
-    pointerLocalY = e.clientY - (rect.top + rect.height * 0.5);
-
-    const nextHover = resolveHoveredTile(pointerLocalX, pointerLocalY);
-    if (nextHover !== hoveredIndex) {
-      hoveredIndex = nextHover;
-      wakeLoop();
-    }
+    pendingClientX = e.clientX;
+    pendingClientY = e.clientY;
+    hoverCheckDirty = true;
+    wakeLoop();
   });
 
   viewportEl.addEventListener('pointerleave', () => {
     pointerInside = false;
+    hoverCheckDirty = false;
     if (hoveredIndex >= 0 && !isDragging) {
       hoveredIndex = -1;
       wakeLoop();
     }
   });
 
-  // Double-click empty canvas space to recenter smoothly
   viewportEl.addEventListener('dblclick', (e) => {
-    if (e.target === viewportEl && Math.hypot(panX, panY) > 12) {
+    if (vpRectDirty) refreshViewportCenter();
+    const hit = resolveTileAt(e.clientX - vpCenterX, e.clientY - vpCenterY, -1);
+    if (hit < 0 && Math.hypot(panX, panY) > 12) {
       recenterGallery();
     }
   });
@@ -1056,11 +1552,9 @@ function wireLightboxTouchSwipes() {
       const dt = Math.max(16, performance.now() - touchStartTime);
       const vx = Math.abs(dx) / dt;
 
-      // Horizontal swipe: next / previous photo
       if ((Math.abs(dx) > 42 || vx > 0.35) && Math.abs(dx) > Math.abs(dy) * 1.25) {
         stepLightbox(dx < 0 ? 1 : -1);
       } else if (dy > 76 && Math.abs(dy) > Math.abs(dx) * 1.4) {
-        // Downward swipe: dismiss photo viewer
         closeLightbox();
       }
     },
@@ -1072,6 +1566,17 @@ function wireEvents() {
   wirePanGestures();
   wireLightboxTouchSwipes();
 
+  if ('MutationObserver' in window) {
+    const themeObs = new MutationObserver(() => {
+      readTheme();
+      wakeLoop();
+    });
+    themeObs.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-day'],
+    });
+  }
+
   if (panBtnEl) {
     panBtnEl.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -1079,7 +1584,6 @@ function wireEvents() {
     });
   }
 
-  // Tapping outside the gallery cleanly exits 2D pan mode so page scroll is never accidentally left locked
   document.addEventListener('pointerdown', (e) => {
     if (!isFreePan || !galleryEl) return;
     if (!galleryEl.contains(e.target)) {
@@ -1134,6 +1638,14 @@ function wireEvents() {
     }
   });
 
+  window.addEventListener(
+    'scroll',
+    () => {
+      vpRectDirty = true;
+    },
+    { passive: true }
+  );
+
   window.addEventListener('resize', () => {
     readMetrics();
     wakeLoop();
@@ -1142,7 +1654,7 @@ function wireEvents() {
 }
 
 export async function initCyclingPhotos() {
-  if (!viewportEl) return;
+  if (!viewportEl || !canvasEl || !ctx) return;
   wireEvents();
 
   try {

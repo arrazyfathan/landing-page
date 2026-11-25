@@ -7,7 +7,7 @@ import {
   playSuccess
 } from './sound.js';
 import { initMarkers, morphMarker, repaintAllMarkers } from './marker.js?v=7';
-import { initCyclingPhotos } from './photos.js?v=17';
+import { initCyclingPhotos } from './photos.js?v=24';
 import { initTrophyCase } from './trophies.js?v=19';
 
 const root = document.documentElement;

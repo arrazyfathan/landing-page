@@ -42,7 +42,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png" />
   <link rel="manifest" href="/site.webmanifest" />
   <link rel="prefetch" href="/" />
-  <link rel="stylesheet" href="/css/styles.css?v=19" />
+  <link rel="stylesheet" href="/css/styles.css?v=21" />
 
   <!-- Structured Data (JSON-LD: WebPage + BreadcrumbList) -->
   <script type="application/ld+json">
@@ -322,14 +322,10 @@
           role="region"
           aria-label="Interactive road photo cluster — drag to explore, hover to zoom, click to open"
         >
-          <!-- Photo tiles populated from /assets/photos/photos.json by /js/photos.js -->
-
-          <!-- Multi-layer Radial Progressive Blur + Paper Opacity Vignette (z-index: 20) -->
-          <div class="watch-blur-layer watch-blur-layer--1" aria-hidden="true"></div>
-          <div class="watch-blur-layer watch-blur-layer--2" aria-hidden="true"></div>
-          <div class="watch-blur-layer watch-blur-layer--3" aria-hidden="true"></div>
-          <div class="watch-blur-layer watch-blur-layer--4" aria-hidden="true"></div>
-          <div class="watch-radial-fade" aria-hidden="true"></div>
+          <canvas class="watch-canvas" id="watch-canvas" aria-hidden="true"></canvas>
+          <div class="watch-a11y-list" id="watch-a11y-list" role="list">
+            <!-- Accessible keyboard focus buttons populated by /js/photos.js -->
+          </div>
         </div>
 
         <div class="watch-hud" aria-live="polite">
@@ -457,6 +453,6 @@
   <!-- Subtle Copy Toast -->
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-  <script type="module" src="/js/main.js?v=19"></script>
+  <script type="module" src="/js/main.js?v=24"></script>
 </body>
 </html>
