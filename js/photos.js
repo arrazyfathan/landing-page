@@ -83,13 +83,15 @@ let theme = {
   hoverShadow: 'rgba(23, 21, 15, 0.22)',
 };
 
-// Pre-rendered shared GPU sprites (ONE texture atlas + 1 shadow sprite + 1 half-res vignette)
+// Pre-rendered shared GPU sprites (ONE texture atlas + cached Light/Dark shadow & vignette sprites)
 let sharpAtlas = null;
 let sharpAtlasCtx = null;
 let blurAtlas = null;
 let blurAtlasCtx = null;
 let shadowSprite = null;
 let vignetteCanvas = null;
+const shadowSpriteCache = { light: null, dark: null };
+const vignetteCache = { light: null, dark: null };
 
 // Single-atlas cell dimensions (packed grid: 8 columns x 5 rows = up to 40 photos in ONE GPU texture!)
 const ATLAS_COLS = 8;
@@ -367,12 +369,18 @@ function bakePhotoIntoAtlases(img, idx) {
   }
 }
 
-/** Pre-bake ONE soft elevation shadow sprite on theme change (ZERO runtime ctx.shadowBlur!) */
+/** Pre-bake ONE soft elevation shadow sprite per theme (cached for 0ms theme toggles) */
 function rebuildShadowSprite() {
-  if (!shadowSprite) shadowSprite = document.createElement('canvas');
-  shadowSprite.width = SHADOW_W;
-  shadowSprite.height = SHADOW_H;
-  const c = shadowSprite.getContext('2d');
+  const key = theme.isDark ? 'dark' : 'light';
+  if (shadowSpriteCache[key]) {
+    shadowSprite = shadowSpriteCache[key];
+    return;
+  }
+
+  const canvas = document.createElement('canvas');
+  canvas.width = SHADOW_W;
+  canvas.height = SHADOW_H;
+  const c = canvas.getContext('2d');
   c.clearRect(0, 0, SHADOW_W, SHADOW_H);
 
   const cardW = SHADOW_W / (1 + SHADOW_PAD_X * 2);
@@ -397,6 +405,9 @@ function rebuildShadowSprite() {
   traceRoundedRect(c, ox + 1, oy + 1, cardW - 2, cardH - 2, 16);
   c.fill();
   c.restore();
+
+  shadowSpriteCache[key] = canvas;
+  shadowSprite = canvas;
 }
 
 function readTheme() {
@@ -428,15 +439,22 @@ function readTheme() {
   rebuildVignetteCanvas();
 }
 
-/** Pre-render half-res elliptical radial paper opacity vignette (4x faster GPU blit, visually identical!) */
+/** Pre-render half-res elliptical radial paper opacity vignette per theme (cached for 0ms theme toggles) */
 function rebuildVignetteCanvas() {
   const w = Math.max(1, Math.round(metrics.vpW * 0.5));
   const h = Math.max(1, Math.round(metrics.vpH * 0.5));
-  if (!vignetteCanvas) vignetteCanvas = document.createElement('canvas');
-  vignetteCanvas.width = w;
-  vignetteCanvas.height = h;
+  const key = theme.isDark ? 'dark' : 'light';
+  const cached = vignetteCache[key];
+  if (cached && cached.width === w && cached.height === h) {
+    vignetteCanvas = cached;
+    return;
+  }
 
-  const vCtx = vignetteCanvas.getContext('2d');
+  const canvas = cached || document.createElement('canvas');
+  canvas.width = w;
+  canvas.height = h;
+
+  const vCtx = canvas.getContext('2d');
   vCtx.clearRect(0, 0, w, h);
 
   const cx = w * 0.5;
@@ -458,6 +476,9 @@ function rebuildVignetteCanvas() {
   vCtx.fillStyle = grad;
   vCtx.fillRect(-2, -2, 4, 4);
   vCtx.restore();
+
+  vignetteCache[key] = canvas;
+  vignetteCanvas = canvas;
 }
 
 function refreshViewportCenter() {
@@ -1669,6 +1690,12 @@ function wireEvents() {
     wakeLoop();
     repositionOpenImage();
   });
+}
+
+export function syncCyclingPhotosTheme() {
+  if (!viewportEl || !canvasEl || !ctx || !tileStates.length) return;
+  readTheme();
+  tick(performance.now());
 }
 
 export async function initCyclingPhotos() {

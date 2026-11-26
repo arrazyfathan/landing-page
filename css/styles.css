@@ -9,16 +9,20 @@
 }
 
 ::view-transition-group(root) {
-  animation-duration: 380ms;
+  animation-duration: var(--vt-group-dur, 380ms);
   animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 ::view-transition-old(root) {
-  animation: vt-page-out 260ms cubic-bezier(0.32, 0, 0.67, 0) both;
+  animation: var(--vt-old-anim, vt-page-out 260ms cubic-bezier(0.32, 0, 0.67, 0) both);
+  mix-blend-mode: normal;
+  z-index: 1;
 }
 
 ::view-transition-new(root) {
-  animation: vt-page-in 380ms cubic-bezier(0.22, 1, 0.36, 1) 40ms both;
+  animation: var(--vt-new-anim, vt-page-in 380ms cubic-bezier(0.22, 1, 0.36, 1) 40ms both);
+  mix-blend-mode: normal;
+  z-index: 2;
 }
 
 @keyframes vt-page-out {
@@ -110,6 +114,30 @@ html[data-profile="cycling"]::view-transition-image-pair(avatar-cycling) {
 ::view-transition-new(topbar-tools) {
   animation: none;
   opacity: 1;
+}
+
+/* Same-Document Theme Switch View Transition (smooth 460ms GPU cross-fade) */
+html.is-theme-switching {
+  --vt-group-dur: 460ms;
+  --vt-old-anim: none;
+  --vt-new-anim: vt-theme-fade 460ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+html.is-theme-switching *,
+html.is-theme-switching *::before,
+html.is-theme-switching *::after {
+  transition: none !important;
+}
+
+html.is-theme-switching .mini-photo--work,
+html.is-theme-switching .mini-photo--cycling,
+html.is-theme-switching .topbar-tools {
+  view-transition-name: none !important;
+}
+
+@keyframes vt-theme-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 :root {
@@ -232,7 +260,6 @@ body {
   line-height: 1.68;
   color: var(--ink);
   background-color: var(--bg);
-  transition: background-color 240ms var(--ease-out), color 240ms var(--ease-out);
   overflow-x: clip;
 }
 

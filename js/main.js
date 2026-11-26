@@ -8,7 +8,7 @@ import {
   playSuccess
 } from './sound.js?v=2';
 import { initMarkers, morphMarker, repaintAllMarkers } from './marker.js?v=11';
-import { initCyclingPhotos } from './photos.js?v=26';
+import { initCyclingPhotos, syncCyclingPhotosTheme } from './photos.js?v=27';
 import { initTrophyCase } from './trophies.js?v=24';
 import { initRidePodcasts } from './podcasts.js?v=5';
 
@@ -176,15 +176,50 @@ function syncDayUI() {
   if (themeMeta) themeMeta.setAttribute('content', isSun ? '#14120E' : '#FBFAF7');
 }
 
-function toggleDay() {
-  const next = root.getAttribute('data-day') === 'sun' ? 'sat' : 'sun';
+let activeThemeTransition = null;
+
+function applyDayTheme(next) {
   root.setAttribute('data-day', next);
   try {
     sessionStorage.setItem('arrazy-day', next);
   } catch (_) {}
   syncDayUI();
   repaintAllMarkers();
+  syncCyclingPhotosTheme();
+}
+
+function toggleDay() {
+  const next = root.getAttribute('data-day') === 'sun' ? 'sat' : 'sun';
   playClick();
+
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const canViewTransition = typeof document.startViewTransition === 'function' && !reducedMotion;
+
+  if (!canViewTransition) {
+    applyDayTheme(next);
+    return;
+  }
+
+  if (activeThemeTransition) {
+    try {
+      activeThemeTransition.skipTransition();
+    } catch (_) {}
+    activeThemeTransition = null;
+  }
+
+  root.classList.add('is-theme-switching');
+
+  const vt = document.startViewTransition(() => {
+    applyDayTheme(next);
+  });
+  activeThemeTransition = vt;
+
+  vt.finished.finally(() => {
+    if (activeThemeTransition === vt) {
+      activeThemeTransition = null;
+      root.classList.remove('is-theme-switching');
+    }
+  });
 }
 
 if (dayToggle) {
