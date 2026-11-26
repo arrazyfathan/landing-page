@@ -1,7 +1,7 @@
 import { playPop, playHover } from './sound.js?v=2';
 
 const TILTS = [-3, 2.2, -2, 2.8, -1.6, 2.4, -1.8, 1.8, -2.6, 2.2];
-const KUDOS_ICON_SRC = '/assets/icons/cycling/kudos.svg';
+const KUDOS_ICON_SRC = '/assets/icons/cycling/kudos.svg?v=2';
 let activeKudosCount = 0;
 
 function prefersReducedMotion() {

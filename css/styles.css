@@ -2224,18 +2224,14 @@ html[data-day="sun"] .trophy-shelf-item.is-active .trophy-img--square {
   opacity: 0.7;
 }
 
-/* Desktop Strava Kudos Pop Burst on Trophy Badge Click */
+/* Strava Kudos Die-Cut Sticker Pop Burst on Trophy Badge Click */
 .trophy-kudos {
   position: fixed;
   z-index: 80;
   display: grid;
   place-items: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: #FFFFFF;
-  border: 1.5px solid #FFFFFF;
-  box-shadow: 0 5px 14px rgba(252, 82, 0, 0.24), 0 0 0 1px rgba(252, 82, 0, 0.16);
+  width: 28px;
+  height: 28px;
   pointer-events: none;
   opacity: 0;
   will-change: transform, opacity;
@@ -2243,24 +2239,19 @@ html[data-day="sun"] .trophy-shelf-item.is-active .trophy-img--square {
 }
 
 .trophy-kudos--sm {
-  width: 24px;
-  height: 24px;
-}
-
-html[data-day="sun"] .trophy-kudos {
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.52), 0 0 0 1px rgba(252, 82, 0, 0.22);
+  width: 21px;
+  height: 21px;
 }
 
 .trophy-kudos img {
   display: block;
-  width: 16px;
-  height: 16px;
-  transform: translateY(-0.5px);
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 3px 6px rgba(23, 21, 15, 0.22));
 }
 
-.trophy-kudos--sm img {
-  width: 13px;
-  height: 13px;
+html[data-day="sun"] .trophy-kudos img {
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.55));
 }
 
 @keyframes trophy-kudos-float {
@@ -3221,7 +3212,7 @@ html[data-day="sun"] .pod-rail-art {
   }
 
   .trophy-shelf-item {
-    cursor: url('/assets/icons/cycling/kudos-cursor.svg') 14 14, pointer;
+    cursor: url('/assets/icons/cycling/kudos-cursor.svg?v=2') 13 13, pointer;
   }
 
   .trophy-strava-link:hover {
