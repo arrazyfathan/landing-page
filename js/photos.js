@@ -23,8 +23,8 @@ const hudIndexEl = document.getElementById('watch-hud-index');
 const panBtnEl = document.getElementById('watch-pan-btn');
 const resetBtnEl = document.getElementById('watch-reset-btn');
 
-// Opaque canvas (alpha: false) eliminates full-viewport compositor alpha blending every frame
-const ctx = canvasEl ? canvasEl.getContext('2d', { alpha: false }) : null;
+// Alpha-capable canvas so Cutting Mat mode lets the real sunlit drafting grid show seamlessly behind photos
+const ctx = canvasEl ? canvasEl.getContext('2d', { alpha: true }) : null;
 
 // Frosted FLIP Lightbox DOM
 const viewer = document.getElementById('photo-lightbox');
@@ -72,7 +72,9 @@ let vpRectDirty = true;
 let dpr = 1;
 
 let theme = {
+  key: 'light',
   isDark: false,
+  isMat: false,
   bgHex: '#FBFAF7',
   bgRgb: '251, 250, 247',
   surface: '#FFFFFF',
@@ -83,15 +85,15 @@ let theme = {
   hoverShadow: 'rgba(23, 21, 15, 0.22)',
 };
 
-// Pre-rendered shared GPU sprites (ONE texture atlas + cached Light/Dark shadow & vignette sprites)
+// Pre-rendered shared GPU sprites (ONE texture atlas + cached per-theme shadow & vignette sprites)
 let sharpAtlas = null;
 let sharpAtlasCtx = null;
 let blurAtlas = null;
 let blurAtlasCtx = null;
 let shadowSprite = null;
 let vignetteCanvas = null;
-const shadowSpriteCache = { light: null, dark: null };
-const vignetteCache = { light: null, dark: null };
+const shadowSpriteCache = {};
+const vignetteCache = {};
 
 // Single-atlas cell dimensions (packed grid: 8 columns x 5 rows = up to 40 photos in ONE GPU texture!)
 const ATLAS_COLS = 8;
@@ -371,7 +373,7 @@ function bakePhotoIntoAtlases(img, idx) {
 
 /** Pre-bake ONE soft elevation shadow sprite per theme (cached for 0ms theme toggles) */
 function rebuildShadowSprite() {
-  const key = theme.isDark ? 'dark' : 'light';
+  const key = theme.key;
   if (shadowSpriteCache[key]) {
     shadowSprite = shadowSpriteCache[key];
     return;
@@ -411,39 +413,64 @@ function rebuildShadowSprite() {
 }
 
 function readTheme() {
-  const isDark = document.documentElement.getAttribute('data-day') === 'sun';
-  theme = isDark
-    ? {
-        isDark: true,
-        bgHex: '#14120E',
-        bgRgb: '20, 18, 14',
-        surface: '#1D1B16',
-        sunken: '#24211B',
-        accent: '#F5C128',
-        tileRim: 'rgba(244, 239, 228, 0.14)',
-        hoverRim: 'rgba(244, 239, 228, 0.24)',
-        hoverShadow: 'rgba(0, 0, 0, 0.62)',
-      }
-    : {
-        isDark: false,
-        bgHex: '#FBFAF7',
-        bgRgb: '251, 250, 247',
-        surface: '#FFFFFF',
-        sunken: '#F2F0EA',
-        accent: '#FFC629',
-        tileRim: 'rgba(23, 21, 15, 0.09)',
-        hoverRim: 'rgba(23, 21, 15, 0.16)',
-        hoverShadow: 'rgba(23, 21, 15, 0.22)',
-      };
+  const rootEl = document.documentElement;
+  const day = rootEl.getAttribute('data-day');
+  const mat = rootEl.getAttribute('data-mat') || 'green';
+
+  if (day === 'mat') {
+    const cs = getComputedStyle(rootEl);
+    const isLightInk = mat !== 'orange';
+    theme = {
+      key: `mat-${mat}`,
+      isDark: isLightInk,
+      isMat: true,
+      bgHex: cs.getPropertyValue('--bg').trim() || '#095848',
+      bgRgb: cs.getPropertyValue('--bg-rgb').trim() || '9, 88, 72',
+      surface: cs.getPropertyValue('--ink').trim() || '#FFFFFF',
+      sunken: cs.getPropertyValue('--sunken').trim() || 'rgba(0, 0, 0, 0.25)',
+      accent: cs.getPropertyValue('--accent').trim() || '#FFD84D',
+      tileRim: isLightInk ? 'rgba(255, 255, 255, 0.22)' : 'rgba(21, 10, 5, 0.22)',
+      hoverRim: isLightInk ? 'rgba(255, 255, 255, 0.42)' : 'rgba(21, 10, 5, 0.42)',
+      hoverShadow: isLightInk ? 'rgba(0, 0, 0, 0.48)' : 'rgba(48, 10, 0, 0.34)',
+    };
+  } else if (day === 'sun') {
+    theme = {
+      key: 'dark',
+      isDark: true,
+      isMat: false,
+      bgHex: '#14120E',
+      bgRgb: '20, 18, 14',
+      surface: '#1D1B16',
+      sunken: '#24211B',
+      accent: '#F5C128',
+      tileRim: 'rgba(244, 239, 228, 0.14)',
+      hoverRim: 'rgba(244, 239, 228, 0.24)',
+      hoverShadow: 'rgba(0, 0, 0, 0.62)',
+    };
+  } else {
+    theme = {
+      key: 'light',
+      isDark: false,
+      isMat: false,
+      bgHex: '#FBFAF7',
+      bgRgb: '251, 250, 247',
+      surface: '#FFFFFF',
+      sunken: '#F2F0EA',
+      accent: '#FFC629',
+      tileRim: 'rgba(23, 21, 15, 0.09)',
+      hoverRim: 'rgba(23, 21, 15, 0.16)',
+      hoverShadow: 'rgba(23, 21, 15, 0.22)',
+    };
+  }
   rebuildShadowSprite();
   rebuildVignetteCanvas();
 }
 
-/** Pre-render half-res elliptical radial paper opacity vignette per theme (cached for 0ms theme toggles) */
+/** Pre-render half-res elliptical radial opacity vignette per theme (cached for 0ms theme toggles) */
 function rebuildVignetteCanvas() {
   const w = Math.max(1, Math.round(metrics.vpW * 0.5));
   const h = Math.max(1, Math.round(metrics.vpH * 0.5));
-  const key = theme.isDark ? 'dark' : 'light';
+  const key = theme.isMat ? 'mat-mask' : theme.key;
   const cached = vignetteCache[key];
   if (cached && cached.width === w && cached.height === h) {
     vignetteCanvas = cached;
@@ -466,12 +493,13 @@ function rebuildVignetteCanvas() {
   vCtx.translate(cx, cy);
   vCtx.scale(rx, ry);
 
+  const rgb = theme.isMat ? '0, 0, 0' : theme.bgRgb;
   const grad = vCtx.createRadialGradient(0, 0, 0.44, 0, 0, 1.02);
-  grad.addColorStop(0.0, `rgba(${theme.bgRgb}, 0)`);
-  grad.addColorStop(0.28, `rgba(${theme.bgRgb}, 0.15)`);
-  grad.addColorStop(0.58, `rgba(${theme.bgRgb}, 0.52)`);
-  grad.addColorStop(0.82, `rgba(${theme.bgRgb}, 0.86)`);
-  grad.addColorStop(1.0, `rgba(${theme.bgRgb}, 1)`);
+  grad.addColorStop(0.0, `rgba(${rgb}, 0)`);
+  grad.addColorStop(0.28, `rgba(${rgb}, 0.15)`);
+  grad.addColorStop(0.58, `rgba(${rgb}, 0.52)`);
+  grad.addColorStop(0.82, `rgba(${rgb}, 0.86)`);
+  grad.addColorStop(1.0, `rgba(${rgb}, 1)`);
 
   vCtx.fillStyle = grad;
   vCtx.fillRect(-2, -2, 4, 4);
@@ -990,13 +1018,18 @@ function tick(now) {
   ctx.imageSmoothingQuality = 'low'; // hardware GPU bilinear (sprites already @2x high-quality baked!)
 
   ctx.globalAlpha = 1;
-  ctx.fillStyle = theme.bgHex;
-  ctx.fillRect(0, 0, metrics.vpW, metrics.vpH);
+  ctx.globalCompositeOperation = 'source-over';
+  if (theme.isMat) {
+    ctx.clearRect(0, 0, metrics.vpW, metrics.vpH);
+  } else {
+    ctx.fillStyle = theme.bgHex;
+    ctx.fillRect(0, 0, metrics.vpW, metrics.vpH);
+  }
 
   const cx = metrics.vpW * 0.5;
   const cy = metrics.vpH * 0.5;
 
-  // Background tiles (behind radial paper vignette)
+  // Background tiles (behind radial vignette / alpha fade)
   for (let k = 0; k < drawOrder.length; k++) {
     const idx = drawOrder[k];
     const st = tileStates[idx];
@@ -1004,10 +1037,16 @@ function tick(now) {
     drawTile(st, idx, cx, cy, false, false);
   }
 
-  // Pre-rendered half-res radial paper opacity vignette (1 GPU quad)
+  // Pre-rendered half-res radial vignette (destination-out alpha fade in Cutting Mat mode so grid shines through)
   if (vignetteCanvas) {
     ctx.globalAlpha = 1;
-    ctx.drawImage(vignetteCanvas, 0, 0, metrics.vpW, metrics.vpH);
+    if (theme.isMat) {
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.drawImage(vignetteCanvas, 0, 0, metrics.vpW, metrics.vpH);
+      ctx.globalCompositeOperation = 'source-over';
+    } else {
+      ctx.drawImage(vignetteCanvas, 0, 0, metrics.vpW, metrics.vpH);
+    }
   }
 
   // Departing/settling tiles (smoothly shrinking back without shadowBlur!)
@@ -1596,7 +1635,7 @@ function wireEvents() {
     });
     themeObs.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['data-day'],
+      attributeFilter: ['data-day', 'data-mat'],
     });
   }
 

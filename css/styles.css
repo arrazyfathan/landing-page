@@ -235,6 +235,242 @@ html[data-profile="cycling"][data-day="sun"] {
   --wave-accent: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='%23F5C128' stroke-width='1.9'/%3E%3C/svg%3E");
 }
 
+/* ==========================================================================
+   Cutting Mat Custom Theme ("mat") — 7 Studio Cutting Mat Palettes
+   ========================================================================== */
+html[data-day="mat"] {
+  /* Default: Classic OLFA Emerald Green (#095848) */
+  --bg: #095848;
+  --bg-rgb: 9, 88, 72;
+  --surface: rgba(215, 255, 244, 0.11);
+  --surface-solid: #116957;
+  --sunken: rgba(3, 36, 29, 0.34);
+  --ink: #F2FFF9;
+  --ink-2: #CBEFE3;
+  --muted: #A2DCCB;
+  --quiet: #79BDA9;
+  --btn-ink: #073D32;
+  --line: rgba(114, 255, 220, 0.20);
+  --line-strong: rgba(114, 255, 220, 0.38);
+
+  --mat-swatch: #095848;
+  --mat-grid-minor: rgba(98, 255, 214, 0.13);
+  --mat-grid-major: rgba(98, 255, 214, 0.36);
+  --mat-ruler: rgba(132, 255, 223, 0.72);
+  --mat-clearance: rgba(7, 72, 58, 0.34);
+  --mat-shadow-dark: rgba(0, 14, 10, 0.62);
+  --mat-shadow-light: rgba(140, 255, 226, 0.20);
+
+  --accent: #5EFFD4;
+  --accent-ink: #06352B;
+  --arrow: #5EFFD4;
+  --wave-rest: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='rgba(242,255,249,0.40)' stroke-width='1.55'/%3E%3C/svg%3E");
+  --wave-accent: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='%235EFFD4' stroke-width='1.9'/%3E%3C/svg%3E");
+  --wave-popover: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='%23073D32' stroke-width='1.6'/%3E%3C/svg%3E");
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.20);
+  --shadow-pill: 0 4px 18px rgba(0, 0, 0, 0.26);
+  --shadow-photo: 0 3px 10px rgba(0, 0, 0, 0.34);
+  --topbar-fade: linear-gradient(
+    to bottom,
+    rgba(var(--bg-rgb), 0.92) 0%,
+    rgba(var(--bg-rgb), 0.78) 68%,
+    rgba(var(--bg-rgb), 0) 100%
+  );
+}
+
+/* 1. Obsidian Black (#000000) */
+html[data-day="mat"][data-mat="black"] {
+  --bg: #121315;
+  --bg-rgb: 18, 19, 21;
+  --surface: rgba(255, 255, 255, 0.085);
+  --surface-solid: #1E2024;
+  --sunken: rgba(255, 255, 255, 0.05);
+  --ink: #F5F5F2;
+  --ink-2: #D4D4CE;
+  --muted: #A6A6A0;
+  --quiet: #82827C;
+  --btn-ink: #121315;
+  --line: rgba(255, 255, 255, 0.14);
+  --line-strong: rgba(255, 255, 255, 0.28);
+  --mat-swatch: #000000;
+  --mat-grid-minor: rgba(255, 255, 255, 0.085);
+  --mat-grid-major: rgba(255, 255, 255, 0.24);
+  --mat-ruler: rgba(255, 255, 255, 0.56);
+  --mat-clearance: rgba(14, 15, 17, 0.38);
+  --mat-shadow-dark: rgba(0, 0, 0, 0.78);
+  --mat-shadow-light: rgba(255, 255, 255, 0.17);
+  --accent: #5CC2FF;
+  --accent-ink: #081523;
+  --arrow: #5CC2FF;
+  --wave-rest: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='rgba(245,245,242,0.34)' stroke-width='1.55'/%3E%3C/svg%3E");
+  --wave-accent: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='%235CC2FF' stroke-width='1.9'/%3E%3C/svg%3E");
+  --wave-popover: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='%23121315' stroke-width='1.6'/%3E%3C/svg%3E");
+}
+
+/* 2. Graphite Gray (#5A5A5A) */
+html[data-day="mat"][data-mat="gray"] {
+  --bg: #5A5A5A;
+  --bg-rgb: 90, 90, 90;
+  --surface: rgba(255, 255, 255, 0.13);
+  --surface-solid: #6B6B6B;
+  --sunken: rgba(18, 18, 18, 0.24);
+  --ink: #FFFFFF;
+  --ink-2: #ECECEC;
+  --muted: #D8D8D8;
+  --quiet: #C2C2C2;
+  --btn-ink: #1C1C1C;
+  --line: rgba(255, 255, 255, 0.22);
+  --line-strong: rgba(255, 255, 255, 0.40);
+  --mat-swatch: #5A5A5A;
+  --mat-grid-minor: rgba(255, 255, 255, 0.13);
+  --mat-grid-major: rgba(255, 255, 255, 0.34);
+  --mat-ruler: rgba(255, 255, 255, 0.68);
+  --mat-clearance: rgba(70, 70, 70, 0.34);
+  --mat-shadow-dark: rgba(8, 8, 8, 0.58);
+  --mat-shadow-light: rgba(255, 255, 255, 0.24);
+  --accent: #73C7FF;
+  --accent-ink: #0C1824;
+  --arrow: #73C7FF;
+  --wave-rest: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='rgba(255,255,255,0.42)' stroke-width='1.55'/%3E%3C/svg%3E");
+  --wave-accent: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='%2373C7FF' stroke-width='1.9'/%3E%3C/svg%3E");
+  --wave-popover: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='%231C1C1C' stroke-width='1.6'/%3E%3C/svg%3E");
+}
+
+/* 3. Crimson Maroon (#3D0000) */
+html[data-day="mat"][data-mat="maroon"] {
+  --bg: #4A0404;
+  --bg-rgb: 74, 4, 4;
+  --surface: rgba(255, 224, 224, 0.11);
+  --surface-solid: #601010;
+  --sunken: rgba(30, 0, 0, 0.36);
+  --ink: #FFF4F4;
+  --ink-2: #F7D1D1;
+  --muted: #E3A7A7;
+  --quiet: #C68383;
+  --btn-ink: #3D0000;
+  --line: rgba(255, 212, 212, 0.19);
+  --line-strong: rgba(255, 212, 212, 0.36);
+  --mat-swatch: #3D0000;
+  --mat-grid-minor: rgba(255, 198, 198, 0.13);
+  --mat-grid-major: rgba(255, 206, 206, 0.34);
+  --mat-ruler: rgba(255, 216, 216, 0.68);
+  --mat-clearance: rgba(58, 2, 2, 0.34);
+  --mat-shadow-dark: rgba(12, 0, 0, 0.70);
+  --mat-shadow-light: rgba(255, 118, 102, 0.24);
+  --accent: #FFB4AB;
+  --accent-ink: #3B0303;
+  --arrow: #FFB4AB;
+  --wave-rest: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='rgba(255,244,244,0.38)' stroke-width='1.55'/%3E%3C/svg%3E");
+  --wave-accent: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='%23FFB4AB' stroke-width='1.9'/%3E%3C/svg%3E");
+  --wave-popover: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='%233D0000' stroke-width='1.6'/%3E%3C/svg%3E");
+}
+
+/* 4. Cobalt / Blueprint Blue (#002F9E) */
+html[data-day="mat"][data-mat="blue"] {
+  --bg: #002F9E;
+  --bg-rgb: 0, 47, 158;
+  --surface: rgba(226, 239, 255, 0.12);
+  --surface-solid: #1141B0;
+  --sunken: rgba(0, 20, 74, 0.34);
+  --ink: #F5F9FF;
+  --ink-2: #D6E6FF;
+  --muted: #B0CAFC;
+  --quiet: #89ADEE;
+  --btn-ink: #00257D;
+  --line: rgba(215, 232, 255, 0.21);
+  --line-strong: rgba(215, 232, 255, 0.39);
+  --mat-swatch: #002F9E;
+  --mat-grid-minor: rgba(215, 232, 255, 0.14);
+  --mat-grid-major: rgba(228, 240, 255, 0.36);
+  --mat-ruler: rgba(228, 240, 255, 0.72);
+  --mat-clearance: rgba(0, 38, 130, 0.34);
+  --mat-shadow-dark: rgba(0, 10, 42, 0.64);
+  --mat-shadow-light: rgba(130, 190, 255, 0.24);
+  --accent: #7CE0FF;
+  --accent-ink: #001F6B;
+  --arrow: #7CE0FF;
+  --wave-rest: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='rgba(245,249,255,0.40)' stroke-width='1.55'/%3E%3C/svg%3E");
+  --wave-accent: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='%237CE0FF' stroke-width='1.9'/%3E%3C/svg%3E");
+  --wave-popover: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='%2300257D' stroke-width='1.6'/%3E%3C/svg%3E");
+}
+
+/* 5. Signal Orange (#FF3F0A) — Carbon-black print & grid matching Frame-4.png */
+html[data-day="mat"][data-mat="orange"] {
+  --bg: #FF3F0A;
+  --bg-rgb: 255, 63, 10;
+  --surface: rgba(21, 10, 5, 0.10);
+  --surface-solid: #E93908;
+  --sunken: rgba(21, 10, 5, 0.16);
+  --ink: #140904;
+  --ink-2: #221008;
+  --muted: #301509;
+  --quiet: #4A200D;
+  --btn-ink: #FFF4EC;
+  --line: rgba(21, 10, 5, 0.20);
+  --line-strong: rgba(21, 10, 5, 0.38);
+  --mat-swatch: #FF3F0A;
+  --mat-grid-minor: rgba(18, 9, 4, 0.13);
+  --mat-grid-major: rgba(18, 9, 4, 0.34);
+  --mat-ruler: rgba(18, 9, 4, 0.68);
+  --mat-clearance: rgba(255, 63, 10, 0.32);
+  --mat-shadow-dark: rgba(92, 10, 0, 0.50);
+  --mat-shadow-light: rgba(255, 206, 132, 0.28);
+  --accent: #150A05;
+  --accent-ink: #FFF4EC;
+  --arrow: #150A05;
+  --wave-rest: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='rgba(21,10,5,0.38)' stroke-width='1.55'/%3E%3C/svg%3E");
+  --wave-accent: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='%23150A05' stroke-width='1.9'/%3E%3C/svg%3E");
+  --wave-popover: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='%23FFF4EC' stroke-width='1.6'/%3E%3C/svg%3E");
+  --shadow-sm: 0 2px 8px rgba(48, 10, 0, 0.16);
+  --shadow-pill: 0 4px 16px rgba(48, 10, 0, 0.20);
+  --shadow-photo: 0 3px 10px rgba(48, 10, 0, 0.24);
+}
+
+/* 6. Rose Pink (#CA6395) */
+html[data-day="mat"][data-mat="pink"] {
+  --bg: #AD4679;
+  --bg-rgb: 173, 70, 121;
+  --surface: rgba(255, 240, 248, 0.15);
+  --surface-solid: #B95586;
+  --sunken: rgba(66, 14, 40, 0.28);
+  --ink: #FFFFFF;
+  --ink-2: #FFF3F9;
+  --muted: #FFECF6;
+  --quiet: #F5C3DC;
+  --btn-ink: #3B0F26;
+  --line: rgba(255, 240, 248, 0.22);
+  --line-strong: rgba(255, 240, 248, 0.42);
+  --mat-swatch: #CA6395;
+  --mat-grid-minor: rgba(255, 240, 248, 0.14);
+  --mat-grid-major: rgba(255, 240, 248, 0.36);
+  --mat-ruler: rgba(255, 240, 248, 0.72);
+  --mat-clearance: rgba(168, 68, 118, 0.32);
+  --mat-shadow-dark: rgba(58, 8, 34, 0.56);
+  --mat-shadow-light: rgba(255, 212, 236, 0.28);
+  --accent: #270C1B;
+  --accent-ink: #FFF5FA;
+  --arrow: #FFFFFF;
+  --wave-rest: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='rgba(255,255,255,0.44)' stroke-width='1.55'/%3E%3C/svg%3E");
+  --wave-accent: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='%23FFFFFF' stroke-width='1.9'/%3E%3C/svg%3E");
+  --wave-popover: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='%233B0F26' stroke-width='1.6'/%3E%3C/svg%3E");
+}
+
+/* Cycling Mode Accent Harmonization on Cutting Mat */
+html[data-profile="cycling"][data-day="mat"] {
+  --accent: #FFD84D;
+  --accent-ink: #14120E;
+  --arrow: #FFD84D;
+  --wave-accent: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='%23FFD84D' stroke-width='1.9'/%3E%3C/svg%3E");
+}
+
+html[data-profile="cycling"][data-day="mat"][data-mat="orange"] {
+  --accent: #FFF3B0;
+  --accent-ink: #150A05;
+  --arrow: #150A05;
+  --wave-accent: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='%23150A05' stroke-width='1.9'/%3E%3C/svg%3E");
+}
+
 @keyframes wave-flow {
   from { background-position: 0 100%; }
   to   { background-position: 16px 100%; }
@@ -624,12 +860,19 @@ html[data-profile="cycling"] .mini-photo--work {
   view-transition-name: topbar-tools;
 }
 
+.theme-control {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
 .theme-switch {
   position: relative;
   display: inline-grid;
-  grid-template-columns: 24px 24px;
+  grid-template-columns: repeat(3, 24px);
+  column-gap: 4px;
   align-items: center;
-  width: 56px;
+  width: 88px;
   height: 32px;
   padding: 3px;
   border-radius: var(--r-pill);
@@ -637,10 +880,6 @@ html[data-profile="cycling"] .mini-photo--work {
   border: 1px solid var(--line);
   box-shadow: inset 0 1px 2px rgba(23, 21, 15, 0.05);
   transition: transform 150ms var(--ease-out), border-color 180ms var(--ease-out);
-}
-
-.theme-switch:active {
-  transform: scale(0.96);
 }
 
 .theme-thumb {
@@ -654,11 +893,18 @@ html[data-profile="cycling"] .mini-photo--work {
   border: 1px solid var(--line);
   box-shadow: 0 1px 4px rgba(23, 21, 15, 0.12);
   transform: translateX(0);
-  transition: transform 420ms var(--spring), background-color 200ms var(--ease-out);
+  pointer-events: none;
+  transition: transform 420ms var(--spring), background-color 200ms var(--ease-out), border-color 200ms var(--ease-out);
 }
 
 html[data-day="sun"] .theme-thumb {
-  transform: translateX(24px);
+  transform: translateX(28px);
+}
+
+html[data-day="mat"] .theme-thumb {
+  transform: translateX(56px);
+  background: var(--ink);
+  border-color: transparent;
 }
 
 .theme-opt {
@@ -668,13 +914,200 @@ html[data-day="sun"] .theme-thumb {
   place-items: center;
   width: 24px;
   height: 24px;
+  border-radius: 50%;
   color: var(--quiet);
-  transition: color 180ms var(--ease-out);
+  transition: color 180ms var(--ease-out), transform 140ms var(--ease-out);
+}
+
+.theme-opt:active {
+  transform: scale(0.9);
+}
+
+.theme-opt:focus-visible {
+  outline-offset: 1px;
 }
 
 html[data-day="sat"] .theme-opt--sun,
 html[data-day="sun"] .theme-opt--moon {
   color: var(--ink);
+}
+
+html[data-day="mat"] .theme-opt--mat {
+  color: var(--btn-ink, var(--bg));
+}
+
+/* Cutting Mat Color Picker Pop-up (modeled on cutting-mat/Colors.png) */
+.mat-picker {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: -10px;
+  z-index: 90;
+  width: 218px;
+  padding: 14px 15px 16px;
+  border-radius: 22px;
+  background: #EFEFEF;
+  color: #17150F;
+  border: 1px solid rgba(23, 21, 15, 0.12);
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.22),
+    0 2px 6px rgba(0, 0, 0, 0.10);
+  opacity: 0;
+  transform: translateY(-8px) scale(0.94);
+  transform-origin: top right;
+  pointer-events: none;
+  transition:
+    opacity 180ms var(--ease-out),
+    transform 300ms var(--spring-soft);
+}
+
+.mat-picker[hidden] {
+  display: none;
+}
+
+.mat-picker.is-open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.mat-picker::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  right: 20px;
+  width: 10px;
+  height: 10px;
+  background: #EFEFEF;
+  border-top: 1px solid rgba(23, 21, 15, 0.10);
+  border-left: 1px solid rgba(23, 21, 15, 0.10);
+  transform: rotate(45deg);
+  border-radius: 2px 0 0 0;
+  pointer-events: none;
+}
+
+.mat-picker-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 15px;
+  margin-bottom: 11px;
+  padding-inline: 2px;
+  white-space: nowrap;
+}
+
+.mat-picker-title {
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-family: var(--text);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  color: rgba(23, 21, 15, 0.50);
+}
+
+.mat-picker-name {
+  min-width: 0;
+  font-family: var(--text);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  color: #17150F;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mat-swatch-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.mat-swatch {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  border-radius: 12px;
+  background-color: var(--swatch);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.12),
+    0 2px 5px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  transition: transform 240ms var(--spring), box-shadow 180ms var(--ease-out);
+}
+
+.mat-swatch--center {
+  grid-column: 2;
+}
+
+/* Subtle engraved cutting-mat crosshatch inside each swatch */
+.mat-swatch::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.24) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.24) 1px, transparent 1px);
+  background-size: 12px 12px;
+  background-position: center;
+  opacity: 0.28;
+  transition: opacity 180ms var(--ease-out);
+  pointer-events: none;
+}
+
+.mat-swatch[data-mat-color="orange"]::before {
+  background-image:
+    linear-gradient(to right, rgba(20, 10, 5, 0.28) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(20, 10, 5, 0.28) 1px, transparent 1px);
+}
+
+.mat-swatch[data-mat-color="green"]::before {
+  background-image:
+    linear-gradient(to right, rgba(94, 255, 212, 0.34) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(94, 255, 212, 0.34) 1px, transparent 1px);
+}
+
+/* Crisp active checkmark badge */
+.mat-swatch::after {
+  content: "";
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.94);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.2 8.4l3.1 3.1 6.5-6.6' fill='none' stroke='%23000' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 14px 14px no-repeat;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.2 8.4l3.1 3.1 6.5-6.6' fill='none' stroke='%23000' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 14px 14px no-repeat;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: opacity 160ms var(--ease-out), transform 260ms var(--spring);
+}
+
+.mat-swatch[data-mat-color="orange"]::after {
+  background: #150A05;
+}
+
+.mat-swatch[aria-pressed="true"] {
+  box-shadow:
+    0 0 0 2px #EFEFEF,
+    0 0 0 4px #17150F,
+    0 4px 10px rgba(0, 0, 0, 0.18);
+}
+
+.mat-swatch[aria-pressed="true"]::before {
+  opacity: 0.52;
+}
+
+.mat-swatch[aria-pressed="true"]::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.mat-swatch:active {
+  transform: scale(0.92);
 }
 
 .icon-btn {
@@ -1826,16 +2259,12 @@ html[data-day="sun"] .inline-avatar--cycling {
 .viewer-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(251, 250, 247, 0.86);
+  background: rgba(var(--bg-rgb), 0.86);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   opacity: 0;
   cursor: zoom-out;
   transition: opacity 480ms var(--viewer-in-out);
-}
-
-html[data-day="sun"] .viewer-backdrop {
-  background: rgba(20, 18, 14, 0.86);
 }
 
 .photo-viewer.is-open .viewer-backdrop {
@@ -2550,7 +2979,7 @@ html[data-day="sun"] .pod-rail-disc {
     circle at 64% 50%,
     transparent 0px,
     transparent 9px,
-    rgba(255, 198, 41, 0.15) 9.5px,
+    color-mix(in srgb, var(--accent) 20%, transparent) 9.5px,
     transparent 11px
   );
 }
@@ -3734,6 +4163,427 @@ html[data-day="sun"] .pod-rail-art {
   }
 }
 
+/* ==========================================================================
+   Cutting Mat Stage & Full Content Harmonization (active when data-day="mat")
+   ========================================================================== */
+.mat-stage {
+  display: none;
+}
+
+html[data-day="mat"] .mat-stage {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100lvh;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  contain: strict;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Dual-scale cutting mat drafting grid (minor 24px + major 120px) */
+.mat-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, var(--mat-grid-major) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--mat-grid-major) 1px, transparent 1px),
+    linear-gradient(to right, var(--mat-grid-minor) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--mat-grid-minor) 1px, transparent 1px);
+  background-size: 120px 120px, 120px 120px, 24px 24px, 24px 24px;
+  background-position: center top;
+}
+
+/* Center clearance frame (like the clean work area in cutting-mat/Frame*.png) */
+.mat-clearance {
+  position: absolute;
+  top: 44px;
+  bottom: 44px;
+  left: 50%;
+  width: min(744px, calc(100% - 48px));
+  transform: translateX(-50%);
+  background: var(--mat-clearance);
+  border-left: 1px solid var(--mat-grid-major);
+  border-right: 1px solid var(--mat-grid-major);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 8%, #000 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 8%, #000 92%, transparent 100%);
+}
+
+/* Perimeter ruler ticks, numbers, and corner protractor guides */
+.mat-drafting {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: var(--mat-ruler);
+}
+
+/* Deep diagonal dappled sunlight & swaying studio foliage shadows (pure GPU transform, zero repaints) */
+.mat-light {
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(48% 34% at 14% 16%, var(--mat-shadow-dark) 0%, transparent 64%),
+    radial-gradient(42% 48% at 88% 18%, var(--mat-shadow-dark) 0%, transparent 62%),
+    radial-gradient(46% 36% at 74% 84%, var(--mat-shadow-dark) 0%, transparent 64%),
+    radial-gradient(36% 30% at 46% 38%, var(--mat-shadow-light) 0%, transparent 66%),
+    linear-gradient(
+      128deg,
+      var(--mat-shadow-dark) 0%,
+      transparent 22%,
+      var(--mat-shadow-light) 43%,
+      transparent 56%,
+      var(--mat-shadow-dark) 78%,
+      transparent 100%
+    );
+  opacity: 0.94;
+  transform-origin: 45% 40%;
+  will-change: transform;
+  animation: mat-shadow-sway-a 10.5s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
+}
+
+.mat-light::after {
+  content: "";
+  position: absolute;
+  inset: -4%;
+  background:
+    radial-gradient(32% 20% at 24% 68%, var(--mat-shadow-dark) 0%, transparent 64%),
+    radial-gradient(28% 22% at 68% 34%, var(--mat-shadow-dark) 0%, transparent 62%),
+    radial-gradient(26% 18% at 38% 22%, var(--mat-shadow-dark) 0%, transparent 60%),
+    radial-gradient(32% 24% at 62% 62%, var(--mat-shadow-light) 0%, transparent 68%);
+  opacity: 0.88;
+  transform-origin: 60% 55%;
+  will-change: transform;
+  animation: mat-shadow-sway-b 14.5s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
+}
+
+@keyframes mat-shadow-sway-a {
+  0% {
+    transform: translate3d(-4.4%, -2.8%, 0) rotate(-2.5deg) scale(1);
+  }
+  50% {
+    transform: translate3d(2.6%, 2.0%, 0) rotate(1.4deg) scale(1.045);
+  }
+  100% {
+    transform: translate3d(4.8%, -1.8%, 0) rotate(2.7deg) scale(1.02);
+  }
+}
+
+@keyframes mat-shadow-sway-b {
+  0% {
+    transform: translate3d(4.6%, 3.0%, 0) rotate(2.8deg) scale(1.025);
+  }
+  50% {
+    transform: translate3d(-2.8%, 1.2%, 0) rotate(-1.4deg) scale(1);
+  }
+  100% {
+    transform: translate3d(-5.0%, -3.2%, 0) rotate(-2.9deg) scale(1.05);
+  }
+}
+
+html.is-theme-switching .mat-light,
+html.is-theme-switching .mat-light::after {
+  animation-play-state: paused;
+}
+
+/* Fine tactile matte PVC rubber grain */
+.mat-grain {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+  mix-blend-mode: overlay;
+  opacity: 0.14;
+}
+
+/* Ensure page content sits cleanly above the fixed cutting mat stage */
+html[data-day="mat"] main,
+html[data-day="mat"] .foot {
+  position: relative;
+  z-index: 2;
+}
+
+/* Let every section breathe seamlessly over the continuous cutting mat */
+html[data-day="mat"] .letter,
+html[data-day="mat"] .photo-gallery-section,
+html[data-day="mat"] .trophy-section,
+html[data-day="mat"] .podcast-section,
+html[data-day="mat"] .connect,
+html[data-day="mat"] .foot {
+  background-color: transparent;
+}
+
+html[data-day="mat"] .letter::before,
+html[data-day="mat"] .letter::after {
+  display: none;
+}
+
+/* Harmonized Buttons, Pills, Cards & Overlays on Cutting Mat */
+html[data-day="mat"] .cta-pill,
+html[data-day="mat"] .btn-resume,
+html[data-day="mat"] .connect-pill,
+html[data-day="mat"] .directory-card,
+html[data-day="mat"] .watch-hud-pill,
+html[data-day="mat"] .viewer-bar,
+html[data-day="mat"] .pod-rail-btn,
+html[data-day="mat"] .icon-btn,
+html[data-day="mat"] .ride-badge,
+html[data-day="mat"] .trophy-pr-pill {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+html[data-day="mat"] .viewer-bar {
+  background: rgba(var(--bg-rgb), 0.90);
+  border-color: var(--line-strong);
+}
+
+html[data-day="mat"] .cta-btn,
+html[data-day="mat"] .btn-strava,
+html[data-day="mat"] .app-popover,
+html[data-day="mat"] .trophy-popover,
+html[data-day="mat"] .toast,
+html[data-day="mat"] .fan-item::after {
+  background: var(--ink);
+  color: var(--btn-ink, var(--bg));
+}
+
+html[data-day="mat"] .mini-photo {
+  background: var(--surface-solid, var(--surface));
+  border-color: var(--line-strong);
+}
+
+html[data-day="mat"] .inline-avatar {
+  border-color: var(--ink);
+}
+
+/* Contrast rings on status dots so they stay vivid on Green & Orange mats */
+html[data-day="mat"] .status-dot {
+  box-shadow: 0 0 0 2px rgba(var(--bg-rgb), 0.82), 0 0 0 3px var(--line-strong);
+}
+
+html[data-day="mat"] .status-dot--bike {
+  box-shadow: 0 0 0 2px rgba(var(--bg-rgb), 0.82), 0 0 0 3px var(--line-strong);
+}
+
+/* Seamless masked edges for horizontal Podcast Rail over Cutting Mat */
+html[data-day="mat"] .pod-rail-fade {
+  display: none;
+}
+
+html[data-day="mat"] .pod-rail {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    rgba(0, 0, 0, calc(1 - var(--fade-left, 0))) 0%,
+    #000 44px,
+    #000 calc(100% - 44px),
+    rgba(0, 0, 0, calc(1 - var(--fade-right, 0))) 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    rgba(0, 0, 0, calc(1 - var(--fade-left, 0))) 0%,
+    #000 44px,
+    #000 calc(100% - 44px),
+    rgba(0, 0, 0, calc(1 - var(--fade-right, 0))) 100%
+  );
+}
+
+html[data-day="mat"] .trophy-img {
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.32));
+}
+
+html[data-day="mat"] .trophy-img--square {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.34), 0 0 0 1px var(--line-strong);
+  filter: none;
+}
+
+html[data-day="mat"] .trophy-shelf-item.is-active .trophy-img:not(.trophy-img--square) {
+  filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.44));
+}
+
+html[data-day="mat"] .trophy-shelf-item.is-active .trophy-img--square {
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.44), 0 0 0 1px var(--ink);
+}
+
+html[data-day="mat"] .pod-rail-art {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.28);
+  border-color: var(--line-strong);
+}
+
+html[data-day="mat"] .foot-keys kbd {
+  background: var(--surface);
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+
+html[data-day="mat"] .directory-copy:hover {
+  background: var(--surface);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .mat-swatch:hover {
+    transform: scale(1.06);
+    box-shadow:
+      inset 0 0 0 1px rgba(0, 0, 0, 0.14),
+      0 6px 14px rgba(0, 0, 0, 0.18);
+  }
+
+  .mat-swatch[aria-pressed="true"]:hover {
+    box-shadow:
+      0 0 0 2px #EFEFEF,
+      0 0 0 4px #17150F,
+      0 6px 14px rgba(0, 0, 0, 0.22);
+  }
+
+  .mat-swatch:hover::before {
+    opacity: 0.56;
+  }
+
+  .theme-opt:hover {
+    color: var(--ink);
+  }
+
+  html[data-day="mat"] .theme-opt--mat:hover {
+    color: var(--btn-ink, var(--bg));
+  }
+}
+
+@media (max-width: 760px) {
+  .mat-ruler-nums,
+  .mat-protractor-labels {
+    display: none;
+  }
+
+  .mat-clearance {
+    top: 20px;
+    bottom: 20px;
+    width: calc(100% - 24px);
+  }
+}
+
+@media (max-width: 600px) {
+  .mat-picker {
+    right: -38px;
+    width: 208px;
+    padding: 13px 14px 15px;
+  }
+
+  .mat-picker::before {
+    right: 48px;
+  }
+}
+
+/* ==========================================================================
+   Desktop Left-Center Camera Lens Auto-Focus Scroll Dial
+   ========================================================================== */
+.lens-scroll {
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) and (min-width: 960px) {
+  .lens-scroll {
+    position: fixed;
+    left: clamp(18px, 2.6vw, 34px);
+    top: 50%;
+    z-index: 35;
+    transform: translate3d(-6px, -50%, 0);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: 12px 14px 12px 6px;
+    user-select: none;
+    -webkit-user-select: none;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      opacity 320ms var(--ease-out),
+      transform 340ms var(--ease-out);
+  }
+
+  /* Keep a quiet hover zone on desktop once scrollable so moving cursor near left-center wakes the dial */
+  .lens-scroll.is-ready {
+    pointer-events: auto;
+  }
+
+  .lens-scroll.is-ready.is-visible,
+  .lens-scroll.is-ready:hover,
+  .lens-scroll.is-ready:focus-within {
+    opacity: 1;
+    transform: translate3d(0, -50%, 0);
+    transition:
+      opacity 160ms var(--ease-out),
+      transform 240ms var(--spring-soft);
+  }
+
+  .lens-tick-btn {
+    display: flex;
+    align-items: center;
+    padding: 4.5px 6px 4.5px 2px;
+    cursor: pointer;
+  }
+
+  .lens-tick-btn:focus-visible {
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  .lens-tick-bar {
+    display: block;
+    width: 15px;
+    height: 3px;
+    border-radius: 1px;
+    background: var(--ink);
+    opacity: calc(0.18 + var(--focus, 0) * 0.66);
+    transform-origin: left center;
+    transform: scaleX(calc(1 + var(--focus, 0) * 0.2));
+    transition:
+      opacity 130ms var(--ease-out),
+      transform 220ms var(--spring-soft),
+      background-color 180ms var(--ease-out);
+  }
+
+  .lens-scroll.is-scrolling .lens-tick-bar {
+    transition-duration: 75ms, 120ms, 140ms;
+  }
+
+  .lens-tick-btn.is-locked .lens-tick-bar {
+    opacity: 0.96;
+    transform: scaleX(1.3);
+  }
+
+  .lens-tick-btn:hover .lens-tick-bar {
+    opacity: calc(0.45 + var(--focus, 0) * 0.55);
+    transform: scaleX(1.28);
+  }
+
+  html[data-day="mat"] .lens-tick-bar {
+    opacity: calc(0.24 + var(--focus, 0) * 0.72);
+  }
+}
+
+/* Hide browser scrollbar cleanly on mobile / touch devices */
+@media (max-width: 760px), (hover: none) {
+  html,
+  body {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+}
+
 /* Reduced Motion & Reduced Transparency */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -3745,10 +4595,10 @@ html[data-day="sun"] .pod-rail-art {
     will-change: auto;
   }
   .status-dot::after { animation: none; opacity: 0; }
-  .scroll-cue-arrow, .photo-toggle-arrow, .pod-mic-wave { animation: none !important; }
+  .scroll-cue-arrow, .photo-toggle-arrow, .pod-mic-wave, .mat-light, .mat-light::after { animation: none !important; will-change: auto; }
   .text-link, .caption-link, .foot-link, .connect-more, .trophy-strava-link, .foot-nav a, .app-popover-link { animation: none !important; }
   .trophy-glare::after { display: none; }
-  .mini-photo, .topbar-inner, .photo-toggle-arrow, .photo-toggle-label, .text-link, .caption-link, .foot-link, .connect-more, .trophy-strava-link, .foot-nav a, .app-popover-link, .trophy-glare, .fan-item, .swap-pill, .connect-pill, .watch-tile, .watch-hud-pill, .watch-reset-btn, .viewer-backdrop, .viewer-img, .viewer-bar, .inline-ico, .inline-avatar, .inline-company-ico, .inline-cluster img { transition-duration: 100ms !important; transition-delay: 0ms !important; }
+  .mini-photo, .topbar-inner, .photo-toggle-arrow, .photo-toggle-label, .text-link, .caption-link, .foot-link, .connect-more, .trophy-strava-link, .foot-nav a, .app-popover-link, .trophy-glare, .fan-item, .swap-pill, .connect-pill, .watch-tile, .watch-hud-pill, .watch-reset-btn, .viewer-backdrop, .viewer-img, .viewer-bar, .inline-ico, .inline-avatar, .inline-company-ico, .inline-cluster img, .mat-picker, .mat-swatch, .theme-thumb { transition-duration: 100ms !important; transition-delay: 0ms !important; }
   ::view-transition-group(*),
   ::view-transition-old(*),
   ::view-transition-new(*),
@@ -3761,5 +4611,20 @@ html[data-day="sun"] .pod-rail-art {
 @media (prefers-reduced-transparency: reduce) {
   .watch-blur-layer {
     display: none;
+  }
+
+  html[data-day="mat"] .cta-pill,
+  html[data-day="mat"] .btn-resume,
+  html[data-day="mat"] .connect-pill,
+  html[data-day="mat"] .directory-card,
+  html[data-day="mat"] .watch-hud-pill,
+  html[data-day="mat"] .viewer-bar,
+  html[data-day="mat"] .pod-rail-btn,
+  html[data-day="mat"] .icon-btn,
+  html[data-day="mat"] .ride-badge,
+  html[data-day="mat"] .trophy-pr-pill {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: var(--surface-solid, var(--bg));
   }
 }

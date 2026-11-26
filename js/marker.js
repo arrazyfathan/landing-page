@@ -17,6 +17,8 @@ function mulberry32(seed) {
 
 function getMarkerColor() {
   const root = document.documentElement;
+  const cssAccent = getComputedStyle(root).getPropertyValue('--accent').trim();
+  if (cssAccent) return cssAccent;
   const isCycling = root.getAttribute('data-profile') === 'cycling';
   const isDark = root.getAttribute('data-day') === 'sun';
   if (isCycling) {

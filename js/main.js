@@ -5,10 +5,12 @@ import {
   playHover,
   playPop,
   playSwitch,
-  playSuccess
-} from './sound.js?v=2';
-import { initMarkers, morphMarker, repaintAllMarkers } from './marker.js?v=11';
-import { initCyclingPhotos, syncCyclingPhotosTheme } from './photos.js?v=27';
+  playSuccess,
+  playFocusStep,
+  playFocusLock
+} from './sound.js?v=5';
+import { initMarkers, morphMarker, repaintAllMarkers } from './marker.js?v=12';
+import { initCyclingPhotos, syncCyclingPhotosTheme } from './photos.js?v=28';
 import { initTrophyCase } from './trophies.js?v=24';
 import { initRidePodcasts } from './podcasts.js?v=5';
 
@@ -166,37 +168,115 @@ if (photoToggle) {
   });
 }
 
-/* 4. Light ("Sat") / Dark ("Sun") Paper Theme Toggle */
+/* 4. Three-Way Theme Toggle: Light ("Sat") / Dark ("Sun") / Cutting Mat ("Mat") + 7-Color Picker */
+const themeControl = document.getElementById('theme-control');
 const dayToggle = document.getElementById('day-toggle');
+const matToggle = document.getElementById('mat-toggle');
+const matPicker = document.getElementById('mat-picker');
+const matPickerName = document.getElementById('mat-picker-name');
+const themeModeButtons = Array.from(document.querySelectorAll('[data-theme-mode]'));
+const matSwatches = Array.from(document.querySelectorAll('[data-mat-color]'));
 const themeMeta = document.querySelector('meta[name="theme-color"]');
 
+const MAT_THEMES = {
+  black:  { label: 'Obsidian Black', hex: '#121315' },
+  gray:   { label: 'Graphite Gray',  hex: '#5A5A5A' },
+  maroon: { label: 'Crimson Maroon', hex: '#4A0404' },
+  blue:   { label: 'Cobalt Blue',    hex: '#002F9E' },
+  orange: { label: 'Signal Orange',  hex: '#FF3F0A' },
+  pink:   { label: 'Rose Pink',      hex: '#AD4679' },
+  green:  { label: 'Classic Green',  hex: '#095848' },
+};
+
+const THEME_ORDER = ['sat', 'sun', 'mat'];
+
+function getCurrentDay() {
+  const val = root.getAttribute('data-day');
+  return val === 'sun' || val === 'mat' ? val : 'sat';
+}
+
+function getCurrentMat() {
+  const val = root.getAttribute('data-mat');
+  return Object.prototype.hasOwnProperty.call(MAT_THEMES, val) ? val : 'green';
+}
+
 function syncDayUI() {
-  const isSun = root.getAttribute('data-day') === 'sun';
-  if (dayToggle) dayToggle.setAttribute('aria-checked', String(isSun));
-  if (themeMeta) themeMeta.setAttribute('content', isSun ? '#14120E' : '#FBFAF7');
+  const day = getCurrentDay();
+  const mat = getCurrentMat();
+  const matMeta = MAT_THEMES[mat];
+
+  themeModeButtons.forEach((btn) => {
+    const isSelected = btn.getAttribute('data-theme-mode') === day;
+    btn.setAttribute('aria-checked', String(isSelected));
+  });
+
+  matSwatches.forEach((btn) => {
+    const isSelected = btn.getAttribute('data-mat-color') === mat;
+    btn.setAttribute('aria-pressed', String(isSelected));
+  });
+
+  if (matPickerName) {
+    matPickerName.textContent = matMeta.label;
+  }
+
+  if (themeMeta) {
+    const color = day === 'mat' ? matMeta.hex : day === 'sun' ? '#14120E' : '#FBFAF7';
+    themeMeta.setAttribute('content', color);
+  }
 }
 
 let activeThemeTransition = null;
+let matPickerOpen = false;
+let matPickerCloseTimer = null;
+let syncHeroOpacityForTheme = null;
 
-function applyDayTheme(next) {
-  root.setAttribute('data-day', next);
+function openMatPicker() {
+  if (!matPicker) return;
+  clearTimeout(matPickerCloseTimer);
+  matPickerOpen = true;
+  matPicker.hidden = false;
+  if (matToggle) matToggle.setAttribute('aria-expanded', 'true');
+  requestAnimationFrame(() => {
+    if (matPickerOpen) matPicker.classList.add('is-open');
+  });
+}
+
+function closeMatPicker({ immediate = false } = {}) {
+  if (!matPicker || (!matPickerOpen && matPicker.hidden)) return;
+  clearTimeout(matPickerCloseTimer);
+  matPickerOpen = false;
+  matPicker.classList.remove('is-open');
+  if (matToggle) matToggle.setAttribute('aria-expanded', 'false');
+  if (immediate) {
+    matPicker.hidden = true;
+  } else {
+    matPickerCloseTimer = setTimeout(() => {
+      if (!matPickerOpen) matPicker.hidden = true;
+    }, 190);
+  }
+}
+
+function commitThemeState(nextDay, nextMat) {
+  root.setAttribute('data-day', nextDay);
+  root.setAttribute('data-mat', nextMat);
   try {
-    sessionStorage.setItem('arrazy-day', next);
+    sessionStorage.setItem('arrazy-day', nextDay);
+    sessionStorage.setItem('arrazy-mat', nextMat);
   } catch (_) {}
   syncDayUI();
   repaintAllMarkers();
   syncCyclingPhotosTheme();
+  if (typeof syncHeroOpacityForTheme === 'function') {
+    syncHeroOpacityForTheme();
+  }
 }
 
-function toggleDay() {
-  const next = root.getAttribute('data-day') === 'sun' ? 'sat' : 'sun';
-  playClick();
-
+function runThemeTransition(nextDay, nextMat) {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const canViewTransition = typeof document.startViewTransition === 'function' && !reducedMotion;
 
   if (!canViewTransition) {
-    applyDayTheme(next);
+    commitThemeState(nextDay, nextMat);
     return;
   }
 
@@ -210,7 +290,7 @@ function toggleDay() {
   root.classList.add('is-theme-switching');
 
   const vt = document.startViewTransition(() => {
-    applyDayTheme(next);
+    commitThemeState(nextDay, nextMat);
   });
   activeThemeTransition = vt;
 
@@ -222,9 +302,96 @@ function toggleDay() {
   });
 }
 
-if (dayToggle) {
-  dayToggle.addEventListener('click', toggleDay);
+function selectThemeMode(nextDay, { openPickerForMat = true } = {}) {
+  const currentDay = getCurrentDay();
+  const currentMat = getCurrentMat();
+
+  if (nextDay === 'mat') {
+    if (currentDay === 'mat') {
+      playClick();
+      if (matPickerOpen) closeMatPicker();
+      else openMatPicker();
+      return;
+    }
+    playClick();
+    runThemeTransition('mat', currentMat);
+    if (openPickerForMat) openMatPicker();
+    return;
+  }
+
+  closeMatPicker({ immediate: true });
+  if (currentDay === nextDay) return;
+  playClick();
+  runThemeTransition(nextDay, currentMat);
 }
+
+function selectMatColor(nextMat) {
+  if (!Object.prototype.hasOwnProperty.call(MAT_THEMES, nextMat)) return;
+  const currentDay = getCurrentDay();
+  const currentMat = getCurrentMat();
+  if (currentDay === 'mat' && currentMat === nextMat) {
+    playPop(1.06);
+    return;
+  }
+  playPop(1.0 + Object.keys(MAT_THEMES).indexOf(nextMat) * 0.035);
+  runThemeTransition('mat', nextMat);
+}
+
+function toggleDay() {
+  const idx = THEME_ORDER.indexOf(getCurrentDay());
+  const next = THEME_ORDER[(idx + 1) % THEME_ORDER.length];
+  selectThemeMode(next, { openPickerForMat: next === 'mat' });
+}
+
+themeModeButtons.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const mode = btn.getAttribute('data-theme-mode');
+    if (mode) selectThemeMode(mode, { openPickerForMat: true });
+  });
+});
+
+matSwatches.forEach((btn, idx) => {
+  const color = btn.getAttribute('data-mat-color');
+  const label = btn.getAttribute('data-mat-label') || '';
+
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (color) selectMatColor(color);
+  });
+
+  btn.addEventListener('pointerenter', (e) => {
+    if (e.pointerType === 'touch') return;
+    playHover(0.95 + idx * 0.04);
+    if (matPickerName && label) matPickerName.textContent = label;
+  });
+
+  btn.addEventListener('pointerleave', () => {
+    if (matPickerName) matPickerName.textContent = MAT_THEMES[getCurrentMat()].label;
+  });
+
+  btn.addEventListener('focus', () => {
+    if (matPickerName && label) matPickerName.textContent = label;
+  });
+
+  btn.addEventListener('blur', () => {
+    if (matPickerName) matPickerName.textContent = MAT_THEMES[getCurrentMat()].label;
+  });
+});
+
+document.addEventListener('pointerdown', (e) => {
+  if (!matPickerOpen || !themeControl) return;
+  if (!themeControl.contains(e.target)) {
+    closeMatPicker();
+  }
+});
+
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && matPickerOpen) {
+    closeMatPicker();
+    if (matToggle) matToggle.focus();
+  }
+});
+
 syncDayUI();
 
 /* 5. Sound Toggle */
@@ -666,9 +833,12 @@ function initHeroScrollShrink() {
     }
 
     // Pure GPU-composited shrink & fade (no filter: blur, no layout reads)
+    // In Cutting Mat mode, fade hero slightly earlier so transparent .letter never crosses hero text
+    const isMat = root.getAttribute('data-day') === 'mat';
     const scale = 1 - raw * 0.24;               // 1.00 -> 0.76
     const translateY = -raw * 22;               // 0 -> -22px gentle recess
-    const fade = raw * raw * 0.35 + raw * 0.65; // smooth ease-in-out fade
+    const fadeRaw = isMat ? Math.min(1, raw * 1.75) : raw;
+    const fade = fadeRaw * fadeRaw * 0.35 + fadeRaw * 0.65; // smooth ease-in-out fade
     const opacity = Math.max(0, 1 - fade * 1.04);
 
     inner.style.transform = `translate3d(0, ${translateY.toFixed(2)}px, 0) scale(${scale.toFixed(4)})`;
@@ -680,6 +850,11 @@ function initHeroScrollShrink() {
       rafId = requestAnimationFrame(applyHeroScroll);
     }
   }
+
+  syncHeroOpacityForTheme = () => {
+    lastRaw = -1;
+    applyHeroScroll();
+  };
 
   window.addEventListener('scroll', scheduleUpdate, { passive: true });
   window.addEventListener('resize', measureRange, { passive: true });
@@ -867,6 +1042,167 @@ function initIconHoverSounds() {
   });
 }
 
+/* 12. Desktop Left-Center Camera Lens Auto-Focus Scroll Dial + Focus Sound */
+function initLensScrollDial() {
+  const desktopMq = window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 960px)');
+  const TICK_COUNT = 8;
+
+  const nav = document.createElement('nav');
+  nav.className = 'lens-scroll';
+  nav.setAttribute('aria-label', 'Page scroll focus indicator');
+
+  const ticks = [];
+  for (let i = 0; i < TICK_COUNT; i++) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'lens-tick-btn';
+    const pct = Math.round((i / (TICK_COUNT - 1)) * 100);
+    btn.setAttribute('aria-label', `Scroll to ${pct}% of page`);
+
+    const bar = document.createElement('span');
+    bar.className = 'lens-tick-bar';
+    bar.setAttribute('aria-hidden', 'true');
+    btn.appendChild(bar);
+
+    btn.addEventListener('click', () => {
+      const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+      if (maxScroll <= 0) return;
+      const targetY = (i / (TICK_COUNT - 1)) * maxScroll;
+      playFocusStep(targetY >= window.scrollY ? 1 : -1, i);
+      window.scrollTo({
+        top: targetY,
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+      });
+    });
+
+    nav.appendChild(btn);
+    ticks.push(btn);
+  }
+
+  document.body.appendChild(nav);
+
+  let rafId = 0;
+  let lastSoundY = window.scrollY || 0;
+  let lastScrollY = window.scrollY || 0;
+  let lastScrollTime = 0;
+  let lockTimer = null;
+  let lockFlashTimer = null;
+  let hideTimer = null;
+  let isHoveringDial = false;
+  let movedBarrel = false;
+  let isInitialized = false;
+
+  const ROTATION_STEP_PX = 44; // fine mechanical detent spacing while scrolling
+
+  function revealDial() {
+    nav.classList.add('is-visible');
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => {
+      if (!isHoveringDial) {
+        nav.classList.remove('is-visible');
+      }
+    }, 1050);
+  }
+
+  nav.addEventListener('pointerenter', () => {
+    isHoveringDial = true;
+    clearTimeout(hideTimer);
+    nav.classList.add('is-visible');
+  });
+
+  nav.addEventListener('pointerleave', () => {
+    isHoveringDial = false;
+    revealDial();
+  });
+
+  function renderTicks(silent = false) {
+    rafId = 0;
+    if (!desktopMq.matches) {
+      nav.classList.remove('is-ready', 'is-visible');
+      return;
+    }
+
+    const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    if (maxScroll < 80) {
+      nav.classList.remove('is-ready', 'is-visible');
+      return;
+    }
+
+    nav.classList.add('is-ready');
+
+    const y = window.scrollY || 0;
+    const progress = Math.min(1, Math.max(0, y / maxScroll));
+    // Map scroll progress across the 8 ticks so ~3 adjacent ticks stay brightly "in focus"
+    const focusCenter = 1 + progress * (TICK_COUNT - 3);
+
+    for (let i = 0; i < TICK_COUNT; i++) {
+      const dist = Math.abs(i - focusCenter);
+      const focus = dist <= 1.05 ? 1 - dist * 0.14 : Math.max(0, 1 - (dist - 1.05) * 1.15) * 0.42;
+      ticks[i].style.setProperty('--focus', focus.toFixed(3));
+    }
+
+    if (!isInitialized) {
+      isInitialized = true;
+      lastSoundY = y;
+      lastScrollY = y;
+      lastScrollTime = performance.now();
+      return;
+    }
+
+    const dy = y - lastScrollY;
+    if (!silent && Math.abs(dy) > 0.5) {
+      const now = performance.now();
+      const dt = Math.max(8, now - lastScrollTime);
+      const speed = Math.min(1, Math.abs(dy) / (dt * 2.2));
+      const dir = dy >= 0 ? 1 : -1;
+
+      revealDial();
+      nav.classList.add('is-scrolling');
+
+      if (Math.abs(y - lastSoundY) >= ROTATION_STEP_PX) {
+        lastSoundY = y;
+        movedBarrel = true;
+        ticks.forEach((t) => t.classList.remove('is-locked'));
+        playFocusStep(dir, speed);
+      }
+
+      clearTimeout(lockTimer);
+      clearTimeout(lockFlashTimer);
+      lockTimer = setTimeout(() => {
+        nav.classList.remove('is-scrolling');
+        if (movedBarrel) {
+          movedBarrel = false;
+          playFocusLock();
+          const activeIdx = Math.min(TICK_COUNT - 1, Math.max(0, Math.round(focusCenter)));
+          ticks[activeIdx].classList.add('is-locked');
+          lockFlashTimer = setTimeout(() => {
+            ticks[activeIdx].classList.remove('is-locked');
+          }, 240);
+        }
+      }, 145);
+
+      lastScrollTime = now;
+    }
+
+    lastScrollY = y;
+  }
+
+  function scheduleRender(silent = false) {
+    if (!rafId) {
+      rafId = requestAnimationFrame(() => renderTicks(silent));
+    }
+  }
+
+  window.addEventListener('scroll', () => scheduleRender(false), { passive: true });
+  window.addEventListener('resize', () => scheduleRender(true), { passive: true });
+  if (desktopMq.addEventListener) {
+    desktopMq.addEventListener('change', () => scheduleRender(true));
+  }
+  // Re-evaluate once images/fonts settle total scrollHeight
+  window.addEventListener('load', () => scheduleRender(true), { once: true });
+  renderTicks(true);
+}
+
 /* Boot */
 setupScrollReveal();
 initMarkers();
@@ -876,3 +1212,4 @@ initRidePodcasts({ onReveal: observeRevealEl });
 initHeroScrollShrink();
 initInlineAppPopovers();
 initIconHoverSounds();
+initLensScrollDial();

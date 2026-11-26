@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-profile="work" data-day="sat">
+<html lang="en" data-profile="work" data-day="sat" data-mat="green">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -42,7 +42,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png" />
   <link rel="manifest" href="/site.webmanifest" />
   <link rel="prefetch" href="/cycling/" />
-  <link rel="stylesheet" href="/css/styles.css?v=54" />
+  <link rel="stylesheet" href="/css/styles.css?v=62" />
 
   <!-- Structured Data (JSON-LD: Person + WebSite) -->
   <script type="application/ld+json">
@@ -114,14 +114,82 @@
         var root = document.documentElement;
         root.classList.add('js');
         var sessionDay = sessionStorage.getItem('arrazy-day');
-        if (sessionDay === 'sun' || sessionDay === 'sat') {
+        if (sessionDay === 'sun' || sessionDay === 'sat' || sessionDay === 'mat') {
           root.setAttribute('data-day', sessionDay);
+        }
+        var sessionMat = sessionStorage.getItem('arrazy-mat');
+        if (/^(black|gray|maroon|blue|orange|pink|green)$/.test(sessionMat || '')) {
+          root.setAttribute('data-mat', sessionMat);
         }
       } catch (e) {}
     })();
   </script>
 </head>
 <body>
+  <!-- Architectural Cutting Mat Backdrop (visible when data-day="mat") -->
+  <div class="mat-stage" aria-hidden="true">
+    <div class="mat-grid"></div>
+    <div class="mat-clearance"></div>
+    <svg class="mat-drafting" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" fill="none">
+      <!-- Outer cutting mat frame -->
+      <rect x="44" y="44" width="1352" height="812" stroke="currentColor" stroke-width="1.2" opacity="0.58" />
+      <!-- Major edge ruler ticks (top & bottom) -->
+      <g stroke="currentColor" stroke-width="1" opacity="0.52">
+        <path d="M120 34v10M180 38v6M240 34v10M300 38v6M360 34v10M420 38v6M480 34v10M540 38v6M600 34v10M660 38v6M720 34v10M780 38v6M840 34v10M900 38v6M960 34v10M1020 38v6M1080 34v10M1140 38v6M1200 34v10M1260 38v6M1320 34v10" />
+        <path d="M120 856v10M180 856v6M240 856v10M300 856v6M360 856v10M420 856v6M480 856v10M540 856v6M600 856v10M660 856v6M720 856v10M780 856v6M840 856v10M900 856v6M960 856v10M1020 856v6M1080 856v10M1140 856v6M1200 856v10M1260 856v6M1320 856v10" />
+        <path d="M34 120h10M38 180h6M34 240h10M38 300h6M34 360h10M38 420h6M34 480h10M38 540h6M34 600h10M38 660h6M34 720h10M38 780h6" />
+        <path d="M1396 120h10M1396 180h6M1396 240h10M1396 300h6M1396 360h10M1396 420h6M1396 480h10M1396 540h6M1396 600h10M1396 660h6M1396 720h10M1396 780h6" />
+      </g>
+      <!-- Ruler numerals -->
+      <g class="mat-ruler-nums" fill="currentColor" font-family="var(--mono)" font-size="10.5" opacity="0.62" text-anchor="middle">
+        <text x="120" y="28">40</text>
+        <text x="240" y="28">35</text>
+        <text x="360" y="28">30</text>
+        <text x="480" y="28">25</text>
+        <text x="720" y="28">20</text>
+        <text x="960" y="28">15</text>
+        <text x="1080" y="28">10</text>
+        <text x="1200" y="28">5</text>
+        <text x="1320" y="28">0</text>
+        <text x="120" y="880">40</text>
+        <text x="240" y="880">35</text>
+        <text x="360" y="880">30</text>
+        <text x="480" y="880">25</text>
+        <text x="720" y="880">20</text>
+        <text x="960" y="880">15</text>
+        <text x="1080" y="880">10</text>
+        <text x="1200" y="880">5</text>
+        <text x="1320" y="880">0</text>
+        <text x="22" y="124">20</text>
+        <text x="22" y="364">15</text>
+        <text x="22" y="604">10</text>
+        <text x="22" y="724">5</text>
+        <text x="22" y="856">0</text>
+        <text x="1418" y="124">20</text>
+        <text x="1418" y="364">15</text>
+        <text x="1418" y="604">10</text>
+        <text x="1418" y="724">5</text>
+        <text x="1418" y="856">0</text>
+      </g>
+      <!-- Bottom-right protractor quarter-arc & dashed 15°/30°/45°/60° guides -->
+      <g class="mat-protractor" stroke="currentColor" opacity="0.46">
+        <path d="M 1396 296 A 560 560 0 0 0 836 856" stroke-width="1.05" />
+        <line x1="1396" y1="856" x2="1246" y2="296" stroke-width="1" stroke-dasharray="5 5" />
+        <line x1="1396" y1="856" x2="1072" y2="296" stroke-width="1" stroke-dasharray="5 5" />
+        <line x1="1396" y1="856" x2="836" y2="296" stroke-width="1" stroke-dasharray="5 5" />
+        <line x1="1396" y1="856" x2="836" y2="532" stroke-width="1" stroke-dasharray="5 5" />
+        <line x1="44" y1="44" x2="430" y2="266" stroke-width="1" stroke-dasharray="5 5" opacity="0.55" />
+      </g>
+      <g class="mat-protractor-labels" fill="currentColor" font-family="var(--mono)" font-size="10.5" opacity="0.62">
+        <text x="1312" y="622">15°</text>
+        <text x="1250" y="656">30°</text>
+        <text x="1192" y="696">45°</text>
+        <text x="1148" y="746">60°</text>
+      </g>
+    </svg>
+    <div class="mat-light"></div>
+    <div class="mat-grain"></div>
+  </div>
 
   <!-- Minimal Top Bar -->
   <header class="topbar" role="banner">
@@ -151,30 +219,85 @@
         </span>
       </a>
 
-      <!-- Minimal Right Controls (Theme Switch Toggle + Sound Icon Button) -->
+      <!-- Minimal Right Controls (3-Way Theme Toggle + Mat Color Pop-up + Sound Button) -->
       <div class="topbar-tools">
-        <button
-          type="button"
-          class="theme-switch"
-          id="day-toggle"
-          role="switch"
-          aria-checked="false"
-          aria-label="Toggle dark mode"
-          title="Toggle light / dark theme (D)"
-        >
-          <span class="theme-thumb" aria-hidden="true"></span>
-          <span class="theme-opt theme-opt--sun" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="4" />
-              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
-            </svg>
-          </span>
-          <span class="theme-opt theme-opt--moon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
-            </svg>
-          </span>
-        </button>
+        <div class="theme-control" id="theme-control">
+          <div
+            class="theme-switch"
+            id="day-toggle"
+            role="radiogroup"
+            aria-label="Color theme"
+          >
+            <span class="theme-thumb" aria-hidden="true"></span>
+            <button
+              type="button"
+              class="theme-opt theme-opt--sun"
+              role="radio"
+              aria-checked="true"
+              data-theme-mode="sat"
+              aria-label="Light theme"
+              title="Light theme (D)"
+            >
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="4" />
+                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              class="theme-opt theme-opt--moon"
+              role="radio"
+              aria-checked="false"
+              data-theme-mode="sun"
+              aria-label="Dark theme"
+              title="Dark theme (D)"
+            >
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              class="theme-opt theme-opt--mat"
+              id="mat-toggle"
+              role="radio"
+              aria-checked="false"
+              aria-haspopup="dialog"
+              aria-expanded="false"
+              aria-controls="mat-picker"
+              data-theme-mode="mat"
+              aria-label="Cutting mat theme"
+              title="Cutting mat theme &amp; colors (D)"
+            >
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="2.5" />
+                <path d="M9 3v18M15 3v18M3 9h18M3 15h18" />
+              </svg>
+            </button>
+          </div>
+
+          <div
+            class="mat-picker"
+            id="mat-picker"
+            role="dialog"
+            aria-label="Choose cutting mat color"
+            hidden
+          >
+            <div class="mat-picker-head">
+              <span class="mat-picker-title">CUTTING MAT</span>
+              <span class="mat-picker-name" id="mat-picker-name">Classic Green</span>
+            </div>
+            <div class="mat-swatch-grid" role="group" aria-label="Cutting mat colors">
+              <button type="button" class="mat-swatch" data-mat-color="black" data-mat-label="Obsidian Black" aria-label="Obsidian Black" aria-pressed="false" style="--swatch: #000000"></button>
+              <button type="button" class="mat-swatch" data-mat-color="gray" data-mat-label="Graphite Gray" aria-label="Graphite Gray" aria-pressed="false" style="--swatch: #5A5A5A"></button>
+              <button type="button" class="mat-swatch" data-mat-color="maroon" data-mat-label="Crimson Maroon" aria-label="Crimson Maroon" aria-pressed="false" style="--swatch: #3D0000"></button>
+              <button type="button" class="mat-swatch" data-mat-color="blue" data-mat-label="Cobalt Blue" aria-label="Cobalt Blue" aria-pressed="false" style="--swatch: #002F9E"></button>
+              <button type="button" class="mat-swatch" data-mat-color="orange" data-mat-label="Signal Orange" aria-label="Signal Orange" aria-pressed="false" style="--swatch: #FF3F0A"></button>
+              <button type="button" class="mat-swatch" data-mat-color="pink" data-mat-label="Rose Pink" aria-label="Rose Pink" aria-pressed="false" style="--swatch: #CA6395"></button>
+              <button type="button" class="mat-swatch mat-swatch--center" data-mat-color="green" data-mat-label="Classic Green" aria-label="Classic Green" aria-pressed="true" style="--swatch: #095848"></button>
+            </div>
+          </div>
+        </div>
 
         <button
           type="button"
@@ -472,6 +595,6 @@
   <!-- Subtle Copy Toast -->
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-  <script type="module" src="/js/main.js?v=42"></script>
+  <script type="module" src="/js/main.js?v=48"></script>
 </body>
 </html>
