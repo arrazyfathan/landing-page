@@ -244,6 +244,36 @@ img {
 button, a {
   font: inherit;
   color: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.photo-toggle,
+.theme-switch,
+.icon-btn,
+.fan-item,
+.swap-pill,
+.inline-ico,
+.inline-avatar,
+.inline-company-ico,
+.inline-cluster,
+.inline-app-btn,
+.trophy-shelf-item,
+.pod-rail-card,
+.pod-rail-btn,
+.connect-pill,
+.cta-btn,
+.btn-resume,
+.btn-strava,
+.directory-card,
+.directory-copy,
+.watch-pan-btn,
+.watch-reset-btn,
+.viewer-btn {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
 }
 
 button {
