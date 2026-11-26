@@ -10,7 +10,7 @@ import {
   playFocusLock
 } from './sound.js?v=5';
 import { initMarkers, morphMarker, repaintAllMarkers } from './marker.js?v=12';
-import { initCyclingPhotos, syncCyclingPhotosTheme } from './photos.js?v=28';
+import { initCyclingPhotos, syncCyclingPhotosTheme } from './photos.js?v=29';
 import { initTrophyCase } from './trophies.js?v=24';
 import { initRidePodcasts } from './podcasts.js?v=5';
 

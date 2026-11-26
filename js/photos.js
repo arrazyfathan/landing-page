@@ -1648,6 +1648,8 @@ function wireEvents() {
 
   document.addEventListener('pointerdown', (e) => {
     if (!isFreePan || !galleryEl) return;
+    if (isOpen || isClosing) return;
+    if (viewer && viewer.contains(e.target)) return;
     if (!galleryEl.contains(e.target)) {
       setFreePan(false, { silent: true });
     }
