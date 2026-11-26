@@ -1,8 +1,10 @@
 import { playPop, playHover } from './sound.js?v=6';
+import { trackEvent } from './analytics.js?v=1';
 
 const TILTS = [-3, 2.2, -2, 2.8, -1.6, 2.4, -1.8, 1.8, -2.6, 2.2];
 const KUDOS_ICON_SRC = '/assets/icons/cycling/kudos.svg?v=2';
 let activeKudosCount = 0;
+let trackedKudos = false;
 
 function prefersReducedMotion() {
   return Boolean(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -279,6 +281,10 @@ function renderShelf(container, trophies, popover, onReveal) {
       }, 700);
 
       playPop(1.0 + comboCount * 0.045);
+      if (!trackedKudos) {
+        trackedKudos = true;
+        trackEvent('trophy-kudos');
+      }
 
       const artRect = art.getBoundingClientRect();
       const hasPoint = e.clientX !== 0 || e.clientY !== 0;

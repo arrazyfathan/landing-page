@@ -1,4 +1,5 @@
 import { playClick, playHover, playPop } from './sound.js?v=6';
+import { trackEvent } from './analytics.js?v=1';
 
 function padRank(n) {
   return String(n).padStart(2, '0');
@@ -165,7 +166,10 @@ export async function initRidePodcasts({ onReveal } = {}) {
     });
 
     card.addEventListener('focus', () => setHovered(idx));
-    card.addEventListener('click', () => playPop(1.04));
+    card.addEventListener('click', () => {
+      playPop(1.04);
+      trackEvent('click-podcast', { name: item.name });
+    });
 
     cards.push(card);
     track.appendChild(card);

@@ -1,4 +1,5 @@
 import { playClick, playPop } from './sound.js?v=6';
+import { trackEvent } from './analytics.js?v=1';
 
 let photos = [];
 let tileStates = [];
@@ -1099,7 +1100,10 @@ function setFreePan(next, { silent = false } = {}) {
     panBtnEl.setAttribute('aria-pressed', String(isFreePan));
     panBtnEl.textContent = isFreePan ? 'Done' : '2D pan';
   }
-  if (!silent) playClick();
+  if (!silent) {
+    playClick();
+    if (isFreePan) trackEvent('photo-2d-pan');
+  }
 }
 
 function recenterGallery() {
@@ -1201,6 +1205,7 @@ function openLightbox(index) {
   viewer.hidden = false;
   setHiddenTile(activeIndex);
   playPop(1.02);
+  trackEvent('photo-lightbox-open');
 
   lbImg.style.width = `${toRect.width}px`;
   lbImg.style.height = `${toRect.height}px`;

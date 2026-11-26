@@ -10,9 +10,10 @@ import {
   playFocusLock
 } from './sound.js?v=6';
 import { initMarkers, morphMarker, repaintAllMarkers } from './marker.js?v=12';
-import { initCyclingPhotos, syncCyclingPhotosTheme } from './photos.js?v=30';
-import { initTrophyCase } from './trophies.js?v=25';
-import { initRidePodcasts } from './podcasts.js?v=6';
+import { initCyclingPhotos, syncCyclingPhotosTheme } from './photos.js?v=31';
+import { initTrophyCase } from './trophies.js?v=26';
+import { initRidePodcasts } from './podcasts.js?v=7';
+import { initAnalytics, trackEvent } from './analytics.js?v=1';
 
 const root = document.documentElement;
 const EMAIL = 'hello@arrazyfathan.com';
@@ -315,6 +316,7 @@ function selectThemeMode(nextDay, { openPickerForMat = true } = {}) {
     }
     playClick();
     runThemeTransition('mat', currentMat);
+    trackEvent('theme-mat');
     if (openPickerForMat) openMatPicker();
     return;
   }
@@ -323,6 +325,7 @@ function selectThemeMode(nextDay, { openPickerForMat = true } = {}) {
   if (currentDay === nextDay) return;
   playClick();
   runThemeTransition(nextDay, currentMat);
+  trackEvent(`theme-${nextDay}`);
 }
 
 function selectMatColor(nextMat) {
@@ -335,6 +338,7 @@ function selectMatColor(nextMat) {
   }
   playPop(1.0 + Object.keys(MAT_THEMES).indexOf(nextMat) * 0.035);
   runThemeTransition('mat', nextMat);
+  trackEvent('theme-mat-color');
 }
 
 function toggleDay() {
@@ -407,6 +411,7 @@ if (soundToggle) {
   soundToggle.addEventListener('click', () => {
     setSoundEnabled(!isSoundEnabled());
     syncSoundUI();
+    trackEvent(isSoundEnabled() ? 'sound-on' : 'sound-off');
   });
 }
 syncSoundUI();
@@ -522,6 +527,7 @@ document.querySelectorAll('.swap-pill').forEach((btn) => {
 
     if (manual) {
       totalSwaps += 1;
+      if (totalSwaps === 1) trackEvent('hero-swap');
       updateSwapHints();
       playPop(0.95 + idx * 0.08);
       resetAutoSwapTimer();
@@ -659,6 +665,7 @@ document.querySelectorAll('[data-copy-email]').forEach((btn) => {
     try {
       await navigator.clipboard.writeText(EMAIL);
       playSuccess();
+      trackEvent('copy-email');
       showToast(`Copied ${EMAIL}`);
       if (label) {
         label.textContent = 'Copied!';
@@ -885,7 +892,11 @@ function initInlineAppPopovers() {
       a.target = '_blank';
       a.rel = 'noopener noreferrer';
       a.className = 'app-popover-link';
+      a.setAttribute('data-track-ignore', '');
       a.textContent = name;
+      a.addEventListener('click', () => {
+        trackEvent('click-project', { name });
+      });
       const arrow = document.createElement('span');
       arrow.className = 'app-popover-arrow';
       arrow.setAttribute('aria-hidden', 'true');
@@ -978,6 +989,7 @@ function initInlineAppPopovers() {
 
       if (pinnedBtn === btn) {
         if (url) {
+          trackEvent('click-project', { name: btn.getAttribute('data-app-name') || '' });
           window.open(url, '_blank', 'noopener,noreferrer');
         }
         hideAll(true);
@@ -1204,6 +1216,7 @@ function initLensScrollDial() {
 }
 
 /* Boot */
+initAnalytics();
 setupScrollReveal();
 initMarkers();
 initCyclingPhotos();
