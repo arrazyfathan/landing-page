@@ -1,4 +1,4 @@
-import { playClick, playHover, playPop } from './sound.js?v=2';
+import { playClick, playHover, playPop } from './sound.js?v=6';
 
 function padRank(n) {
   return String(n).padStart(2, '0');

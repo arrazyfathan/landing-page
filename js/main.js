@@ -8,11 +8,11 @@ import {
   playSuccess,
   playFocusStep,
   playFocusLock
-} from './sound.js?v=5';
+} from './sound.js?v=6';
 import { initMarkers, morphMarker, repaintAllMarkers } from './marker.js?v=12';
-import { initCyclingPhotos, syncCyclingPhotosTheme } from './photos.js?v=29';
-import { initTrophyCase } from './trophies.js?v=24';
-import { initRidePodcasts } from './podcasts.js?v=5';
+import { initCyclingPhotos, syncCyclingPhotosTheme } from './photos.js?v=30';
+import { initTrophyCase } from './trophies.js?v=25';
+import { initRidePodcasts } from './podcasts.js?v=6';
 
 const root = document.documentElement;
 const EMAIL = 'hello@arrazyfathan.com';
