@@ -1,65 +1,65 @@
 [
   {
     "index": 1,
+    "label": "300th Activity Milestone",
+    "date": "Milestone",
+    "image": "/assets/trophies/milestone-300.webp?v=3",
+    "shape": "diecut"
+  },
+  {
+    "index": 2,
     "label": "November Ride 200K Challenge",
     "date": "Nov 2026",
     "image": "/assets/trophies/01-november-ride-200k-challenge.webp",
     "shape": "diecut"
   },
   {
-    "index": 2,
+    "index": 3,
     "label": "November Ten Days Active Challenge",
     "date": "Nov 2026",
     "image": "/assets/trophies/02-november-ten-days-active-challenge.webp",
     "shape": "diecut"
   },
   {
-    "index": 3,
+    "index": 4,
     "label": "November 5K Challenge",
     "date": "Nov 2026",
     "image": "/assets/trophies/03-november-5k-challenge.webp",
     "shape": "diecut"
   },
   {
-    "index": 4,
+    "index": 5,
     "label": "November 400-minute x Runna Challenge",
     "date": "Nov 2026",
     "image": "/assets/trophies/04-november-400-minute-x-runna-challenge.webp",
     "shape": "diecut"
   },
   {
-    "index": 5,
+    "index": 6,
     "label": "October Ten Days Active Challenge",
     "date": "Oct 2026",
     "image": "/assets/trophies/05-october-ten-days-active-challenge.webp",
     "shape": "diecut"
   },
   {
-    "index": 6,
+    "index": 7,
     "label": "October Ride 200K Challenge",
     "date": "Oct 2026",
     "image": "/assets/trophies/06-october-ride-200k-challenge.webp",
     "shape": "diecut"
   },
   {
-    "index": 7,
+    "index": 8,
     "label": "The MAAP MIND:SET Challenge",
     "date": "Oct 2026",
     "image": "/assets/trophies/07-the-maap-mind-set-challenge.webp",
     "shape": "square"
   },
   {
-    "index": 8,
+    "index": 9,
     "label": "September Ride 200K Challenge",
     "date": "Sep 2026",
     "image": "/assets/trophies/08-september-ride-200k-challenge.webp",
-    "shape": "diecut"
-  },
-  {
-    "index": 9,
-    "label": "Runna September Ten Days Active Challenge",
-    "date": "Sep 2026",
-    "image": "/assets/trophies/09-runna-september-ten-days-active-challenge.webp",
     "shape": "diecut"
   },
   {

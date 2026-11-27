@@ -10,9 +10,9 @@ import {
   playFocusLock
 } from './sound.js?v=6';
 import { initMarkers, morphMarker, repaintAllMarkers } from './marker.js?v=12';
-import { initCyclingPhotos, syncCyclingPhotosTheme } from './photos.js?v=31';
+import { initCyclingPhotos, syncCyclingPhotosTheme } from './photos.js?v=33';
 import { initTrophyCase } from './trophies.js?v=26';
-import { initRidePodcasts } from './podcasts.js?v=7';
+import { initRidePodcasts } from './podcasts.js?v=8';
 import { initAnalytics, trackEvent } from './analytics.js?v=1';
 
 const root = document.documentElement;
@@ -180,13 +180,15 @@ const matSwatches = Array.from(document.querySelectorAll('[data-mat-color]'));
 const themeMeta = document.querySelector('meta[name="theme-color"]');
 
 const MAT_THEMES = {
-  black:  { label: 'Obsidian Black', hex: '#121315' },
-  gray:   { label: 'Graphite Gray',  hex: '#5A5A5A' },
-  maroon: { label: 'Crimson Maroon', hex: '#4A0404' },
-  blue:   { label: 'Cobalt Blue',    hex: '#002F9E' },
-  orange: { label: 'Signal Orange',  hex: '#FF3F0A' },
-  pink:   { label: 'Rose Pink',      hex: '#AD4679' },
-  green:  { label: 'Classic Green',  hex: '#095848' },
+  black:    { label: 'Obsidian Black', hex: '#121315' },
+  gray:     { label: 'Graphite Gray',  hex: '#5A5A5A' },
+  maroon:   { label: 'Crimson Maroon', hex: '#4A0404' },
+  blue:     { label: 'Cobalt Blue',    hex: '#002F9E' },
+  orange:   { label: 'Signal Orange',  hex: '#FF3F0A' },
+  pink:     { label: 'Rose Pink',      hex: '#AD4679' },
+  green:    { label: 'Classic Green',  hex: '#095848' },
+  sand:     { label: 'Kraft Sand',     hex: '#D8CCB6' },
+  espresso: { label: 'Espresso',       hex: '#362117' },
 };
 
 const THEME_ORDER = ['sat', 'sun', 'mat'];
@@ -228,12 +230,26 @@ function syncDayUI() {
 
 let activeThemeTransition = null;
 let matPickerOpen = false;
+let matPickerPinned = false;
 let matPickerCloseTimer = null;
+let matHoverOpenTimer = null;
+let matHoverLeaveTimer = null;
+let matSuppressHoverUntilLeave = false;
 let syncHeroOpacityForTheme = null;
 
-function openMatPicker() {
+function clearMatHoverTimers() {
+  clearTimeout(matHoverOpenTimer);
+  clearTimeout(matHoverLeaveTimer);
+  matHoverOpenTimer = null;
+  matHoverLeaveTimer = null;
+}
+
+function openMatPicker({ pinned = true } = {}) {
   if (!matPicker) return;
   clearTimeout(matPickerCloseTimer);
+  clearMatHoverTimers();
+  if (pinned) matPickerPinned = true;
+  if (matPickerOpen) return;
   matPickerOpen = true;
   matPicker.hidden = false;
   if (matToggle) matToggle.setAttribute('aria-expanded', 'true');
@@ -243,6 +259,8 @@ function openMatPicker() {
 }
 
 function closeMatPicker({ immediate = false } = {}) {
+  clearMatHoverTimers();
+  matPickerPinned = false;
   if (!matPicker || (!matPickerOpen && matPicker.hidden)) return;
   clearTimeout(matPickerCloseTimer);
   matPickerOpen = false;
@@ -255,6 +273,17 @@ function closeMatPicker({ immediate = false } = {}) {
       if (!matPickerOpen) matPicker.hidden = true;
     }, 190);
   }
+}
+
+function scheduleMatHoverClose() {
+  clearTimeout(matHoverOpenTimer);
+  if (!matPickerOpen || matPickerPinned) return;
+  clearTimeout(matHoverLeaveTimer);
+  matHoverLeaveTimer = setTimeout(() => {
+    if (matPickerOpen && !matPickerPinned) {
+      closeMatPicker();
+    }
+  }, 240);
 }
 
 function commitThemeState(nextDay, nextMat) {
@@ -310,17 +339,22 @@ function selectThemeMode(nextDay, { openPickerForMat = true } = {}) {
   if (nextDay === 'mat') {
     if (currentDay === 'mat') {
       playClick();
-      if (matPickerOpen) closeMatPicker();
-      else openMatPicker();
+      if (matPickerOpen && matPickerPinned) {
+        matSuppressHoverUntilLeave = true;
+        closeMatPicker();
+      } else {
+        openMatPicker({ pinned: true });
+      }
       return;
     }
     playClick();
     runThemeTransition('mat', currentMat);
     trackEvent('theme-mat');
-    if (openPickerForMat) openMatPicker();
+    if (openPickerForMat) openMatPicker({ pinned: true });
     return;
   }
 
+  matSuppressHoverUntilLeave = false;
   closeMatPicker({ immediate: true });
   if (currentDay === nextDay) return;
   playClick();
@@ -353,6 +387,37 @@ themeModeButtons.forEach((btn) => {
     if (mode) selectThemeMode(mode, { openPickerForMat: true });
   });
 });
+
+/* Desktop hover-to-peek when Cutting Mat is already active (click still pins it open) */
+if (matToggle && matPicker) {
+  matToggle.addEventListener('pointerenter', (e) => {
+    if (e.pointerType === 'touch') return;
+    clearTimeout(matHoverLeaveTimer);
+    if (getCurrentDay() !== 'mat' || matPickerOpen || matSuppressHoverUntilLeave) return;
+    clearTimeout(matHoverOpenTimer);
+    matHoverOpenTimer = setTimeout(() => {
+      if (getCurrentDay() === 'mat' && !matPickerOpen) {
+        openMatPicker({ pinned: false });
+      }
+    }, 160);
+  });
+
+  matToggle.addEventListener('pointerleave', (e) => {
+    if (e.pointerType === 'touch') return;
+    matSuppressHoverUntilLeave = false;
+    scheduleMatHoverClose();
+  });
+
+  matPicker.addEventListener('pointerenter', (e) => {
+    if (e.pointerType === 'touch') return;
+    clearTimeout(matHoverLeaveTimer);
+  });
+
+  matPicker.addEventListener('pointerleave', (e) => {
+    if (e.pointerType === 'touch') return;
+    scheduleMatHoverClose();
+  });
+}
 
 matSwatches.forEach((btn, idx) => {
   const color = btn.getAttribute('data-mat-color');

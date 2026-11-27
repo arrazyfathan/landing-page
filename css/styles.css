@@ -456,6 +456,67 @@ html[data-day="mat"][data-mat="pink"] {
   --wave-popover: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='%233B0F26' stroke-width='1.6'/%3E%3C/svg%3E");
 }
 
+/* 7. Kraft Sand (#D6C9B2) — Architectural vellum / studio drafting board */
+html[data-day="mat"][data-mat="sand"] {
+  --bg: #D8CCB6;
+  --bg-rgb: 216, 204, 182;
+  --surface: rgba(28, 22, 14, 0.075);
+  --surface-solid: #CCC0A8;
+  --sunken: rgba(28, 22, 14, 0.12);
+  --ink: #1D1710;
+  --ink-2: #2F261C;
+  --muted: #473B2D;
+  --quiet: #615240;
+  --btn-ink: #FAF5EB;
+  --line: rgba(28, 22, 14, 0.17);
+  --line-strong: rgba(28, 22, 14, 0.34);
+  --mat-swatch: #D6C9B2;
+  --mat-grid-minor: rgba(28, 22, 14, 0.11);
+  --mat-grid-major: rgba(28, 22, 14, 0.28);
+  --mat-ruler: rgba(28, 22, 14, 0.62);
+  --mat-clearance: rgba(216, 204, 182, 0.34);
+  --mat-shadow-dark: rgba(62, 46, 24, 0.30);
+  --mat-shadow-light: rgba(255, 252, 244, 0.36);
+  --accent: #084CB3;
+  --accent-ink: #FFFFFF;
+  --arrow: #084CB3;
+  --wave-rest: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='rgba(29,23,16,0.34)' stroke-width='1.55'/%3E%3C/svg%3E");
+  --wave-accent: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='%23084CB3' stroke-width='1.9'/%3E%3C/svg%3E");
+  --wave-popover: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='%23FAF5EB' stroke-width='1.6'/%3E%3C/svg%3E");
+  --shadow-sm: 0 2px 8px rgba(42, 32, 18, 0.11);
+  --shadow-pill: 0 4px 16px rgba(42, 32, 18, 0.14);
+  --shadow-photo: 0 3px 10px rgba(42, 32, 18, 0.18);
+}
+
+/* 8. Espresso (#3A241A) — Roasted walnut / leather desk-mat */
+html[data-day="mat"][data-mat="espresso"] {
+  --bg: #362117;
+  --bg-rgb: 54, 33, 23;
+  --surface: rgba(255, 238, 220, 0.10);
+  --surface-solid: #482E21;
+  --sunken: rgba(18, 8, 4, 0.38);
+  --ink: #FDF6EE;
+  --ink-2: #EFE0D1;
+  --muted: #D6BEA8;
+  --quiet: #B5987E;
+  --btn-ink: #2A170F;
+  --line: rgba(255, 234, 212, 0.18);
+  --line-strong: rgba(255, 234, 212, 0.35);
+  --mat-swatch: #3A241A;
+  --mat-grid-minor: rgba(255, 232, 208, 0.11);
+  --mat-grid-major: rgba(255, 236, 214, 0.30);
+  --mat-ruler: rgba(255, 238, 218, 0.66);
+  --mat-clearance: rgba(42, 24, 16, 0.36);
+  --mat-shadow-dark: rgba(12, 4, 0, 0.72);
+  --mat-shadow-light: rgba(255, 204, 158, 0.20);
+  --accent: #F6B97E;
+  --accent-ink: #29150B;
+  --arrow: #F6B97E;
+  --wave-rest: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='rgba(253,246,238,0.36)' stroke-width='1.55'/%3E%3C/svg%3E");
+  --wave-accent: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='%23F6B97E' stroke-width='1.9'/%3E%3C/svg%3E");
+  --wave-popover: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='%232A170F' stroke-width='1.6'/%3E%3C/svg%3E");
+}
+
 /* Cycling Mode Accent Harmonization on Cutting Mat */
 html[data-profile="cycling"][data-day="mat"] {
   --accent: #FFD84D;
@@ -469,6 +530,13 @@ html[data-profile="cycling"][data-day="mat"][data-mat="orange"] {
   --accent-ink: #150A05;
   --arrow: #150A05;
   --wave-accent: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='%23150A05' stroke-width='1.9'/%3E%3C/svg%3E");
+}
+
+html[data-profile="cycling"][data-day="mat"][data-mat="sand"] {
+  --accent: #F2B705;
+  --accent-ink: #1D1710;
+  --arrow: #1D1710;
+  --wave-accent: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M-8 3Q-4 5.3 0 3T8 3T16 3T24 3' fill='none' stroke='%231D1710' stroke-width='1.9'/%3E%3C/svg%3E");
 }
 
 @keyframes wave-flow {
@@ -936,6 +1004,37 @@ html[data-day="mat"] .theme-opt--mat {
   color: var(--btn-ink, var(--bg));
 }
 
+/* Active cutting-mat color cue dot (signals clickable color palette) */
+.theme-opt--mat::after {
+  content: "";
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--mat-swatch, #095848);
+  box-shadow:
+    0 0 0 1.5px var(--ink),
+    0 1px 2px rgba(0, 0, 0, 0.28);
+  opacity: 0;
+  transform: scale(0.4);
+  pointer-events: none;
+  transition:
+    opacity 180ms var(--ease-out),
+    transform 260ms var(--spring),
+    background-color 200ms var(--ease-out);
+}
+
+html[data-day="mat"] .theme-opt--mat::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+html[data-day="mat"] .theme-opt--mat[aria-expanded="true"]::after {
+  transform: scale(1.18);
+}
+
 /* Cutting Mat Color Picker Pop-up (modeled on cutting-mat/Colors.png) */
 .mat-picker {
   position: absolute;
@@ -958,6 +1057,16 @@ html[data-day="mat"] .theme-opt--mat {
   transition:
     opacity 180ms var(--ease-out),
     transform 300ms var(--spring-soft);
+}
+
+/* Invisible hover bridge spanning the gap between toggle button and picker */
+.mat-picker::after {
+  content: "";
+  position: absolute;
+  top: -14px;
+  left: 0;
+  right: 0;
+  height: 14px;
 }
 
 .mat-picker[hidden] {
@@ -1041,10 +1150,6 @@ html[data-day="mat"] .theme-opt--mat {
   transition: transform 240ms var(--spring), box-shadow 180ms var(--ease-out);
 }
 
-.mat-swatch--center {
-  grid-column: 2;
-}
-
 /* Subtle engraved cutting-mat crosshatch inside each swatch */
 .mat-swatch::before {
   content: "";
@@ -1060,10 +1165,11 @@ html[data-day="mat"] .theme-opt--mat {
   pointer-events: none;
 }
 
-.mat-swatch[data-mat-color="orange"]::before {
+.mat-swatch[data-mat-color="orange"]::before,
+.mat-swatch[data-mat-color="sand"]::before {
   background-image:
-    linear-gradient(to right, rgba(20, 10, 5, 0.28) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(20, 10, 5, 0.28) 1px, transparent 1px);
+    linear-gradient(to right, rgba(20, 14, 5, 0.28) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(20, 14, 5, 0.28) 1px, transparent 1px);
 }
 
 .mat-swatch[data-mat-color="green"]::before {
@@ -1086,7 +1192,8 @@ html[data-day="mat"] .theme-opt--mat {
   transition: opacity 160ms var(--ease-out), transform 260ms var(--spring);
 }
 
-.mat-swatch[data-mat-color="orange"]::after {
+.mat-swatch[data-mat-color="orange"]::after,
+.mat-swatch[data-mat-color="sand"]::after {
   background: #150A05;
 }
 

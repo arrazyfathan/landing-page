@@ -420,7 +420,7 @@ function readTheme() {
 
   if (day === 'mat') {
     const cs = getComputedStyle(rootEl);
-    const isLightInk = mat !== 'orange';
+    const isLightInk = mat !== 'orange' && mat !== 'sand';
     theme = {
       key: `mat-${mat}`,
       isDark: isLightInk,

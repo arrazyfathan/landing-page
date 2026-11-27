@@ -42,7 +42,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png" />
   <link rel="manifest" href="/site.webmanifest" />
   <link rel="prefetch" href="/cycling/" />
-  <link rel="stylesheet" href="/css/styles.css?v=62" />
+  <link rel="stylesheet" href="/css/styles.css?v=65" />
 
   <!-- Structured Data (JSON-LD: Person + WebSite) -->
   <script type="application/ld+json">
@@ -118,7 +118,7 @@
           root.setAttribute('data-day', sessionDay);
         }
         var sessionMat = sessionStorage.getItem('arrazy-mat');
-        if (/^(black|gray|maroon|blue|orange|pink|green)$/.test(sessionMat || '')) {
+        if (/^(black|gray|maroon|blue|orange|pink|green|sand|espresso)$/.test(sessionMat || '')) {
           root.setAttribute('data-mat', sessionMat);
         }
       } catch (e) {}
@@ -301,7 +301,9 @@
               <button type="button" class="mat-swatch" data-mat-color="blue" data-mat-label="Cobalt Blue" aria-label="Cobalt Blue" aria-pressed="false" style="--swatch: #002F9E"></button>
               <button type="button" class="mat-swatch" data-mat-color="orange" data-mat-label="Signal Orange" aria-label="Signal Orange" aria-pressed="false" style="--swatch: #FF3F0A"></button>
               <button type="button" class="mat-swatch" data-mat-color="pink" data-mat-label="Rose Pink" aria-label="Rose Pink" aria-pressed="false" style="--swatch: #CA6395"></button>
-              <button type="button" class="mat-swatch mat-swatch--center" data-mat-color="green" data-mat-label="Classic Green" aria-label="Classic Green" aria-pressed="true" style="--swatch: #095848"></button>
+              <button type="button" class="mat-swatch" data-mat-color="green" data-mat-label="Classic Green" aria-label="Classic Green" aria-pressed="true" style="--swatch: #095848"></button>
+              <button type="button" class="mat-swatch" data-mat-color="sand" data-mat-label="Kraft Sand" aria-label="Kraft Sand" aria-pressed="false" style="--swatch: #D6C9B2"></button>
+              <button type="button" class="mat-swatch" data-mat-color="espresso" data-mat-label="Espresso" aria-label="Espresso" aria-pressed="false" style="--swatch: #3A241A"></button>
             </div>
           </div>
         </div>
@@ -602,6 +604,6 @@
   <!-- Subtle Copy Toast -->
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-  <script type="module" src="/js/main.js?v=51"></script>
+  <script type="module" src="/js/main.js?v=55"></script>
 </body>
 </html>

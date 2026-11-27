@@ -1,8 +1,14 @@
 import { playClick, playHover, playPop } from './sound.js?v=6';
 import { trackEvent } from './analytics.js?v=1';
 
-function padRank(n) {
-  return String(n).padStart(2, '0');
+/** Unbiased Fisher-Yates shuffle so every page load refreshes the podcast order */
+function shuffleItems(list) {
+  const arr = list.slice();
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
 }
 
 /** Studio Podcast Condenser Mic + Radiating Broadcast Signal Arcs */
@@ -60,6 +66,7 @@ export async function initRidePodcasts({ onReveal } = {}) {
   } catch (_) {}
 
   if (!Array.isArray(items) || !items.length) return;
+  items = shuffleItems(items);
 
   const wrap = document.createElement('div');
   wrap.className = 'pod-rail-wrap';
@@ -95,7 +102,7 @@ export async function initRidePodcasts({ onReveal } = {}) {
     card.rel = 'noopener noreferrer';
     card.className = 'pod-rail-card';
     card.setAttribute('role', 'listitem');
-    card.setAttribute('aria-label', `#${item.index} ${item.name} by ${item.publisher} — open on Spotify`);
+    card.setAttribute('aria-label', `${item.name} by ${item.publisher} — open on Spotify`);
 
     const artStage = document.createElement('span');
     artStage.className = 'pod-rail-stage';
@@ -131,10 +138,6 @@ export async function initRidePodcasts({ onReveal } = {}) {
     sheen.className = 'pod-sleeve-sheen';
     sheen.setAttribute('aria-hidden', 'true');
 
-    const rank = document.createElement('span');
-    rank.className = 'pod-rail-rank';
-    rank.textContent = `#${padRank(item.index)}`;
-
     const playBadge = document.createElement('span');
     playBadge.className = 'pod-rail-play';
     playBadge.setAttribute('aria-hidden', 'true');
@@ -146,7 +149,7 @@ export async function initRidePodcasts({ onReveal } = {}) {
     spotifyImg.decoding = 'async';
     playBadge.appendChild(spotifyImg);
 
-    art.append(img, sheen, rank, playBadge);
+    art.append(img, sheen, playBadge);
     artStage.append(disc, art);
 
     const title = document.createElement('strong');
